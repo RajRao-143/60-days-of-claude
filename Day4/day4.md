@@ -10,6 +10,8 @@ For Day 4 of the ABTalks 60 Days Claude Challenge, I explored:
 - Creating a structured 12-month roadmap for becoming an AI Engineer
 - Reviewing AI-generated recommendations and identifying key skill gaps
 
+---
+
 ## 🧩 Part 1 – Exploring Capsule Hub
 
 I installed and explored Capsule Hub by Tilantra to understand how reusable AI prompts and conversation context can be organized.
@@ -26,7 +28,9 @@ I installed and explored Capsule Hub by Tilantra to understand how reusable AI p
 
 Capsule Hub provides a way to capture and reuse useful AI conversation context and prompts.
 
-During this task, I was able to access the Capsule Hub menu and use the Generate option while working on my career roadmap.
+![Capsule Hub Exploration](./day4-capsulehub.png)
+
+---
 
 # 🧠 Part 2 – Chain-of-Thought Prompting
 
@@ -73,6 +77,12 @@ It first collected four pieces of information before generating the roadmap.
 
 **Answer:** 1 year / 12 months
 
+### Screenshot – Questions and Answers
+
+![Career Roadmap Questions](./day4-questions.png)
+
+---
+
 # 🚀 Part 3 – Personalized AI Engineer Career Roadmap
 
 Claude generated a 12-month personalized career roadmap based on my current skills and target of becoming an AI Engineer.
@@ -105,9 +115,11 @@ The major skill gaps identified were:
 - AWS AI/ML deployment
 - ML System Design
 
-## 🛠 Recommended Learning Plan
+---
 
-### Phase 1 – Months 1–3
+# 🛠 Recommended Learning Plan
+
+## Phase 1 – Months 1–3
 
 - Mathematics for Machine Learning
 - Linear Algebra
@@ -119,7 +131,7 @@ The major skill gaps identified were:
 - Machine Learning algorithms
 - Kaggle basics
 
-### Phase 2 – Months 4–6
+## Phase 2 – Months 4–6
 
 - PyTorch
 - Neural Networks
@@ -129,7 +141,7 @@ The major skill gaps identified were:
 - NLP fundamentals
 - Hugging Face
 
-### Phase 3 – Months 7–9
+## Phase 3 – Months 7–9
 
 - LLM fine-tuning
 - LangChain
@@ -142,7 +154,7 @@ The major skill gaps identified were:
 - AWS Lambda
 - Model deployment
 
-### Phase 4 – Months 10–12
+## Phase 4 – Months 10–12
 
 - Portfolio improvement
 - ML System Design
@@ -151,6 +163,8 @@ The major skill gaps identified were:
 - Open-source contributions
 - Job applications
 
+---
+
 # 💼 Suggested Projects
 
 1. End-to-End ML Pipeline
@@ -158,6 +172,8 @@ The major skill gaps identified were:
 3. RAG-Based Chatbot
 4. Kaggle Competition
 5. Fine-Tuned NLP Model
+
+---
 
 # 🌐 Networking Strategy
 
@@ -168,6 +184,8 @@ The major skill gaps identified were:
 - Participate in Kaggle and Hugging Face communities
 - Attend AI/ML meetups and hackathons
 - Have informational conversations with AI engineers and founders
+
+---
 
 # 📅 12-Month Milestones
 
@@ -196,12 +214,16 @@ The major skill gaps identified were:
 - Complete mock interviews
 - Begin actively applying for AI Engineering opportunities
 
+---
+
 # ⚡ Immediate Next Actions
 
 1. Start a Linear Algebra and Probability refresher.
 2. Start a Scikit-learn mini-project using a Kaggle dataset.
 3. Share my AI Engineer learning journey on LinkedIn.
 4. Join an AI community such as Kaggle or a Hugging Face community.
+
+---
 
 # 💡 Biggest Insight
 
@@ -212,6 +234,8 @@ The roadmap made the progression much clearer:
 **Programming Foundation → Machine Learning → Deep Learning → LLMs & GenAI → RAG → MLOps → Deployment → Job Readiness**
 
 Instead of trying to learn every AI technology at once, I now have a structured path that shows what to learn and when to apply it through projects.
+
+---
 
 # 🧠 What I Learned
 
@@ -244,6 +268,8 @@ The roadmap showed that an AI Engineer needs knowledge across multiple areas:
 
 **ML + Deep Learning + GenAI + Software Engineering + MLOps + Cloud + Deployment**
 
+---
+
 # 🔍 Observations
 
 One important observation was that my existing web-development skills can be combined with AI technologies.
@@ -258,11 +284,7 @@ and
 
 This makes it possible to build on existing skills instead of starting completely from zero.
 
-# 📸 Screenshots
-
-- `day4-capsulehub.png` – Capsule Hub exploration
-- `day4-questions.png` – Four career-planning questions and answers
-- `day4-roadmap.png` – Generated AI Engineer career roadmap
+---
 
 # 📄 Generated Roadmap
 
@@ -279,6 +301,27 @@ The roadmap covered:
 - Quarterly Milestones
 - Immediate Next Actions
 
+### Roadmap Screenshot
+
+![AI Engineer Career Roadmap](./day4-roadmap%281%29.png)
+
+---
+
+# 📸 Screenshots
+
+The Day 4 activity is documented through the following screenshots:
+
+1. **Capsule Hub Exploration**  
+   `day4-capsulehub.png`
+
+2. **Four Career Questions and Answers**  
+   `day4-questions.png`
+
+3. **Generated AI Engineer Career Roadmap**  
+   `day4-roadmap(1).png`
+
+---
+
 # ✅ Day 4 Challenge Checklist
 
 - [x] Installed Capsule Hub
@@ -294,6 +337,8 @@ The roadmap covered:
 - [x] Added screenshots
 - [x] Created Day4 folder
 - [x] Created day4.md
+
+---
 
 # 🚀 Conclusion
 
