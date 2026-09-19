@@ -21,7 +21,9 @@ usage information directly within the Claude interface.
 
 ![Claude Counter](./claude-counter.png)
 
-The extension displayed token and usage information inside Claude.
+The Claude Counter extension was installed successfully. During testing,
+the Claude interface displayed usage-related information, which I
+documented as part of the Day 7 experiment.
 
 ## 🤖 My Claude Usage Strategy
 
