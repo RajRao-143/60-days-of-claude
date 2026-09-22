@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raj Rao | Computer Science Engineering Student — AI/ML & Cloud Enthusiast</title>
+<meta name="description" content="Portfolio of Raj Rao, a Computer Science Engineering student focused on AI/ML, Cloud Computing and Software Engineering. Explore projects, skills, experience and education.">
+<meta name="keywords" content="Raj Rao, Portfolio, AI, ML, Machine Learning, Cloud, Software Engineer, Computer Science Student">
+<meta property="og:title" content="Raj Rao | AI/ML & Cloud Enthusiast">
+<meta property="og:description" content="Computer Science Engineering student building practical AI/ML and full-stack projects.">
+<meta property="og:type" content="website">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          accentBlue: '#5B8DEF',
+          accentPurple: '#8B7CF6',
+          accentTeal: '#3FD9C7',
+          basedark: '#0B0E14',
+          panel: '#12161F',
+          panel2: '#171C27',
+        },
+        fontFamily: {
+          sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        }
+      }
+    }
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #3a4152; border-radius: 8px; }
+
+  .glass {
+    background: rgba(23, 28, 39, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .light .glass { background: rgba(255,255,255,0.7); }
+
+  .gradient-text {
+    background: linear-gradient(90deg, #5B8DEF, #8B7CF6 60%, #3FD9C7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .nav-link { position: relative; }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: -4px;
+    width: 0%; height: 2px;
+    background: linear-gradient(90deg, #5B8DEF, #3FD9C7);
+    transition: width 0.25s ease;
+  }
+  .nav-link.active::after, .nav-link:hover::after { width: 100%; }
+  .nav-link.active { color: #fff; }
+  .light .nav-link.active { color: #111; }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; }
+  .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -20px rgba(91,141,239,0.35); border-color: rgba(91,141,239,0.5); }
+
+  .skill-bar-fill { width: 0%; transition: width 1.4s cubic-bezier(0.22, 1, 0.36, 1); }
+
+  .typing-cursor { border-right: 2px solid #3FD9C7; animation: blink 0.8s step-end infinite; }
+  @keyframes blink { 50% { border-color: transparent; } }
+
+  #back-to-top { opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; }
+  #back-to-top.show { opacity: 1; pointer-events: auto; }
+
+  .tag {
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .tag:hover { transform: translateY(-2px); border-color: #5B8DEF; }
+
+  .mobile-menu { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .mobile-menu.open { max-height: 480px; }
+
+  .focus-ring:focus-visible { outline: 2px solid #3FD9C7; outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body class="bg-basedark text-slate-200 antialiased selection:bg-accentBlue/30">
+
+<!-- ================= NAVIGATION ================= -->
+<header id="navbar" class="fixed top-0 inset-x-0 z-50 glass border-b border-white/5">
+  <nav class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+    <a href="#home" class="font-bold text-lg tracking-tight focus-ring rounded">
+      <span class="gradient-text">Raj</span><span class="text-slate-200 light:text-slate-800">Rao</span>
+    </a>
+
+    <ul class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+      <li><a href="#home" class="nav-link active focus-ring rounded" data-nav>Home</a></li>
+      <li><a href="#about" class="nav-link focus-ring rounded" data-nav>About</a></li>
+      <li><a href="#skills" class="nav-link focus-ring rounded" data-nav>Skills</a></li>
+      <li><a href="#projects" class="nav-link focus-ring rounded" data-nav>Projects</a></li>
+      <li><a href="#experience" class="nav-link focus-ring rounded" data-nav>Experience</a></li>
+      <li><a href="#education" class="nav-link focus-ring rounded" data-nav>Education</a></li>
+      <li><a href="#contact" class="nav-link focus-ring rounded" data-nav>Contact</a></li>
+    </ul>
+
+    <div class="flex items-center gap-3">
+      <button id="theme-toggle" aria-label="Toggle dark and light mode" class="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:border-accentTeal/60 transition focus-ring">
+        <svg id="icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        <svg id="icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      </button>
+      <button id="mobile-menu-btn" aria-label="Open navigation menu" aria-expanded="false" class="md:hidden w-9 h-9 rounded-full border border-white/10 flex items-center justify-center focus-ring">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div id="mobile-menu" class="mobile-menu md:hidden glass border-t border-white/5">
+    <ul class="flex flex-col px-5 py-3 gap-1 text-sm font-medium">
+      <li><a href="#home" class="block py-2.5 focus-ring rounded" data-nav data-mobile>Home</a></li>
+      <li><a href="#about" class="block py-2.5 focus-ring rounded" data-nav data-mobile>About</a></li>
+      <li><a href="#skills" class="block py-2.5 focus-ring rounded" data-nav data-mobile>Skills</a></li>
+      <li><a href="#projects" class="block py-2.5 focus-ring rounded" data-nav data-mobile>Projects</a></li>
+      <li><a href="#experience" class="block py-2.5 focus-ring rounded" data-nav data-mobile>Experience</a></li>
+      <li><a href="#education" class="block py-2.5 focus-ring rounded" data-nav data-mobile>Education</a></li>
+      <li><a href="#contact" class="block py-2.5 focus-ring rounded" data-nav data-mobile>Contact</a></li>
+    </ul>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section id="home" class="relative pt-32 pb-24 px-5 sm:px-8 overflow-hidden">
+  <div class="absolute -top-32 -left-20 w-80 h-80 bg-accentBlue/20 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute top-40 -right-20 w-80 h-80 bg-accentPurple/20 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div class="max-w-6xl mx-auto relative">
+    <p class="reveal in-view text-accentTeal font-medium tracking-wide mb-4">Hi, I'm</p>
+    <h1 class="reveal in-view text-4xl sm:text-6xl font-extrabold tracking-tight mb-4">
+      <span class="gradient-text">Raj Rao</span>
+    </h1>
+    <h2 class="reveal in-view text-xl sm:text-2xl font-semibold text-slate-300 mb-6">
+      Computer Science Engineering Student | AI/ML & Cloud Enthusiast
+    </h2>
+
+    <div class="reveal in-view h-8 mb-6 text-lg sm:text-xl font-medium text-accentBlue">
+      <span id="typing-text" class="typing-cursor pr-1"></span>
+    </div>
+
+    <p class="reveal in-view max-w-2xl text-slate-400 leading-relaxed mb-10">
+      I am a Computer Science Engineering student interested in Artificial Intelligence, Machine Learning, Cloud Computing, and Software Engineering. I enjoy building practical projects, learning through hands-on development, and participating in hackathons and technology challenges. My goal is to grow as a software engineer while developing real-world AI/ML solutions.
+    </p>
+
+    <div class="reveal in-view flex flex-wrap gap-4">
+      <a href="https://github.com/RajRao-143" target="_blank" rel="noopener noreferrer" class="focus-ring flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white text-slate-900 font-semibold text-sm hover:bg-slate-200 transition">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-1.94c-3.2.7-3.87-1.54-3.87-1.54-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 015.8 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.4-5.27 5.68.42.36.78 1.08.78 2.18v3.23c0 .3.21.66.79.55A10.52 10.52 0 0023.5 12c0-6.35-5.15-11.5-11.5-11.5z"/></svg>
+        GitHub
+      </a>
+      <a href="https://www.linkedin.com/in/raj-rao-b32ab3341/" target="_blank" rel="noopener noreferrer" class="focus-ring flex items-center gap-2 px-5 py-2.5 rounded-lg bg-accentBlue text-white font-semibold text-sm hover:bg-accentBlue/80 transition">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 110-4.12 2.06 2.06 0 010 4.12zM7.11 20.45H3.56V9h3.55v11.45zM22.22 0H1.77C.8 0 0 .78 0 1.75v20.5C0 23.22.8 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.75V1.75C24 .78 23.2 0 22.22 0z"/></svg>
+        LinkedIn
+      </a>
+      <a id="resume-btn" href="#" target="_blank" rel="noopener noreferrer" class="focus-ring flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/15 text-slate-200 font-semibold text-sm hover:border-accentTeal/60 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"/></svg>
+        Resume
+      </a>
+      <a href="#projects" class="focus-ring flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/15 text-slate-200 font-semibold text-sm hover:border-accentPurple/60 transition">
+        View Projects
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+      </a>
+    </div>
+
+    <p class="reveal in-view mt-8 text-sm text-slate-500 flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Ghaziabad, Uttar Pradesh, India
+    </p>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section id="about" class="py-24 px-5 sm:px-8 border-t border-white/5">
+  <div class="max-w-6xl mx-auto grid md:grid-cols-5 gap-12 items-start">
+    <div class="md:col-span-2 reveal">
+      <p class="text-accentTeal font-medium tracking-wide mb-2">About Me</p>
+      <h2 class="text-3xl font-bold mb-4">Who I Am</h2>
+      <div class="h-1 w-16 bg-gradient-to-r from-accentBlue to-accentTeal rounded-full"></div>
+    </div>
+    <div class="md:col-span-3 reveal">
+      <p class="text-slate-400 leading-relaxed mb-4">
+        I'm a Computer Science Engineering student at ABES Engineering College, Ghaziabad, with a strong interest in Artificial Intelligence, Machine Learning, Cloud Computing, and Software Engineering.
+      </p>
+      <p class="text-slate-400 leading-relaxed mb-4">
+        I like learning by building — working on practical projects, exploring AI/ML techniques, and taking part in hackathons and technology challenges. I'm currently sharpening my skills in full-stack development and applied machine learning through hands-on internships and self-directed learning.
+      </p>
+      <p class="text-slate-400 leading-relaxed">
+        My goal is to grow as a software engineer and contribute to real-world AI/ML solutions, while continuing to build a strong foundation in core computer science fundamentals.
+      </p>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-8">
+        <div class="rounded-xl border border-white/10 p-4 bg-panel">
+          <p class="text-xs text-slate-500 mb-1">Based in</p>
+          <p class="font-semibold text-sm">Ghaziabad, UP</p>
+        </div>
+        <div class="rounded-xl border border-white/10 p-4 bg-panel">
+          <p class="text-xs text-slate-500 mb-1">Focus Areas</p>
+          <p class="font-semibold text-sm">AI/ML · Cloud</p>
+        </div>
+        <div class="rounded-xl border border-white/10 p-4 bg-panel">
+          <p class="text-xs text-slate-500 mb-1">Status</p>
+          <p class="font-semibold text-sm">Learning & Building</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SKILLS ================= -->
+<section id="skills" class="py-24 px-5 sm:px-8 border-t border-white/5 bg-panel/30">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center reveal mb-14">
+      <p class="text-accentTeal font-medium tracking-wide mb-2">What I Work With</p>
+      <h2 class="text-3xl font-bold">Skills & Technologies</h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 mb-14">
+      <!-- Programming -->
+      <div class="reveal rounded-2xl border border-white/10 bg-panel p-6">
+        <h3 class="font-semibold text-lg mb-5 text-accentBlue">Programming</h3>
+        <div class="space-y-4" data-skills>
+          <div data-level="80"><div class="flex justify-between text-sm mb-1"><span>Java</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentBlue to-accentTeal"></div></div></div>
+          <div data-level="82"><div class="flex justify-between text-sm mb-1"><span>Python</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentBlue to-accentTeal"></div></div></div>
+          <div data-level="65"><div class="flex justify-between text-sm mb-1"><span>C++</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentBlue to-accentTeal"></div></div></div>
+          <div data-level="75"><div class="flex justify-between text-sm mb-1"><span>JavaScript</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentBlue to-accentTeal"></div></div></div>
+        </div>
+      </div>
+
+      <!-- Web Development -->
+      <div class="reveal rounded-2xl border border-white/10 bg-panel p-6">
+        <h3 class="font-semibold text-lg mb-5 text-accentPurple">Web Development</h3>
+        <div class="space-y-4" data-skills>
+          <div data-level="80"><div class="flex justify-between text-sm mb-1"><span>HTML5 / CSS3</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentPurple to-accentBlue"></div></div></div>
+          <div data-level="72"><div class="flex justify-between text-sm mb-1"><span>React.js</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentPurple to-accentBlue"></div></div></div>
+          <div data-level="68"><div class="flex justify-between text-sm mb-1"><span>Node.js / Express.js</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentPurple to-accentBlue"></div></div></div>
+          <div data-level="70"><div class="flex justify-between text-sm mb-1"><span>REST APIs</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentPurple to-accentBlue"></div></div></div>
+        </div>
+      </div>
+
+      <!-- AI/ML -->
+      <div class="reveal rounded-2xl border border-white/10 bg-panel p-6">
+        <h3 class="font-semibold text-lg mb-5 text-accentTeal">AI / ML</h3>
+        <div class="space-y-4" data-skills>
+          <div data-level="75"><div class="flex justify-between text-sm mb-1"><span>Machine Learning</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentTeal to-accentBlue"></div></div></div>
+          <div data-level="70"><div class="flex justify-between text-sm mb-1"><span>NLP</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentTeal to-accentBlue"></div></div></div>
+          <div data-level="78"><div class="flex justify-between text-sm mb-1"><span>Scikit-learn</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentTeal to-accentBlue"></div></div></div>
+          <div data-level="75"><div class="flex justify-between text-sm mb-1"><span>Pandas / NumPy</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentTeal to-accentBlue"></div></div></div>
+        </div>
+      </div>
+
+      <!-- Cloud & Tools -->
+      <div class="reveal rounded-2xl border border-white/10 bg-panel p-6">
+        <h3 class="font-semibold text-lg mb-5 text-accentBlue">Cloud & Tools</h3>
+        <div class="space-y-4" data-skills>
+          <div data-level="60"><div class="flex justify-between text-sm mb-1"><span>AWS</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentBlue to-accentPurple"></div></div></div>
+          <div data-level="82"><div class="flex justify-between text-sm mb-1"><span>Git / GitHub</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentBlue to-accentPurple"></div></div></div>
+          <div data-level="70"><div class="flex justify-between text-sm mb-1"><span>VS Code / Postman</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentBlue to-accentPurple"></div></div></div>
+          <div data-level="65"><div class="flex justify-between text-sm mb-1"><span>Vite</span></div><div class="h-2 rounded-full bg-white/5"><div class="skill-bar-fill h-2 rounded-full bg-gradient-to-r from-accentBlue to-accentPurple"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal rounded-2xl border border-white/10 bg-panel p-6">
+      <h3 class="font-semibold text-lg mb-5 text-slate-200">Core Computer Science</h3>
+      <div class="flex flex-wrap gap-2.5">
+        <span class="tag px-3.5 py-1.5 rounded-full text-xs font-medium border border-white/10 bg-white/5">Data Structures & Algorithms</span>
+        <span class="tag px-3.5 py-1.5 rounded-full text-xs font-medium border border-white/10 bg-white/5">Object-Oriented Programming</span>
+        <span class="tag px-3.5 py-1.5 rounded-full text-xs font-medium border border-white/10 bg-white/5">DBMS</span>
+        <span class="tag px-3.5 py-1.5 rounded-full text-xs font-medium border border-white/10 bg-white/5">Operating Systems</span>
+        <span class="tag px-3.5 py-1.5 rounded-full text-xs font-medium border border-white/10 bg-white/5">MongoDB</span>
+        <span class="tag px-3.5 py-1.5 rounded-full text-xs font-medium border border-white/10 bg-white/5">SQL</span>
+        <span class="tag px-3.5 py-1.5 rounded-full text-xs font-medium border border-white/10 bg-white/5">TF-IDF</span>
+        <span class="tag px-3.5 py-1.5 rounded-full text-xs font-medium border border-white/10 bg-white/5">Logistic Regression</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROJECTS ================= -->
+<section id="projects" class="py-24 px-5 sm:px-8 border-t border-white/5">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center reveal mb-14">
+      <p class="text-accentTeal font-medium tracking-wide mb-2">My Work</p>
+      <h2 class="text-3xl font-bold">Projects</h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <!-- Project 1 -->
+      <div class="reveal card-hover rounded-2xl border border-white/10 bg-panel p-6 flex flex-col">
+        <div class="w-11 h-11 rounded-xl bg-accentBlue/15 flex items-center justify-center mb-4">
+          <svg class="w-5 h-5 text-accentBlue" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m0 12.728l.707-.707M18.364 18.364l-.707-.707M12 20v1m-3-8a3 3 0 116 0c0 1.657-1 2-1 3H10c0-1-1-1.343-1-3z"/></svg>
+        </div>
+        <h3 class="font-bold text-lg mb-2">SANKET-X</h3>
+        <p class="text-xs text-slate-500 mb-3">AI/NLP-Based SIF Precursor Detection System</p>
+        <p class="text-sm text-slate-400 leading-relaxed mb-4 flex-grow">
+          An AI/NLP-based system that analyzes free-text industrial safety reports and identifies potential Serious Injury & Fatality (SIF) precursors.
+        </p>
+        <ul class="text-sm text-slate-400 space-y-1.5 mb-4">
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>5,006 safety reports analyzed</li>
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>SIF Potential vs Non-SIF classification</li>
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>Stratified 80/20 train-test split</li>
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>Accuracy, Precision, Recall & F1 evaluation</li>
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>Prediction module with confidence probability</li>
+        </ul>
+        <div class="flex flex-wrap gap-1.5 mb-5">
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">Python</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">Pandas</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">Scikit-learn</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">NLP</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">TF-IDF</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">Joblib</span>
+        </div>
+        <span class="focus-ring inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-white/15 text-sm font-medium text-slate-500 cursor-not-allowed" title="Public repository link not provided">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-1.94c-3.2.7-3.87-1.54-3.87-1.54-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 015.8 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.4-5.27 5.68.42.36.78 1.08.78 2.18v3.23c0 .3.21.66.79.55A10.52 10.52 0 0023.5 12c0-6.35-5.15-11.5-11.5-11.5z"/></svg>
+          Repo link not provided
+        </span>
+      </div>
+
+      <!-- Project 2 -->
+      <div class="reveal card-hover rounded-2xl border border-white/10 bg-panel p-6 flex flex-col">
+        <div class="w-11 h-11 rounded-xl bg-accentPurple/15 flex items-center justify-center mb-4">
+          <svg class="w-5 h-5 text-accentPurple" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2M5 21H3m16 0h-2M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4a1 1 0 011-1h0a1 1 0 011 1v4"/></svg>
+        </div>
+        <h3 class="font-bold text-lg mb-2">CampusOS</h3>
+        <p class="text-xs text-slate-500 mb-3">Smart College Management & Student Success Platform</p>
+        <p class="text-sm text-slate-400 leading-relaxed mb-4 flex-grow">
+          A centralized student platform bringing college resources, career preparation, DSA practice, internships, projects and productivity tools into one place.
+        </p>
+        <ul class="text-sm text-slate-400 space-y-1.5 mb-4">
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>Resume & portfolio builder</li>
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>Internship & hackathon resources</li>
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>DSA prep & skill tracker</li>
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>CGPA / attendance calculators</li>
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>Study planner & placement tracker</li>
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>AI career assistant</li>
+        </ul>
+        <div class="flex flex-wrap gap-1.5 mb-5">
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">React.js</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">Vite</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">Node.js</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">Express.js</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">MongoDB</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">REST APIs</span>
+        </div>
+        <span class="focus-ring inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-white/15 text-sm font-medium text-slate-500 cursor-not-allowed" title="Public repository link not provided">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-1.94c-3.2.7-3.87-1.54-3.87-1.54-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 015.8 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.4-5.27 5.68.42.36.78 1.08.78 2.18v3.23c0 .3.21.66.79.55A10.52 10.52 0 0023.5 12c0-6.35-5.15-11.5-11.5-11.5z"/></svg>
+          Repo link not provided
+        </span>
+      </div>
+
+      <!-- Project 3 -->
+      <div class="reveal card-hover rounded-2xl border border-white/10 bg-panel p-6 flex flex-col">
+        <div class="w-11 h-11 rounded-xl bg-accentTeal/15 flex items-center justify-center mb-4">
+          <svg class="w-5 h-5 text-accentTeal" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h3 class="font-bold text-lg mb-2">60 Days Claude Challenge</h3>
+        <p class="text-xs text-slate-500 mb-3">AI-Assisted Development Learning Journey</p>
+        <p class="text-sm text-slate-400 leading-relaxed mb-4 flex-grow">
+          A public learning journey exploring AI-assisted development, prompt engineering, Claude Artifacts and iterative AI product building. The project documents hands-on experimentation across multiple days.
+        </p>
+        <ul class="text-sm text-slate-400 space-y-1.5 mb-4">
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>Daily prompt engineering practice</li>
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>Building with Claude Artifacts</li>
+          <li class="flex gap-2"><span class="text-accentTeal">•</span>Iterative AI product experiments</li>
+        </ul>
+        <div class="flex flex-wrap gap-1.5 mb-5">
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">Claude</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">Prompt Engineering</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">HTML</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">JavaScript</span>
+          <span class="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10">GitHub</span>
+        </div>
+        <a href="https://github.com/RajRao-143/60-days-of-claude" target="_blank" rel="noopener noreferrer" class="focus-ring inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accentTeal/15 border border-accentTeal/40 text-accentTeal text-sm font-medium hover:bg-accentTeal/25 transition">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-1.94c-3.2.7-3.87-1.54-3.87-1.54-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 015.8 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.4-5.27 5.68.42.36.78 1.08.78 2.18v3.23c0 .3.21.66.79.55A10.52 10.52 0 0023.5 12c0-6.35-5.15-11.5-11.5-11.5z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= EXPERIENCE ================= -->
+<section id="experience" class="py-24 px-5 sm:px-8 border-t border-white/5 bg-panel/30">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center reveal mb-14">
+      <p class="text-accentTeal font-medium tracking-wide mb-2">Where I've Learned</p>
+      <h2 class="text-3xl font-bold">Experience & Achievements</h2>
+    </div>
+
+    <div class="max-w-3xl mx-auto relative border-l border-white/10 pl-8 space-y-10">
+
+      <div class="reveal relative">
+        <span class="absolute -left-[41px] top-1 w-4 h-4 rounded-full bg-accentBlue ring-4 ring-basedark"></span>
+        <p class="text-xs text-slate-500 mb-1">September 2026</p>
+        <h3 class="font-semibold text-lg">Machine Learning & Applied AI Intern</h3>
+        <p class="text-sm text-accentBlue mb-2">IBM SkillsBuild / BharatCares</p>
+        <p class="text-sm text-slate-400 leading-relaxed">Focused on Machine Learning and Applied AI learning and hands-on development.</p>
+      </div>
+
+      <div class="reveal relative">
+        <span class="absolute -left-[41px] top-1 w-4 h-4 rounded-full bg-accentPurple ring-4 ring-basedark"></span>
+        <p class="text-xs text-slate-500 mb-1">Ongoing</p>
+        <h3 class="font-semibold text-lg">60 Days Claude Challenge</h3>
+        <p class="text-sm text-accentPurple mb-2">ABTalks</p>
+        <p class="text-sm text-slate-400 leading-relaxed">An ongoing learning challenge focused on Claude, prompt engineering, AI-assisted development and building applications with Claude.</p>
+      </div>
+
+      <div class="reveal relative">
+        <span class="absolute -left-[41px] top-1 w-4 h-4 rounded-full bg-accentTeal ring-4 ring-basedark"></span>
+        <p class="text-xs text-slate-500 mb-1">Certification</p>
+        <h3 class="font-semibold text-lg">AWS Cloud Foundation Certificate</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">Foundational certification in AWS cloud computing concepts.</p>
+      </div>
+
+      <div class="reveal relative">
+        <span class="absolute -left-[41px] top-1 w-4 h-4 rounded-full bg-accentBlue ring-4 ring-basedark"></span>
+        <p class="text-xs text-slate-500 mb-1">Ongoing</p>
+        <h3 class="font-semibold text-lg">Hackathons & Technology Competitions</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">Active participation in hackathons and technology challenges as part of hands-on learning.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= EDUCATION ================= -->
+<section id="education" class="py-24 px-5 sm:px-8 border-t border-white/5">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center reveal mb-14">
+      <p class="text-accentTeal font-medium tracking-wide mb-2">Academic Background</p>
+      <h2 class="text-3xl font-bold">Education</h2>
+    </div>
+
+    <div class="max-w-3xl mx-auto space-y-6">
+      <div class="reveal rounded-2xl border border-white/10 bg-panel p-6 card-hover">
+        <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
+          <h3 class="font-semibold text-lg">B.Tech, Computer Science & Engineering</h3>
+          <span class="text-xs px-2.5 py-1 rounded-full bg-accentBlue/15 text-accentBlue">Expected 2028</span>
+        </div>
+        <p class="text-sm text-slate-400 mb-4">ABES Engineering College, Ghaziabad — Affiliated to AKTU</p>
+        <div class="flex flex-wrap gap-4 text-sm">
+          <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">First-year CGPA: <strong class="text-slate-200">8.8</strong></span>
+          <span class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">Second-year CGPA: <strong class="text-slate-200">7.5</strong></span>
+        </div>
+      </div>
+
+      <div class="reveal rounded-2xl border border-white/10 bg-panel p-6 card-hover">
+        <h3 class="font-semibold text-lg mb-2">Class XII — UP Board</h3>
+        <p class="text-sm text-slate-400">Scored <strong class="text-slate-200">91%</strong></p>
+      </div>
+
+      <div class="reveal rounded-2xl border border-white/10 bg-panel p-6 card-hover">
+        <h3 class="font-semibold text-lg mb-2">Class X — UP Board</h3>
+        <p class="text-sm text-slate-400">Scored <strong class="text-slate-200">95%</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section id="contact" class="py-24 px-5 sm:px-8 border-t border-white/5 bg-panel/30">
+  <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
+    <div class="reveal">
+      <p class="text-accentTeal font-medium tracking-wide mb-2">Get In Touch</p>
+      <h2 class="text-3xl font-bold mb-6">Contact Me</h2>
+      <p class="text-slate-400 leading-relaxed mb-8">
+        I'm open to internships, collaborations, and interesting conversations about AI/ML, cloud, and software engineering. Feel free to reach out.
+      </p>
+
+      <div class="space-y-4">
+        <a href="mailto:rajrao.placeholder@example.com" class="focus-ring flex items-center gap-3 text-sm text-slate-300 hover:text-accentTeal transition">
+          <span class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </span>
+          rajrao.placeholder@example.com
+        </a>
+        <a href="https://www.linkedin.com/in/raj-rao-b32ab3341/" target="_blank" rel="noopener noreferrer" class="focus-ring flex items-center gap-3 text-sm text-slate-300 hover:text-accentTeal transition">
+          <span class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 110-4.12 2.06 2.06 0 010 4.12zM7.11 20.45H3.56V9h3.55v11.45zM22.22 0H1.77C.8 0 0 .78 0 1.75v20.5C0 23.22.8 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.75V1.75C24 .78 23.2 0 22.22 0z"/></svg>
+          </span>
+          linkedin.com/in/raj-rao-b32ab3341
+        </a>
+        <a href="https://github.com/RajRao-143" target="_blank" rel="noopener noreferrer" class="focus-ring flex items-center gap-3 text-sm text-slate-300 hover:text-accentTeal transition">
+          <span class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-1.94c-3.2.7-3.87-1.54-3.87-1.54-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 015.8 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.4-5.27 5.68.42.36.78 1.08.78 2.18v3.23c0 .3.21.66.79.55A10.52 10.52 0 0023.5 12c0-6.35-5.15-11.5-11.5-11.5z"/></svg>
+          </span>
+          github.com/RajRao-143
+        </a>
+      </div>
+
+      <p class="text-xs text-slate-500 mt-8 leading-relaxed">
+        Note: the form below is a front-end UI only. To actually send messages, it needs to be connected to an email/backend service (e.g. Formspree, EmailJS, or a custom API endpoint).
+      </p>
+    </div>
+
+    <form id="contact-form" class="reveal rounded-2xl border border-white/10 bg-panel p-6 space-y-4">
+      <div>
+        <label for="cf-name" class="block text-sm font-medium text-slate-300 mb-1.5">Name</label>
+        <input id="cf-name" name="name" type="text" required class="focus-ring w-full px-4 py-2.5 rounded-lg bg-basedark border border-white/10 text-sm outline-none focus:border-accentBlue transition" placeholder="Your name">
+      </div>
+      <div>
+        <label for="cf-email" class="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
+        <input id="cf-email" name="email" type="email" required class="focus-ring w-full px-4 py-2.5 rounded-lg bg-basedark border border-white/10 text-sm outline-none focus:border-accentBlue transition" placeholder="you@example.com">
+      </div>
+      <div>
+        <label for="cf-message" class="block text-sm font-medium text-slate-300 mb-1.5">Message</label>
+        <textarea id="cf-message" name="message" rows="4" required class="focus-ring w-full px-4 py-2.5 rounded-lg bg-basedark border border-white/10 text-sm outline-none focus:border-accentBlue transition resize-none" placeholder="Your message..."></textarea>
+      </div>
+      <button type="submit" class="focus-ring w-full py-3 rounded-lg bg-gradient-to-r from-accentBlue to-accentTeal text-white font-semibold text-sm hover:opacity-90 transition">
+        Send Message
+      </button>
+      <p id="cf-status" class="text-xs text-center text-slate-500 min-h-[16px]"></p>
+    </form>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="py-10 px-5 sm:px-8 border-t border-white/5">
+  <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="text-center sm:text-left">
+      <p class="font-bold gradient-text">Raj Rao</p>
+      <p class="text-xs text-slate-500">Computer Science Engineering | AI/ML | Cloud</p>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="https://github.com/RajRao-143" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="focus-ring w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:border-accentTeal/60 transition">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-1.94c-3.2.7-3.87-1.54-3.87-1.54-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 015.8 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.4-5.27 5.68.42.36.78 1.08.78 2.18v3.23c0 .3.21.66.79.55A10.52 10.52 0 0023.5 12c0-6.35-5.15-11.5-11.5-11.5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/raj-rao-b32ab3341/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="focus-ring w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:border-accentTeal/60 transition">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 110-4.12 2.06 2.06 0 010 4.12zM7.11 20.45H3.56V9h3.55v11.45zM22.22 0H1.77C.8 0 0 .78 0 1.75v20.5C0 23.22.8 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.75V1.75C24 .78 23.2 0 22.22 0z"/></svg>
+      </a>
+    </div>
+    <p class="text-xs text-slate-500">&copy; <span id="year"></span> Raj Rao. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- Back to top -->
+<button id="back-to-top" aria-label="Back to top" class="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full bg-accentBlue text-white flex items-center justify-center shadow-lg hover:bg-accentBlue/80 transition focus-ring">
+  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+</button>
+
+<script>
+(function() {
+  'use strict';
+
+  // ---------- YEAR ----------
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // ---------- THEME TOGGLE ----------
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('theme-toggle');
+  const iconMoon = document.getElementById('icon-moon');
+  const iconSun = document.getElementById('icon-sun');
+
+  function applyTheme(mode) {
+    if (mode === 'light') {
+      root.classList.add('light');
+      document.body.classList.remove('bg-basedark', 'text-slate-200');
+      document.body.classList.add('bg-slate-50', 'text-slate-800');
+      iconMoon.classList.add('hidden');
+      iconSun.classList.remove('hidden');
+    } else {
+      root.classList.remove('light');
+      document.body.classList.remove('bg-slate-50', 'text-slate-800');
+      document.body.classList.add('bg-basedark', 'text-slate-200');
+      iconMoon.classList.remove('hidden');
+      iconSun.classList.add('hidden');
+    }
+  }
+
+  let savedTheme = 'dark';
+  try { savedTheme = localStorage.getItem('raj-portfolio-theme') || 'dark'; } catch (e) {}
+  applyTheme(savedTheme);
+
+  themeToggle.addEventListener('click', function() {
+    const isLight = root.classList.contains('light');
+    const next = isLight ? 'dark' : 'light';
+    applyTheme(next);
+    try { localStorage.setItem('raj-portfolio-theme', next); } catch (e) {}
+  });
+
+  // ---------- MOBILE MENU ----------
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  menuBtn.addEventListener('click', function() {
+    const isOpen = mobileMenu.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+
+  document.querySelectorAll('[data-mobile]').forEach(function(link) {
+    link.addEventListener('click', function() {
+      mobileMenu.classList.remove('open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // ---------- SMOOTH SCROLL + ACTIVE NAV ----------
+  const navLinks = Array.from(document.querySelectorAll('[data-nav]'));
+  const sections = Array.from(document.querySelectorAll('section[id]'));
+
+  navLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      const targetId = link.getAttribute('href');
+      const target = document.querySelector(targetId);
+      if (target) {
+        e.preventDefault();
+        const y = target.getBoundingClientRect().top + window.pageYOffset - 64;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    });
+  });
+
+  function setActiveNav() {
+    let current = sections[0] ? sections[0].id : '';
+    const scrollPos = window.scrollY + 100;
+    sections.forEach(function(section) {
+      if (scrollPos >= section.offsetTop) {
+        current = section.id;
+      }
+    });
+    navLinks.forEach(function(link) {
+      const href = link.getAttribute('href').replace('#', '');
+      link.classList.toggle('active', href === current);
+    });
+  }
+
+  // ---------- BACK TO TOP + NAV STATE ON SCROLL ----------
+  const backToTop = document.getElementById('back-to-top');
+  window.addEventListener('scroll', function() {
+    setActiveNav();
+    if (window.scrollY > 400) {
+      backToTop.classList.add('show');
+    } else {
+      backToTop.classList.remove('show');
+    }
+  });
+  backToTop.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  setActiveNav();
+
+  // ---------- TYPING ANIMATION ----------
+  const typingEl = document.getElementById('typing-text');
+  const phrases = [
+    'AI/ML Enthusiast',
+    'Software Engineering Student',
+    'Cloud Computing Learner',
+    'Problem Solver',
+    'Builder'
+  ];
+  let phraseIndex = 0, charIndex = 0, deleting = false;
+
+  function typeLoop() {
+    const current = phrases[phraseIndex];
+    if (!deleting) {
+      charIndex++;
+      typingEl.textContent = current.slice(0, charIndex);
+      if (charIndex === current.length) {
+        deleting = true;
+        setTimeout(typeLoop, 1400);
+        return;
+      }
+    } else {
+      charIndex--;
+      typingEl.textContent = current.slice(0, charIndex);
+      if (charIndex === 0) {
+        deleting = false;
+        phraseIndex = (phraseIndex + 1) % phrases.length;
+      }
+    }
+    setTimeout(typeLoop, deleting ? 40 : 80);
+  }
+  typeLoop();
+
+  // ---------- SCROLL REVEAL ----------
+  const revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(function(el) { observer.observe(el); });
+  } else {
+    revealEls.forEach(function(el) { el.classList.add('in-view'); });
+  }
+
+  // ---------- SKILL BARS ANIMATION ----------
+  const skillGroups = document.querySelectorAll('[data-skills]');
+  if ('IntersectionObserver' in window) {
+    const skillObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          const bars = entry.target.querySelectorAll('[data-level]');
+          bars.forEach(function(bar) {
+            const level = bar.getAttribute('data-level');
+            const fill = bar.querySelector('.skill-bar-fill');
+            if (fill) fill.style.width = level + '%';
+          });
+          skillObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    skillGroups.forEach(function(group) { skillObserver.observe(group); });
+  } else {
+    document.querySelectorAll('[data-level]').forEach(function(bar) {
+      const level = bar.getAttribute('data-level');
+      const fill = bar.querySelector('.skill-bar-fill');
+      if (fill) fill.style.width = level + '%';
+    });
+  }
+
+  // ---------- CONTACT FORM (front-end only) ----------
+  const contactForm = document.getElementById('contact-form');
+  const cfStatus = document.getElementById('cf-status');
+  contactForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    cfStatus.textContent = 'This form is a UI demo — connect a backend or service (e.g. Formspree, EmailJS) to enable sending.';
+    cfStatus.classList.add('text-accentTeal');
+  });
+
+})();
+</script>
+
+</body>
+</html>
