@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicle Cost Analysis Dashboard — Maruti Suzuki Baleno</title>
+<style>
+:root{
+  --bg:#0a0f1e; --panel:rgba(255,255,255,.065); --panel2:rgba(255,255,255,.045);
+  --border:rgba(255,255,255,.13); --text:#e8ecf8; --muted:#98a2bf;
+  --petrol:#3b82f6; --diesel:#9ca3af; --cng:#22c55e; --e85:#f59e0b; --ev:#a855f7;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100vh; padding:20px; color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(900px 500px at 10% -10%,rgba(59,130,246,.20),transparent 60%),
+    radial-gradient(900px 500px at 100% 0%,rgba(168,85,247,.16),transparent 55%),
+    var(--bg);
+}
+.container{max-width:1450px;margin:auto;display:grid;gap:18px}
+.card{
+  background:var(--panel); border:1px solid var(--border); border-radius:18px;
+  padding:18px; box-shadow:0 12px 35px rgba(0,0,0,.25);
+  backdrop-filter:blur(12px);
+}
+.header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+h1{font-size:clamp(1.25rem,3vw,2rem);margin:0}
+h2{font-size:1.05rem;margin:0 0 5px}
+.sub{font-size:.78rem;color:var(--muted);margin-bottom:12px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid rgba(59,130,246,.65);background:rgba(59,130,246,.12);padding:6px 11px;border-radius:999px;font-size:.76rem}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:12px}
+.kpi{border-top:3px solid var(--petrol)}
+.kpi-label{font-size:.74rem;color:var(--muted)}
+.kpi-value{font-size:1.5rem;font-weight:800;margin-top:7px}
+.kpi-note{font-size:.68rem;color:var(--muted);margin-top:5px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.chart{min-height:330px}
+svg{width:100%;height:auto;display:block}
+svg text{fill:#c9d0e5;font-size:11px}
+.gridline{stroke:rgba(255,255,255,.10);stroke-width:1}
+.axis{stroke:rgba(255,255,255,.28);stroke-width:1}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th,td{padding:9px 7px;border-bottom:1px solid rgba(255,255,255,.09);text-align:right}
+th:first-child,td:first-child{text-align:left}
+.highlight{background:rgba(59,130,246,.13)}
+.scroll{overflow-x:auto}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:.72rem;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:5px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.ex{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.metric{background:var(--panel2);border-radius:13px;padding:14px}
+.metric strong{display:block;font-size:1.35rem;color:var(--e85)}
+.metric small{color:var(--muted);line-height:1.35}
+.gauge-wrap{display:flex;justify-content:center}
+.gauge{max-width:340px}
+.verdict{text-align:center;font-size:.86rem;margin-top:5px}
+.cards{display:grid;grid-template-columns:repeat(5,minmax(180px,1fr));gap:12px}
+.fuel-card{border-top:4px solid var(--fuel)}
+.fuel-card.selected{box-shadow:0 0 0 2px var(--petrol),0 0 28px rgba(59,130,246,.25)}
+.fuel-title{display:flex;justify-content:space-between;align-items:center;color:var(--fuel);font-weight:800}
+.badge{font-size:.62rem;color:#fff;background:var(--petrol);border-radius:999px;padding:3px 7px}
+.fuel-card ul{padding:0;margin:12px 0 0}
+.fuel-card li{list-style:none;font-size:.74rem;margin:7px 0;line-height:1.35}
+.best{font-size:.73rem;color:var(--muted);margin-top:10px;line-height:1.4}
+footer{text-align:center;color:var(--muted);font-size:.68rem;padding:4px}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}.cards{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:750px){.grid2{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr 1fr}.ex{grid-template-columns:1fr}}
+@media(max-width:480px){body{padding:10px}.kpis{grid-template-columns:1fr}.cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+  <section class="card header">
+    <div>
+      <h1>Maruti Suzuki Baleno · Petrol · Age: 3y · 1000 km/mo</h1>
+      <div class="sub" style="margin:6px 0 0">Vehicle Cost Analysis Dashboard</div>
+    </div>
+    <div class="chips">
+      <span class="chip">Usage: Mixed</span>
+      <span class="chip" id="recordCount"></span>
+    </div>
+  </section>
+
+  <section class="kpis" id="kpis"></section>
+
+  <section class="grid2">
+    <div class="card chart">
+      <h2>Fuel Cost per km</h2>
+      <div class="sub">Average Fuel_Cost_INR ÷ Distance_km</div>
+      <svg id="barChart" viewBox="0 0 650 330" aria-label="Fuel cost per km bar chart"></svg>
+    </div>
+    <div class="card chart">
+      <h2>CO₂ per km</h2>
+      <div class="sub">Average CO₂ emitted per kilometre</div>
+      <svg id="donutChart" viewBox="0 0 650 330" aria-label="CO2 per km doughnut chart"></svg>
+      <div class="legend" id="donutLegend"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Cost/km vs Vehicle Age (0–12 years)</h2>
+    <div class="sub">Only ages present in the dataset are plotted. Dashed vertical line marks the 3-year-old Baleno.</div>
+    <svg id="lineChart" viewBox="0 0 1100 390" aria-label="Cost per km versus vehicle age line chart"></svg>
+    <div class="legend" id="lineLegend"></div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <h2>Age Bucket Analysis</h2>
+      <div class="sub">New: 0–2y · Mid-life: 3–5y · Aged: 6–9y · Old: 10+y</div>
+      <div class="scroll"><table id="ageTable"></table></div>
+    </div>
+    <div class="card">
+      <h2>E85 Paradox</h2>
+      <div class="sub">Pump-price saving versus real running-cost impact</div>
+      <div class="ex" id="e85Metrics"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Averages by Fuel Type</h2>
+    <div class="sub">Cost/km, CO₂/km, maintenance/km and refuel/recharge time</div>
+    <div class="scroll"><table id="fuelTable"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>E85 Score / 10</h2>
+    <div class="sub">Cost = 4 pts · CO₂ = 3 pts · Refuel = 2 pts · Maintenance = 1 pt. Lower values receive more points.</div>
+    <div class="gauge-wrap"><svg class="gauge" id="gauge" viewBox="0 0 340 210"></svg></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="legend" id="scoreBreakdown" style="justify-content:center"></div>
+  </section>
+
+  <section class="cards" id="fuelCards"></section>
+
+  <footer>Dataset: day17_e85_dataset_optimised.csv · Calculations are based only on the supplied CSV.</footer>
+</div>
+
+<script>
+"use strict";
+
+const DATA = [{"Fuel_Type": "CNG", "Vehicle_Age_yrs": 7, "Distance_km": 1316.0, "Fuel_Cost_INR": 4600.0, "CO2_emitted_kg": 167.3, "Maintenance_Cost_INR": 904.0, "Refuel_Recharge_time_min": 8.0, "Fuel_Price_per_unit_INR": 80.0, "Typical_Mileage": 22.9}, {"Fuel_Type": "Diesel", "Vehicle_Age_yrs": 4, "Distance_km": 2343.0, "Fuel_Cost_INR": 10201.0, "CO2_emitted_kg": 399.9, "Maintenance_Cost_INR": 1270.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 91.0, "Typical_Mileage": 20.9}, {"Fuel_Type": "CNG", "Vehicle_Age_yrs": 2, "Distance_km": 1450.0, "Fuel_Cost_INR": 4464.0, "CO2_emitted_kg": 181.5, "Maintenance_Cost_INR": 730.0, "Refuel_Recharge_time_min": 8.0, "Fuel_Price_per_unit_INR": 80.0, "Typical_Mileage": 26.0}, {"Fuel_Type": "Electric (EV)", "Vehicle_Age_yrs": 3, "Distance_km": 2457.0, "Fuel_Cost_INR": 4468.0, "CO2_emitted_kg": 218.5, "Maintenance_Cost_INR": 346.0, "Refuel_Recharge_time_min": 45.0, "Fuel_Price_per_unit_INR": 12.0, "Typical_Mileage": 6.6}, {"Fuel_Type": "CNG", "Vehicle_Age_yrs": 3, "Distance_km": 970.0, "Fuel_Cost_INR": 3144.0, "CO2_emitted_kg": 116.7, "Maintenance_Cost_INR": 712.0, "Refuel_Recharge_time_min": 8.0, "Fuel_Price_per_unit_INR": 80.0, "Typical_Mileage": 24.7}, {"Fuel_Type": "CNG", "Vehicle_Age_yrs": 3, "Distance_km": 1094.0, "Fuel_Cost_INR": 3544.0, "CO2_emitted_kg": 136.3, "Maintenance_Cost_INR": 823.0, "Refuel_Recharge_time_min": 8.0, "Fuel_Price_per_unit_INR": 80.0, "Typical_Mileage": 24.7}, {"Fuel_Type": "Petrol (E20)", "Vehicle_Age_yrs": 4, "Distance_km": 1294.0, "Fuel_Cost_INR": 7570.0, "CO2_emitted_kg": 213.8, "Maintenance_Cost_INR": 702.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 100.0, "Typical_Mileage": 17.1}, {"Fuel_Type": "Diesel", "Vehicle_Age_yrs": 4, "Distance_km": 1348.0, "Fuel_Cost_INR": 5870.0, "CO2_emitted_kg": 230.1, "Maintenance_Cost_INR": 958.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 91.0, "Typical_Mileage": 20.9}, {"Fuel_Type": "Electric (EV)", "Vehicle_Age_yrs": 1, "Distance_km": 1142.0, "Fuel_Cost_INR": 1957.0, "CO2_emitted_kg": 106.0, "Maintenance_Cost_INR": 319.0, "Refuel_Recharge_time_min": 45.0, "Fuel_Price_per_unit_INR": 12.0, "Typical_Mileage": 7.0}, {"Fuel_Type": "Petrol (E20)", "Vehicle_Age_yrs": 8, "Distance_km": 1673.0, "Fuel_Cost_INR": 10590.0, "CO2_emitted_kg": 290.1, "Maintenance_Cost_INR": 867.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 100.0, "Typical_Mileage": 15.8}, {"Fuel_Type": "Diesel", "Vehicle_Age_yrs": 3, "Distance_km": 2448.0, "Fuel_Cost_INR": 10656.0, "CO2_emitted_kg": 415.4, "Maintenance_Cost_INR": 970.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 91.0, "Typical_Mileage": 20.9}, {"Fuel_Type": "E85 (Flex-Fuel)", "Vehicle_Age_yrs": 1, "Distance_km": 1067.0, "Fuel_Cost_INR": 6732.0, "CO2_emitted_kg": 77.9, "Maintenance_Cost_INR": 646.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 82.0, "Typical_Mileage": 13.0}, {"Fuel_Type": "E85 (Flex-Fuel)", "Vehicle_Age_yrs": 1, "Distance_km": 2749.0, "Fuel_Cost_INR": 17343.0, "CO2_emitted_kg": 184.3, "Maintenance_Cost_INR": 568.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 82.0, "Typical_Mileage": 13.0}, {"Fuel_Type": "E85 (Flex-Fuel)", "Vehicle_Age_yrs": 1, "Distance_km": 1686.0, "Fuel_Cost_INR": 10635.0, "CO2_emitted_kg": 112.5, "Maintenance_Cost_INR": 573.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 82.0, "Typical_Mileage": 13.0}, {"Fuel_Type": "Electric (EV)", "Vehicle_Age_yrs": 2, "Distance_km": 903.0, "Fuel_Cost_INR": 1548.0, "CO2_emitted_kg": 85.2, "Maintenance_Cost_INR": 253.0, "Refuel_Recharge_time_min": 45.0, "Fuel_Price_per_unit_INR": 12.0, "Typical_Mileage": 7.0}, {"Fuel_Type": "Electric (EV)", "Vehicle_Age_yrs": 1, "Distance_km": 2774.0, "Fuel_Cost_INR": 4756.0, "CO2_emitted_kg": 259.2, "Maintenance_Cost_INR": 322.0, "Refuel_Recharge_time_min": 45.0, "Fuel_Price_per_unit_INR": 12.0, "Typical_Mileage": 7.0}, {"Fuel_Type": "CNG", "Vehicle_Age_yrs": 6, "Distance_km": 1585.0, "Fuel_Cost_INR": 5536.0, "CO2_emitted_kg": 201.4, "Maintenance_Cost_INR": 1114.0, "Refuel_Recharge_time_min": 8.0, "Fuel_Price_per_unit_INR": 80.0, "Typical_Mileage": 22.9}, {"Fuel_Type": "Diesel", "Vehicle_Age_yrs": 6, "Distance_km": 1502.0, "Fuel_Cost_INR": 7043.0, "CO2_emitted_kg": 276.8, "Maintenance_Cost_INR": 1323.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 91.0, "Typical_Mileage": 19.4}, {"Fuel_Type": "Electric (EV)", "Vehicle_Age_yrs": 4, "Distance_km": 1115.0, "Fuel_Cost_INR": 2027.0, "CO2_emitted_kg": 101.9, "Maintenance_Cost_INR": 362.0, "Refuel_Recharge_time_min": 45.0, "Fuel_Price_per_unit_INR": 12.0, "Typical_Mileage": 6.6}, {"Fuel_Type": "Diesel", "Vehicle_Age_yrs": 6, "Distance_km": 962.0, "Fuel_Cost_INR": 4514.0, "CO2_emitted_kg": 181.4, "Maintenance_Cost_INR": 1332.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 91.0, "Typical_Mileage": 19.4}, {"Fuel_Type": "E85 (Flex-Fuel)", "Vehicle_Age_yrs": 2, "Distance_km": 925.0, "Fuel_Cost_INR": 5838.0, "CO2_emitted_kg": 62.4, "Maintenance_Cost_INR": 530.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 82.0, "Typical_Mileage": 13.0}, {"Fuel_Type": "Diesel", "Vehicle_Age_yrs": 12, "Distance_km": 951.0, "Fuel_Cost_INR": 5032.0, "CO2_emitted_kg": 172.3, "Maintenance_Cost_INR": 1550.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 91.0, "Typical_Mileage": 17.2}, {"Fuel_Type": "CNG", "Vehicle_Age_yrs": 4, "Distance_km": 1191.0, "Fuel_Cost_INR": 3856.0, "CO2_emitted_kg": 150.2, "Maintenance_Cost_INR": 841.0, "Refuel_Recharge_time_min": 8.0, "Fuel_Price_per_unit_INR": 80.0, "Typical_Mileage": 24.7}, {"Fuel_Type": "E85 (Flex-Fuel)", "Vehicle_Age_yrs": 1, "Distance_km": 1586.0, "Fuel_Cost_INR": 10004.0, "CO2_emitted_kg": 112.7, "Maintenance_Cost_INR": 630.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 82.0, "Typical_Mileage": 13.0}, {"Fuel_Type": "Electric (EV)", "Vehicle_Age_yrs": 2, "Distance_km": 1188.0, "Fuel_Cost_INR": 2036.0, "CO2_emitted_kg": 103.8, "Maintenance_Cost_INR": 297.0, "Refuel_Recharge_time_min": 45.0, "Fuel_Price_per_unit_INR": 12.0, "Typical_Mileage": 7.0}, {"Fuel_Type": "Petrol (E20)", "Vehicle_Age_yrs": 8, "Distance_km": 1540.0, "Fuel_Cost_INR": 9750.0, "CO2_emitted_kg": 266.5, "Maintenance_Cost_INR": 702.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 100.0, "Typical_Mileage": 15.8}, {"Fuel_Type": "Petrol (E20)", "Vehicle_Age_yrs": 7, "Distance_km": 3105.0, "Fuel_Cost_INR": 19650.0, "CO2_emitted_kg": 519.1, "Maintenance_Cost_INR": 727.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 100.0, "Typical_Mileage": 15.8}, {"Fuel_Type": "E85 (Flex-Fuel)", "Vehicle_Age_yrs": 2, "Distance_km": 1614.0, "Fuel_Cost_INR": 10184.0, "CO2_emitted_kg": 109.8, "Maintenance_Cost_INR": 661.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 82.0, "Typical_Mileage": 13.0}, {"Fuel_Type": "CNG", "Vehicle_Age_yrs": 3, "Distance_km": 1534.0, "Fuel_Cost_INR": 4968.0, "CO2_emitted_kg": 190.9, "Maintenance_Cost_INR": 764.0, "Refuel_Recharge_time_min": 8.0, "Fuel_Price_per_unit_INR": 80.0, "Typical_Mileage": 24.7}, {"Fuel_Type": "Petrol (E20)", "Vehicle_Age_yrs": 5, "Distance_km": 1513.0, "Fuel_Cost_INR": 8850.0, "CO2_emitted_kg": 260.1, "Maintenance_Cost_INR": 684.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 100.0, "Typical_Mileage": 17.1}, {"Fuel_Type": "Petrol (E20)", "Vehicle_Age_yrs": 7, "Distance_km": 3119.0, "Fuel_Cost_INR": 19740.0, "CO2_emitted_kg": 560.6, "Maintenance_Cost_INR": 698.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 100.0, "Typical_Mileage": 15.8}, {"Fuel_Type": "Petrol (E20)", "Vehicle_Age_yrs": 3, "Distance_km": 959.0, "Fuel_Cost_INR": 5610.0, "CO2_emitted_kg": 151.4, "Maintenance_Cost_INR": 655.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 100.0, "Typical_Mileage": 17.1}, {"Fuel_Type": "Electric (EV)", "Vehicle_Age_yrs": 1, "Distance_km": 1496.0, "Fuel_Cost_INR": 2564.0, "CO2_emitted_kg": 128.5, "Maintenance_Cost_INR": 272.0, "Refuel_Recharge_time_min": 45.0, "Fuel_Price_per_unit_INR": 12.0, "Typical_Mileage": 7.0}, {"Fuel_Type": "Diesel", "Vehicle_Age_yrs": 9, "Distance_km": 1333.0, "Fuel_Cost_INR": 6252.0, "CO2_emitted_kg": 231.7, "Maintenance_Cost_INR": 1524.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 91.0, "Typical_Mileage": 19.4}, {"Fuel_Type": "E85 (Flex-Fuel)", "Vehicle_Age_yrs": 1, "Distance_km": 1491.0, "Fuel_Cost_INR": 9405.0, "CO2_emitted_kg": 106.1, "Maintenance_Cost_INR": 663.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 82.0, "Typical_Mileage": 13.0}, {"Fuel_Type": "E85 (Flex-Fuel)", "Vehicle_Age_yrs": 2, "Distance_km": 1633.0, "Fuel_Cost_INR": 10299.0, "CO2_emitted_kg": 111.1, "Maintenance_Cost_INR": 626.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 82.0, "Typical_Mileage": 13.0}, {"Fuel_Type": "CNG", "Vehicle_Age_yrs": 8, "Distance_km": 2523.0, "Fuel_Cost_INR": 8816.0, "CO2_emitted_kg": 308.1, "Maintenance_Cost_INR": 1097.0, "Refuel_Recharge_time_min": 8.0, "Fuel_Price_per_unit_INR": 80.0, "Typical_Mileage": 22.9}, {"Fuel_Type": "Petrol (E20)", "Vehicle_Age_yrs": 7, "Distance_km": 1116.0, "Fuel_Cost_INR": 7060.0, "CO2_emitted_kg": 195.3, "Maintenance_Cost_INR": 718.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 100.0, "Typical_Mileage": 15.8}, {"Fuel_Type": "Petrol (E20)", "Vehicle_Age_yrs": 6, "Distance_km": 1598.0, "Fuel_Cost_INR": 10110.0, "CO2_emitted_kg": 280.9, "Maintenance_Cost_INR": 750.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 100.0, "Typical_Mileage": 15.8}, {"Fuel_Type": "E85 (Flex-Fuel)", "Vehicle_Age_yrs": 1, "Distance_km": 1003.0, "Fuel_Cost_INR": 6330.0, "CO2_emitted_kg": 72.6, "Maintenance_Cost_INR": 542.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 82.0, "Typical_Mileage": 13.0}, {"Fuel_Type": "E85 (Flex-Fuel)", "Vehicle_Age_yrs": 3, "Distance_km": 1504.0, "Fuel_Cost_INR": 10029.0, "CO2_emitted_kg": 105.4, "Maintenance_Cost_INR": 763.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 82.0, "Typical_Mileage": 12.3}, {"Fuel_Type": "Electric (EV)", "Vehicle_Age_yrs": 4, "Distance_km": 1063.0, "Fuel_Cost_INR": 1933.0, "CO2_emitted_kg": 102.2, "Maintenance_Cost_INR": 397.0, "Refuel_Recharge_time_min": 45.0, "Fuel_Price_per_unit_INR": 12.0, "Typical_Mileage": 6.6}, {"Fuel_Type": "CNG", "Vehicle_Age_yrs": 6, "Distance_km": 951.0, "Fuel_Cost_INR": 3320.0, "CO2_emitted_kg": 126.4, "Maintenance_Cost_INR": 939.0, "Refuel_Recharge_time_min": 8.0, "Fuel_Price_per_unit_INR": 80.0, "Typical_Mileage": 22.9}, {"Fuel_Type": "Electric (EV)", "Vehicle_Age_yrs": 1, "Distance_km": 1371.0, "Fuel_Cost_INR": 2351.0, "CO2_emitted_kg": 128.0, "Maintenance_Cost_INR": 258.0, "Refuel_Recharge_time_min": 45.0, "Fuel_Price_per_unit_INR": 12.0, "Typical_Mileage": 7.0}, {"Fuel_Type": "CNG", "Vehicle_Age_yrs": 5, "Distance_km": 1299.0, "Fuel_Cost_INR": 4208.0, "CO2_emitted_kg": 159.9, "Maintenance_Cost_INR": 792.0, "Refuel_Recharge_time_min": 8.0, "Fuel_Price_per_unit_INR": 80.0, "Typical_Mileage": 24.7}, {"Fuel_Type": "Electric (EV)", "Vehicle_Age_yrs": 1, "Distance_km": 1579.0, "Fuel_Cost_INR": 2707.0, "CO2_emitted_kg": 138.8, "Maintenance_Cost_INR": 320.0, "Refuel_Recharge_time_min": 45.0, "Fuel_Price_per_unit_INR": 12.0, "Typical_Mileage": 7.0}, {"Fuel_Type": "Diesel", "Vehicle_Age_yrs": 11, "Distance_km": 1452.0, "Fuel_Cost_INR": 7680.0, "CO2_emitted_kg": 282.4, "Maintenance_Cost_INR": 1728.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 91.0, "Typical_Mileage": 17.2}, {"Fuel_Type": "Electric (EV)", "Vehicle_Age_yrs": 3, "Distance_km": 1654.0, "Fuel_Cost_INR": 3007.0, "CO2_emitted_kg": 151.9, "Maintenance_Cost_INR": 375.0, "Refuel_Recharge_time_min": 45.0, "Fuel_Price_per_unit_INR": 12.0, "Typical_Mileage": 6.6}, {"Fuel_Type": "E85 (Flex-Fuel)", "Vehicle_Age_yrs": 3, "Distance_km": 1289.0, "Fuel_Cost_INR": 8594.0, "CO2_emitted_kg": 93.9, "Maintenance_Cost_INR": 837.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 82.0, "Typical_Mileage": 12.3}, {"Fuel_Type": "Petrol (E20)", "Vehicle_Age_yrs": 7, "Distance_km": 2361.0, "Fuel_Cost_INR": 14940.0, "CO2_emitted_kg": 419.4, "Maintenance_Cost_INR": 731.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 100.0, "Typical_Mileage": 15.8}, {"Fuel_Type": "Petrol (E20)", "Vehicle_Age_yrs": 5, "Distance_km": 1031.0, "Fuel_Cost_INR": 6030.0, "CO2_emitted_kg": 164.2, "Maintenance_Cost_INR": 614.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 100.0, "Typical_Mileage": 17.1}, {"Fuel_Type": "Diesel", "Vehicle_Age_yrs": 4, "Distance_km": 972.0, "Fuel_Cost_INR": 4232.0, "CO2_emitted_kg": 170.0, "Maintenance_Cost_INR": 1131.0, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_per_unit_INR": 91.0, "Typical_Mileage": 20.9}];
+const COLORS = {
+  Petrol:"#3b82f6",
+  Diesel:"#9ca3af",
+  CNG:"#22c55e",
+  E85:"#f59e0b",
+  EV:"#a855f7"
+};
+const ORDER = ["Petrol","Diesel","CNG","E85","EV"];
+const MY_AGE = 3;
+const KM_MONTH = 1000;
+
+const FUEL_MAP = {
+  "Petrol (E20)":"Petrol",
+  "Diesel":"Diesel",
+  "CNG":"CNG",
+  "E85 (Flex-Fuel)":"E85",
+  "Electric (EV)":"EV"
+};
+
+const rows = DATA.map(r => ({
+  fuel:FUEL_MAP[r.Fuel_Type],
+  age:Number(r.Vehicle_Age_yrs),
+  km:Number(r.Distance_km),
+  cost:Number(r.Fuel_Cost_INR),
+  co2:Number(r.CO2_emitted_kg),
+  maint:Number(r.Maintenance_Cost_INR),
+  time:Number(r.Refuel_Recharge_time_min),
+  price:Number(r.Fuel_Price_per_unit_INR),
+  mileage:Number(r.Typical_Mileage)
+}));
+
+const mean = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+const money = n => "₹" + Number(n).toFixed(2);
+const num = n => Number(n).toFixed(3);
+const bucket = age => age <= 2 ? "New" : age <= 5 ? "Mid-life" : age <= 9 ? "Aged" : "Old";
+
+const stats = {};
+ORDER.forEach(fuel => {
+  const r = rows.filter(x=>x.fuel===fuel);
+  stats[fuel] = {
+    rows:r,
+    n:r.length,
+    cpk:mean(r.map(x=>x.cost/x.km)),
+    co2:mean(r.map(x=>x.co2/x.km)),
+    mpk:mean(r.map(x=>x.maint/x.km)),
+    time:mean(r.map(x=>x.time)),
+    price:mean(r.map(x=>x.price)),
+    mileage:mean(r.map(x=>x.mileage))
+  };
+});
+
+const petrol = stats.Petrol;
+const e85 = stats.E85;
+const pumpSaving = ((petrol.price-e85.price)/petrol.price)*100;
+const runningPenalty = ((e85.cpk-petrol.cpk)/petrol.cpk)*100;
+const breakEven = (e85.mileage/petrol.mileage)*petrol.price;
+const monthlyCost = petrol.cpk * KM_MONTH;
+
+function scaledScore(key, weight){
+  const values = ORDER.map(f=>stats[f][key]);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  if(max===min) return weight;
+  return weight * (max-stats.E85[key])/(max-min);
+}
+const scoreParts = {
+  cost:scaledScore("cpk",4),
+  co2:scaledScore("co2",3),
+  time:scaledScore("time",2),
+  maint:scaledScore("mpk",1)
+};
+const e85Score = Object.values(scoreParts).reduce((a,b)=>a+b,0);
+
+document.getElementById("recordCount").textContent = rows.length + " records";
+
+function addSvg(parent, tag, attrs, text){
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  Object.entries(attrs||{}).forEach(([k,v])=>el.setAttribute(k,String(v)));
+  if(text !== undefined) el.textContent = text;
+  parent.appendChild(el);
+  return el;
+}
+
+function tooltip(el, text){
+  el.addEventListener("mouseenter", e => {
+    el.setAttribute("opacity",".78");
+    el.setAttribute("data-tooltip",text);
+  });
+  el.addEventListener("mouseleave", () => el.setAttribute("opacity","1"));
+  el.addEventListener("click", () => alert(text));
+}
+
+function renderKPIs(){
+  const items = [
+    ["My fuel cost/km", money(petrol.cpk), "Petrol CSV average", COLORS.Petrol],
+    ["E85 cost/km", money(e85.cpk), "E85 CSV average", COLORS.E85],
+    ["E85 premium vs Petrol", (runningPenalty>=0?"+":"")+runningPenalty.toFixed(2)+"%", "Running cost difference", COLORS.E85],
+    ["E85 break-even price", money(breakEven)+"/L", "Price where E85 matches petrol cost/km", COLORS.E85],
+    ["My monthly fuel cost", "₹"+Math.round(monthlyCost).toLocaleString("en-IN"), "Petrol cost/km × 1000 km", COLORS.Petrol]
+  ];
+  document.getElementById("kpis").innerHTML = items.map(x =>
+    `<div class="card kpi" style="border-top-color:${x[3]}">
+      <div class="kpi-label">${x[0]}</div>
+      <div class="kpi-value">${x[1]}</div>
+      <div class="kpi-note">${x[2]}</div>
+    </div>`).join("");
+}
+
+function renderBar(){
+  const svg=document.getElementById("barChart");
+  const L=65,B=275,T=25,R=620,H=B-T,W=R-L;
+  const max=Math.max(...ORDER.map(f=>stats[f].cpk))*1.2;
+  for(let i=0;i<=5;i++){
+    const y=B-(H*i/5);
+    addSvg(svg,"line",{x1:L,x2:R,y1:y,y2:y,class:"gridline"});
+    addSvg(svg,"text",{x:L-8,y:y+4,"text-anchor":"end"},"₹"+(max*i/5).toFixed(1));
+  }
+  const slot=W/ORDER.length;
+  ORDER.forEach((f,i)=>{
+    const h=(stats[f].cpk/max)*H;
+    const x=L+i*slot+slot*.18;
+    const w=slot*.64;
+    const rect=addSvg(svg,"rect",{x,y:B-h,width:w,height:h,rx:7,fill:COLORS[f]});
+    tooltip(rect,`${f}: ₹${stats[f].cpk.toFixed(3)}/km`);
+    addSvg(svg,"text",{x:x+w/2,y:B-h-8,"text-anchor":"middle","font-weight":"700"},"₹"+stats[f].cpk.toFixed(2));
+    addSvg(svg,"text",{x:x+w/2,y:B+22,"text-anchor":"middle"},f);
+  });
+  addSvg(svg,"line",{x1:L,x2:R,y1:B,y2:B,class:"axis"});
+}
+
+function renderDonut(){
+  const svg=document.getElementById("donutChart");
+  const cx=210,cy=165,R=105,r=63;
+  const total=ORDER.reduce((s,f)=>s+stats[f].co2,0);
+  let start=-Math.PI/2;
+  ORDER.forEach(f=>{
+    const frac=stats[f].co2/total;
+    const end=start+frac*Math.PI*2;
+    const large=frac>.5?1:0;
+    const p0=[cx+R*Math.cos(start),cy+R*Math.sin(start)];
+    const p1=[cx+R*Math.cos(end),cy+R*Math.sin(end)];
+    const q1=[cx+r*Math.cos(end),cy+r*Math.sin(end)];
+    const q0=[cx+r*Math.cos(start),cy+r*Math.sin(start)];
+    const d=`M ${p0[0]} ${p0[1]} A ${R} ${R} 0 ${large} 1 ${p1[0]} ${p1[1]} L ${q1[0]} ${q1[1]} A ${r} ${r} 0 ${large} 0 ${q0[0]} ${q0[1]} Z`;
+    const path=addSvg(svg,"path",{d,fill:COLORS[f],stroke:"#0a0f1e","stroke-width":2});
+    tooltip(path,`${f}: ${stats[f].co2.toFixed(3)} kg CO₂/km`);
+    start=end;
+  });
+  addSvg(svg,"text",{x:cx,y:cy-4,"text-anchor":"middle","font-size":"18","font-weight":"700"},"CO₂/km");
+  addSvg(svg,"text",{x:cx,y:cy+17,"text-anchor":"middle"}, "average");
+  document.getElementById("donutLegend").innerHTML=ORDER.map(f=>
+    `<span><i class="dot" style="background:${COLORS[f]}"></i>${f}: ${stats[f].co2.toFixed(3)}</span>`).join("");
+}
+
+function renderLine(){
+  const svg=document.getElementById("lineChart");
+  const L=70,R=1060,T=25,B=330,W=R-L,H=B-T;
+  const all=ORDER.flatMap(f=>stats[f].rows.map(x=>x.cost/x.km));
+  const max=Math.ceil(Math.max(...all)*1.15);
+  const X=age=>L+(age/12)*W;
+  const Y=v=>B-(v/max)*H;
+  for(let i=0;i<=5;i++){
+    const v=max*i/5,y=Y(v);
+    addSvg(svg,"line",{x1:L,x2:R,y1:y,y2:y,class:"gridline"});
+    addSvg(svg,"text",{x:L-8,y:y+4,"text-anchor":"end"},"₹"+v.toFixed(1));
+  }
+  for(let age=0;age<=12;age+=1){
+    addSvg(svg,"text",{x:X(age),y:B+22,"text-anchor":"middle"},String(age));
+  }
+  addSvg(svg,"text",{x:(L+R)/2,y:B+47,"text-anchor":"middle"},"Vehicle age (years)");
+  const mineX=X(MY_AGE);
+  addSvg(svg,"line",{x1:mineX,x2:mineX,y1:T,y2:B,stroke:"#fff","stroke-dasharray":"7 5","stroke-width":2});
+  addSvg(svg,"text",{x:mineX+7,y:T+14,"font-weight":"700"},"Your car · 3 years");
+
+  ORDER.forEach(f=>{
+    const byAge={};
+    stats[f].rows.forEach(x=>{
+      if(!byAge[x.age]) byAge[x.age]=[];
+      byAge[x.age].push(x.cost/x.km);
+    });
+    const ages=Object.keys(byAge).map(Number).sort((a,b)=>a-b);
+    const pts=ages.map(age=>[X(age),Y(mean(byAge[age]))]);
+    if(!pts.length) return;
+    const d=pts.map((p,i)=>(i?"L":"M")+p[0]+" "+p[1]).join(" ");
+    addSvg(svg,"path",{d,fill:"none",stroke:COLORS[f],"stroke-width":f==="Petrol"?4:2.5});
+    pts.forEach((p,i)=>{
+      const c=addSvg(svg,"circle",{cx:p[0],cy:p[1],r:5,fill:COLORS[f]});
+      tooltip(c,`${f} · age ${ages[i]}: ₹${mean(byAge[ages[i]]).toFixed(3)}/km`);
+    });
+  });
+  document.getElementById("lineLegend").innerHTML=ORDER.map(f=>
+    `<span><i class="dot" style="background:${COLORS[f]}"></i>${f}</span>`).join("");
+}
+
+function renderTables(){
+  const buckets=["New","Mid-life","Aged","Old"];
+  let h="<tr><th>Fuel</th>"+buckets.map(b=>`<th>${b}${b==="Mid-life"?" · you":""}<br>Cost · Maint/km</th>`).join("")+"</tr>";
+  ORDER.forEach(f=>{
+    h+=`<tr><td style="color:${COLORS[f]};font-weight:700">${f}</td>`;
+    buckets.forEach(b=>{
+      const r=stats[f].rows.filter(x=>bucket(x.age)===b);
+      h+=`<td class="${b==="Mid-life"?"highlight":""}">${r.length?money(mean(r.map(x=>x.cost/x.km)))+" · "+money(mean(r.map(x=>x.maint/x.km)))+"<br><small>n="+r.length+"</small>":"Unavailable"}</td>`;
+    });
+    h+="</tr>";
+  });
+  document.getElementById("ageTable").innerHTML=h;
+
+  let h2="<tr><th>Fuel</th><th>Cost/km</th><th>CO₂/km</th><th>Maint/km</th><th>Refuel/recharge</th></tr>";
+  ORDER.forEach(f=>{
+    const s=stats[f];
+    h2+=`<tr class="${f==="Petrol"?"highlight":""}">
+      <td style="color:${COLORS[f]};font-weight:700">${f}</td>
+      <td>${money(s.cpk)}</td><td>${num(s.co2)}</td><td>${money(s.mpk)}</td><td>${s.time.toFixed(0)} min</td>
+    </tr>`;
+  });
+  document.getElementById("fuelTable").innerHTML=h2;
+}
+
+function renderE85(){
+  document.getElementById("e85Metrics").innerHTML=`
+    <div class="metric"><strong>${pumpSaving.toFixed(2)}%</strong><small>Pump saving: ₹${petrol.price.toFixed(0)} → ₹${e85.price.toFixed(0)}/L</small></div>
+    <div class="metric"><strong>+${runningPenalty.toFixed(2)}%</strong><small>Running penalty: E85 ₹${e85.cpk.toFixed(3)} vs Petrol ₹${petrol.cpk.toFixed(3)}/km</small></div>
+    <div class="metric"><strong>₹${breakEven.toFixed(2)}/L</strong><small>Break-even E85 price based on mileage ratio</small></div>
+  `;
+}
+
+function renderGauge(){
+  const svg=document.getElementById("gauge");
+  const cx=170,cy=170,R=120;
+  const start=Math.PI, end=2*Math.PI;
+  const p1=[cx+R*Math.cos(start),cy+R*Math.sin(start)];
+  const p2=[cx+R*Math.cos(end),cy+R*Math.sin(end)];
+  const d=`M ${p1[0]} ${p1[1]} A ${R} ${R} 0 0 1 ${p2[0]} ${p2[1]}`;
+  addSvg(svg,"path",{d,fill:"none",stroke:"rgba(255,255,255,.12)","stroke-width":22,"stroke-linecap":"round"});
+  const angle=start+(e85Score/10)*Math.PI;
+  const endX=cx+R*Math.cos(angle),endY=cy+R*Math.sin(angle);
+  const sweep=angle-start>Math.PI?1:0;
+  const d2=`M ${p1[0]} ${p1[1]} A ${R} ${R} 0 ${sweep} 1 ${endX} ${endY}`;
+  addSvg(svg,"path",{d:d2,fill:"none",stroke:COLORS.E85,"stroke-width":22,"stroke-linecap":"round"});
+  addSvg(svg,"text",{x:cx,y:cy-18,"text-anchor":"middle","font-size":"42","font-weight":"800",fill:COLORS.E85},e85Score.toFixed(1));
+  addSvg(svg,"text",{x:cx,y:cy+12,"text-anchor":"middle"},"out of 10");
+  addSvg(svg,"text",{x:cx-R,y:cy+32,"text-anchor":"middle"},"0");
+  addSvg(svg,"text",{x:cx+R,y:cy+32,"text-anchor":"middle"},"10");
+
+  document.getElementById("scoreBreakdown").innerHTML=[
+    ["Cost",scoreParts.cost,4],["CO₂",scoreParts.co2,3],["Refuel",scoreParts.time,2],["Maint.",scoreParts.maint,1]
+  ].map(x=>`<span><i class="dot" style="background:${COLORS.E85}"></i>${x[0]} ${x[1].toFixed(1)}/${x[2]}</span>`).join("");
+
+  document.getElementById("verdict").textContent =
+    `E85 scores ${e85Score.toFixed(1)}/10. Its pump price is lower than Petrol, but its lower mileage makes its average cost per km ${runningPenalty.toFixed(1)}% higher in this dataset.`;
+}
+
+function renderFuelCards(){
+  const descriptions={
+    Petrol:{
+      pros:[`Short average refuel time (${petrol.time.toFixed(0)} min)`,`Moderate maintenance cost (${money(petrol.mpk)}/km)`],
+      cons:[`Cost/km is ${money(petrol.cpk)}`,`CO₂ is ${num(petrol.co2)} kg/km`],
+      best:"Mixed city and highway use for this dashboard vehicle"
+    },
+    Diesel:{
+      pros:[`Cost/km is ${money(stats.Diesel.cpk)}`,`Short refuel time (${stats.Diesel.time.toFixed(0)} min)`],
+      cons:[`Maintenance is ${money(stats.Diesel.mpk)}/km`,`CO₂ is ${num(stats.Diesel.co2)} kg/km`],
+      best:"High-distance driving where diesel access is convenient"
+    },
+    CNG:{
+      pros:[`Cost/km is ${money(stats.CNG.cpk)}`,`CO₂ is ${num(stats.CNG.co2)} kg/km`],
+      cons:[`Refuel time averages ${stats.CNG.time.toFixed(0)} min`,`Maintenance is ${money(stats.CNG.mpk)}/km`],
+      best:"Budget-focused commuting near CNG stations"
+    },
+    E85:{
+      pros:[`Lowest CO₂ in this supplied dataset: ${num(e85.co2)} kg/km`,`Pump price is ${pumpSaving.toFixed(1)}% below Petrol`],
+      cons:[`Cost/km is ${money(e85.cpk)}`,`Mileage is ${e85.mileage.toFixed(2)} km/L vs Petrol ${petrol.mileage.toFixed(2)}`],
+      best:"Where lower emissions matter and E85 price approaches break-even"
+    },
+    EV:{
+      pros:[`Lowest cost/km: ${money(stats.EV.cpk)}`,`Lowest maintenance/km: ${money(stats.EV.mpk)}`],
+      cons:[`Recharge time averages ${stats.EV.time.toFixed(0)} min`,`Requires reliable charging access`],
+      best:"Predictable routes with home or workplace charging"
+    }
+  };
+  document.getElementById("fuelCards").innerHTML=ORDER.map(f=>{
+    const d=descriptions[f];
+    return `<div class="card fuel-card ${f==="Petrol"?"selected":""}" style="--fuel:${COLORS[f]}">
+      <div class="fuel-title">${f}${f==="Petrol"?'<span class="badge">Your fuel</span>':""}</div>
+      <ul>${d.pros.map(x=>`<li>✅ ${x}</li>`).join("")}${d.cons.map(x=>`<li>❌ ${x}</li>`).join("")}</ul>
+      <div class="best">🚗 Best for: ${d.best}</div>
+    </div>`;
+  }).join("");
+}
+
+renderKPIs();
+renderBar();
+renderDonut();
+renderLine();
+renderTables();
+renderE85();
+renderGauge();
+renderFuelCards();
+</script>
+</body>
+</html>
