@@ -1,0 +1,502 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Quarterly Growth Strategy Meeting</title>
+<style>
+/* Layout: sticky section nav above a single-column stack of collapsible cards; KPI strip with scaled bars up top. */
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+:root{
+  --bg:#EEF1F4;
+  --surface:#FFFFFF;
+  --surface-2:#F6F8FA;
+  --line:#D9DFE6;
+  --ink:#14202B;
+  --muted:#556270;
+  --accent:#1D5BBF;
+  --accent-bg:#E4EDFB;
+  --red:#B3261E; --red-bg:#FBE6E4;
+  --amber:#8A5A00; --amber-bg:#FCEFD2;
+  --green:#1B6B3A; --green-bg:#DDF2E4;
+  --violet:#5B3FA6; --violet-bg:#ECE6FA;
+  --orange:#A8420A; --orange-bg:#FDE7DA;
+  --grey-bg:#E7EBEF;
+  --shadow:0 1px 2px rgba(20,32,43,.06),0 4px 14px rgba(20,32,43,.05);
+  --font-display:"Manrope","Segoe UI",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E151C; --surface:#161F29; --surface-2:#1B2631; --line:#2A3745;
+    --ink:#E6ECF2; --muted:#9AA9B8; --accent:#7FB0FF; --accent-bg:#1A2D4A;
+    --red:#FF9A91; --red-bg:#40201D;
+    --amber:#F2C467; --amber-bg:#3B2D10;
+    --green:#7FD6A0; --green-bg:#16301F;
+    --violet:#BBA6FF; --violet-bg:#2A2147;
+    --orange:#FFAE82; --orange-bg:#3E2312;
+    --grey-bg:#222E3A;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.25);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E151C; --surface:#161F29; --surface-2:#1B2631; --line:#2A3745;
+  --ink:#E6ECF2; --muted:#9AA9B8; --accent:#7FB0FF; --accent-bg:#1A2D4A;
+  --red:#FF9A91; --red-bg:#40201D;
+  --amber:#F2C467; --amber-bg:#3B2D10;
+  --green:#7FD6A0; --green-bg:#16301F;
+  --violet:#BBA6FF; --violet-bg:#2A2147;
+  --orange:#FFAE82; --orange-bg:#3E2312;
+  --grey-bg:#222E3A;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.25);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:20px 56px}
+.wrap{max-width:1120px;margin-inline:auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;line-height:1.2}
+p{margin:0}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+/* header */
+.head{display:flex;flex-direction:column;gap:6px;padding-block:8px 4px}
+.head h1{font-size:clamp(26px,4.6vw,38px);font-weight:800;letter-spacing:-.01em}
+.head .sub{color:var(--muted);max-width:70ch}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{font-size:12.5px;padding:3px 10px;border-radius:999px;background:var(--grey-bg);color:var(--muted);border:1px solid var(--line)}
+
+/* kpi */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-width:0}
+.kpi .val{font-family:var(--font-display);font-weight:800;font-size:30px;line-height:1;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.kpi .val small{font-family:var(--font-body);font-size:13px;font-weight:500;color:var(--muted)}
+.kpi .lbl{font-size:13px;color:var(--muted)}
+.bar{position:relative;height:8px;border-radius:99px;background:var(--grey-bg);overflow:visible}
+.bar>i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:var(--accent)}
+.bar>b{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);border-radius:2px}
+.bar-legend{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);font-family:var(--font-mono)}
+.kpi.warn .bar>i{background:var(--orange)}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;margin-inline:-4px;padding-inline:4px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+.nav button{flex:0 0 auto;font:inherit;font-size:13px;font-weight:500;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.nav button:hover{background:var(--accent-bg);border-color:var(--accent)}
+.nav .tools{margin-left:auto;display:flex;gap:6px}
+
+button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* sections */
+details.sec{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);scroll-margin-top:64px}
+details.sec>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 18px;user-select:none}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary h2{font-size:18px;font-weight:700;flex:1;min-width:0}
+.count{font-family:var(--font-mono);font-size:12.5px;background:var(--grey-bg);color:var(--muted);border-radius:99px;padding:2px 9px}
+.caret{width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s}
+details[open]>summary .caret{transform:rotate(45deg)}
+.body{padding:2px 18px 18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.lead{font-size:16px;max-width:75ch}
+
+/* grids and cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.card{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0;transition:transform .12s,border-color .12s}
+.card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.card h3{font-size:15px;font-weight:700}
+.card p{font-size:14px;color:var(--ink)}
+.src{font-size:12px;color:var(--muted);font-family:var(--font-mono)}
+.num{font-family:var(--font-mono);font-weight:500}
+
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;white-space:nowrap;line-height:1.5;border:0;font-family:var(--font-body)}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.b-high{background:var(--red-bg);color:var(--red)}
+.b-med{background:var(--amber-bg);color:var(--amber)}
+.b-low{background:var(--green-bg);color:var(--green)}
+.b-conflict{background:var(--orange-bg);color:var(--orange)}
+.b-question{background:var(--violet-bg);color:var(--violet)}
+.b-done{background:var(--green-bg);color:var(--green)}
+.b-pending{background:var(--amber-bg);color:var(--amber)}
+.b-prog{background:var(--accent-bg);color:var(--accent)}
+.b-neutral{background:var(--grey-bg);color:var(--muted)}
+.b-decision{background:var(--accent-bg);color:var(--accent)}
+.row-badges{display:flex;flex-wrap:wrap;gap:6px}
+.ns{color:var(--muted);font-style:italic}
+
+/* toolbar for actions */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.toolbar label{font-size:12.5px;color:var(--muted);display:flex;gap:6px;align-items:center}
+select,input[type=search]{font:inherit;font-size:14px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-width:0}
+input[type=search]{flex:1 1 180px}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{font:inherit;font-size:13px;padding:5px 11px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.progress{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.progress .bar{flex:1;max-width:260px}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;min-width:720px;font-size:14px}
+th{position:sticky;top:0;text-align:left;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);background:var(--surface-2);padding:10px 12px;border-bottom:1px solid var(--line);font-weight:600}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+td .task{font-weight:600}
+td .note{display:block;font-size:12.5px;color:var(--muted);margin-top:3px}
+.statusbtn{cursor:pointer}
+.statusbtn:hover{filter:brightness(.95);outline:1px solid currentColor}
+.hint{font-size:12.5px;color:var(--muted)}
+.empty{padding:18px;text-align:center;color:var(--muted)}
+
+/* lists */
+.list{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.item{display:flex;flex-direction:column;gap:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
+.item .t{font-weight:600}
+.item .d{font-size:14px;color:var(--ink)}
+.item .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* speakers */
+.sp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.sp{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.sp-head{display:flex;gap:10px;align-items:center}
+.av{width:36px;height:36px;border-radius:50%;background:var(--accent-bg);color:var(--accent);display:grid;place-items:center;font-family:var(--font-display);font-weight:800;font-size:13px;flex:none}
+.sp h3{font-size:15px}
+.sp ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:14px}
+.sp .sub-h{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.sp li.none{list-style:none;margin-left:-18px;color:var(--muted);font-style:italic}
+
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+@media (max-width:520px){ .nav .tools{margin-left:0} body{font-size:14.5px} }
+@media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <span class="eyebrow">Meeting Transcript Analysis</span>
+    <h1>Quarterly Growth Strategy Meeting</h1>
+    <p class="sub">Built only from the transcript. Anything the transcript does not state is shown as “Not specified”.</p>
+    <div class="chips">
+      <span class="chip">Speakers: CEO, Head of Sales, CFO, VP Marketing, Product Director, CTO, Customer Success Lead</span>
+      <span class="chip">Meeting date: Not specified</span>
+    </div>
+  </header>
+
+  <section class="kpis" aria-label="Figures stated in the meeting">
+    <div class="kpi warn">
+      <span class="lbl">Q2 revenue growth vs target</span>
+      <div class="val"><span class="mono">12%</span><small>target 18%</small></div>
+      <div class="bar" role="img" aria-label="12 percent against an 18 percent target"><i style="width:66.67%"></i><b style="left:calc(100% - 1px)"></b></div>
+      <div class="bar-legend"><span>0%</span><span>18% target</span></div>
+    </div>
+    <div class="kpi warn">
+      <span class="lbl">Large contracts finalized</span>
+      <div class="val"><span class="mono">9</span><small>of 14 expected</small></div>
+      <div class="bar" role="img" aria-label="9 of 14 expected contracts finalized"><i style="width:64.29%"></i></div>
+      <div class="bar-legend"><span>0</span><span>14</span></div>
+    </div>
+    <div class="kpi">
+      <span class="lbl">Website traffic vs last quarter</span>
+      <div class="val"><span class="mono">+34%</span><small>conversion lower than expected</small></div>
+    </div>
+    <div class="kpi">
+      <span class="lbl">Customer retention</span>
+      <div class="val"><span class="mono">94%</span><small>support tickets up significantly</small></div>
+      <div class="bar" role="img" aria-label="94 percent retention"><i style="width:94%"></i></div>
+      <div class="bar-legend"><span>0%</span><span>100%</span></div>
+    </div>
+  </section>
+
+  <nav class="nav" aria-label="Sections">
+    <button data-go="summary">Summary</button>
+    <button data-go="takeaways">Takeaways</button>
+    <button data-go="actions">Actions</button>
+    <button data-go="questions">Questions</button>
+    <button data-go="risks">Risks</button>
+    <button data-go="conflicts">Conflicts</button>
+    <button data-go="notes">Notes</button>
+    <button data-go="speakers">Speakers</button>
+    <button data-go="decisions">Decisions</button>
+    <button data-go="byspeaker">By speaker</button>
+    <button data-go="attrib">Attribution</button>
+    <span class="tools"><button id="expand">Expand all</button><button id="collapse">Collapse all</button></span>
+  </nav>
+
+  <details class="sec" id="summary" open>
+    <summary><h2>Summary</h2><span class="caret"></span></summary>
+    <div class="body">
+      <p class="lead">The CEO opened by stating that Q2 revenue grew 12%, below the 18% target committed to at the start of the year. The Head of Sales attributed most of the gap to enterprise deals slipping into next quarter: 14 large contracts were expected to close and 9 were finalized. Procurement delays were the biggest reason, and two clients requested additional security reviews before signing.</p>
+      <p class="lead">Marketing reported website traffic up 34% compared to last quarter with conversion rates still lower than expected, and a planned website redesign. The Product Director and CTO raised engineering capacity, with the analytics dashboard scheduled for August. Customer Success reported 94% retention and a significant rise in support ticket volume tied to reporting performance and dashboard loading times. The CEO deferred spending, hiring and conference budget decisions, asked for no public commitments until the engineering milestone review is complete, and said open items will be followed up at next week's leadership meeting.</p>
+    </div>
+  </details>
+
+  <details class="sec" id="takeaways" open>
+    <summary><h2>Key Takeaways</h2><span class="count">6</span><span class="caret"></span></summary>
+    <div class="body">
+      <div class="grid">
+        <div class="card"><div class="row-badges"><span class="badge b-high">High Priority</span></div><h3>Reporting performance is a priority issue</h3><p>Complaints relate to reporting performance and dashboard loading times. Several prospects also mentioned it during sales calls. The CEO called it a priority issue, and the Product Director said it may have a larger business impact than some planned feature releases.</p><span class="src">CEO · Product Director · Customer Success Lead · Head of Sales</span></div>
+        <div class="card"><h3>Revenue below target</h3><p>Q2 revenue grew <span class="num">12%</span> against the <span class="num">18%</span> target. The CFO said further deal movement may cause the annual target to be missed.</p><span class="src">CEO · CFO</span></div>
+        <div class="card"><h3>Enterprise deals slipped</h3><p><span class="num">9</span> of <span class="num">14</span> expected large contracts were finalized. Procurement delays were the biggest reason, and two clients requested additional security reviews.</p><span class="src">Head of Sales</span></div>
+        <div class="card"><h3>Lead generation up, conversion lagging</h3><p>Website traffic increased <span class="num">34%</span> compared to last quarter. Conversion rates are still lower than expected. A website redesign and a simpler demo-request process are planned.</p><span class="src">VP Marketing</span></div>
+        <div class="card"><h3>Engineering near capacity</h3><p>The engineering team is focused on the new analytics dashboard scheduled for August. Major website work may require additional contractors, and no cost estimate exists yet because the architecture review is not complete.</p><span class="src">Product Director · CTO</span></div>
+        <div class="card"><h3>Retention strong, tickets rising</h3><p>Customer retention remains strong at <span class="num">94%</span>, but support ticket volume has increased significantly.</p><span class="src">Customer Success Lead</span></div>
+      </div>
+    </div>
+  </details>
+
+  <details class="sec" id="actions" open>
+    <summary><h2>Action Items</h2><span class="count" id="act-count">0</span><span class="caret"></span></summary>
+    <div class="body">
+      <div class="toolbar">
+        <input type="search" id="q" placeholder="Search tasks" aria-label="Search tasks">
+        <label for="owner">Owner
+          <select id="owner"></select>
+        </label>
+        <div class="seg" id="statusfilter" role="group" aria-label="Filter by status">
+          <button data-s="all" aria-pressed="true">All</button>
+          <button data-s="Pending" aria-pressed="false">Pending</button>
+          <button data-s="In progress" aria-pressed="false">In progress</button>
+          <button data-s="Completed" aria-pressed="false">Completed</button>
+        </div>
+      </div>
+      <div class="progress"><span id="prog-text"></span><div class="bar"><i id="prog-bar" style="width:0%"></i></div></div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Task</th><th>Owner</th><th>Deadline</th><th>Status</th></tr></thead>
+          <tbody id="act-body"></tbody>
+        </table>
+      </div>
+      <p class="hint">Select a status badge to cycle Pending, In progress and Completed. Changes apply to this view only. Starting statuses come from the transcript: investigation of reporting performance has started; everything else is Pending.</p>
+    </div>
+  </details>
+
+  <details class="sec" id="questions" open>
+    <summary><h2>Open Questions</h2><span class="count">6</span><span class="caret"></span></summary>
+    <div class="body">
+      <ul class="list">
+        <li class="item"><div class="meta"><span class="badge b-question">Open Question</span><span class="src">Raised by CFO</span></div><div class="t">What will the additional website work cost?</div><div class="d">The CTO said there is no estimate yet because the architecture review hasn't been completed. The CEO wants the estimate before approving any additional spending.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-question">Open Question</span><span class="src">Raised by CFO</span></div><div class="t">What is next year's hiring plan?</div><div class="d">Department heads submitted different headcount requests. The CEO postponed hiring decisions until Q3 forecasts are finalized.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-question">Open Question</span><span class="src">Raised by VP Marketing</span></div><div class="t">Will the annual customer conference budget be approved?</div><div class="d">The CFO still needs final vendor proposals before approving. The CEO will revisit it next month after proposals are received.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-question">Open Question</span><span class="src">Raised by Head of Sales</span></div><div class="t">Should the new analytics dashboard be announced at the conference?</div><div class="d">The Product Director said only if confident about the August release date. The CTO can't guarantee that date. The CEO asked to avoid public commitments until engineering completes the milestone review.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-question">Open Question</span><span class="src">Raised by CFO</span></div><div class="t">Will the delayed deals move again?</div><div class="d">The CFO said if the deals move again, the annual target may be missed. The transcript does not state whether they will.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-question">Open Question</span><span class="src">Raised by CEO</span></div><div class="t">How will conversion rates be improved, and on what timeline?</div><div class="d">VP Marketing described planned changes. The Product Director and CTO raised capacity concerns, and no timeline or approval is stated.</div></li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="sec" id="risks" open>
+    <summary><h2>Risks / Blockers</h2><span class="count">7</span><span class="caret"></span></summary>
+    <div class="body">
+      <p class="hint">Priority is Not specified unless the transcript gives one.</p>
+      <div class="grid">
+        <div class="card"><div class="row-badges"><span class="badge b-high">High Priority</span></div><h3>Reporting performance and dashboard loading</h3><p>Support ticket volume has increased significantly, and prospects mention the issue during sales calls. Engineering has started investigating.</p><span class="src">Customer Success Lead · Head of Sales · CTO</span></div>
+        <div class="card"><div class="row-badges"><span class="badge b-neutral">Priority not specified</span></div><h3>Annual revenue target at risk</h3><p>If the delayed deals move again, the annual target may be missed.</p><span class="src">CFO</span></div>
+        <div class="card"><div class="row-badges"><span class="badge b-neutral">Priority not specified</span></div><h3>Procurement delays and security reviews</h3><p>Procurement delays were the biggest reason deals slipped, and two clients requested additional security reviews before signing.</p><span class="src">Head of Sales</span></div>
+        <div class="card"><div class="row-badges"><span class="badge b-neutral">Priority not specified</span></div><h3>Engineering capacity</h3><p>The team is operating close to capacity. Major website work may require additional contractors.</p><span class="src">CTO · Product Director</span></div>
+        <div class="card"><div class="row-badges"><span class="badge b-neutral">Priority not specified</span></div><h3>Architecture review incomplete</h3><p>No cost estimate is available until the architecture review is completed, which blocks approval of additional spending.</p><span class="src">CTO · CEO</span></div>
+        <div class="card"><div class="row-badges"><span class="badge b-neutral">Priority not specified</span></div><h3>August release date not guaranteed</h3><p>The CTO said he can't guarantee the August date for the analytics dashboard at the moment.</p><span class="src">CTO</span></div>
+        <div class="card"><div class="row-badges"><span class="badge b-neutral">Priority not specified</span></div><h3>Pending inputs for budget decisions</h3><p>Final vendor proposals are needed for the conference budget, and Q3 forecasts are needed before hiring decisions.</p><span class="src">CFO · CEO</span></div>
+      </div>
+    </div>
+  </details>
+
+  <details class="sec" id="conflicts" open>
+    <summary><h2>Conflicts</h2><span class="count">5</span><span class="caret"></span></summary>
+    <div class="body">
+      <p class="hint">The transcript contains no conflicting deadlines or owners. These are competing positions and tensions between statements. None is resolved here.</p>
+      <ul class="list">
+        <li class="item"><div class="meta"><span class="badge b-conflict">Conflict</span></div><div class="t">Website redesign vs engineering capacity</div><div class="d">VP Marketing is planning a website redesign and a simpler demo-request process. The Product Director advised caution on timelines because engineering is focused on the analytics dashboard scheduled for August, and the CTO said major website work may require additional contractors.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-conflict">Conflict</span></div><div class="t">Reporting performance vs planned feature releases</div><div class="d">The Product Director said improving reporting performance may have a larger business impact than some planned feature releases. The analytics dashboard is scheduled for August.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-conflict">Conflict</span></div><div class="t">Scheduled August release vs no guarantee</div><div class="d">The Product Director referred to the August release date as scheduled. The CTO said he can't guarantee that date.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-conflict">Conflict</span></div><div class="t">Different headcount requests</div><div class="d">The CFO said department heads submitted different headcount requests. Which requests, and how they differ, is Not specified.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-conflict">Conflict</span></div><div class="t">Conference budget request vs missing proposals</div><div class="d">VP Marketing asked for approval of the annual customer conference budget. The CFO said final vendor proposals are still needed before approving.</div></li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="sec" id="notes">
+    <summary><h2>Additional Notes</h2><span class="count">5</span><span class="caret"></span></summary>
+    <div class="body">
+      <ul class="list">
+        <li class="item"><div class="d">The CEO closed the meeting by saying open items will be followed up during next week's leadership meeting.</div></li>
+        <li class="item"><div class="d">The 18% revenue target was committed to at the start of the year.</div></li>
+        <li class="item"><div class="d">The CTO described the reporting performance problem as a known issue that the engineering team has already started investigating.</div></li>
+        <li class="item"><div class="d">The CEO decided no additional spending will be approved before the cost estimate is available.</div></li>
+        <li class="item"><div class="d">The transcript gives no meeting date, attendee list beyond the speaker labels, or specific calendar deadlines.</div></li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="sec" id="speakers" open>
+    <summary><h2>Speaker Summary</h2><span class="count">7</span><span class="caret"></span></summary>
+    <div class="body">
+      <div class="sp-grid" id="sp-summary"></div>
+    </div>
+  </details>
+
+  <details class="sec" id="decisions" open>
+    <summary><h2>Decisions by Speaker</h2><span class="caret"></span></summary>
+    <div class="body">
+      <p class="hint">“Decision” marks something the speaker decided. “Position” marks a stated stance, condition or plan that is not a decision.</p>
+      <div class="sp-grid" id="sp-decisions"></div>
+    </div>
+  </details>
+
+  <details class="sec" id="byspeaker" open>
+    <summary><h2>Action Items by Speaker</h2><span class="caret"></span></summary>
+    <div class="body">
+      <p class="hint">Grouped by the owner shown in the Action Items table. Items without a stated owner appear under Not specified.</p>
+      <div class="sp-grid" id="sp-actions"></div>
+    </div>
+  </details>
+
+  <details class="sec" id="attrib" open>
+    <summary><h2>Attribution Notes</h2><span class="count">8</span><span class="caret"></span></summary>
+    <div class="body">
+      <p class="hint">Where the transcript does not clearly say who owns an item.</p>
+      <ul class="list">
+        <li class="item"><div class="meta"><span class="badge b-conflict">Unclear owner</span></div><div class="t">Cost estimate for additional website work</div><div class="d">The CEO asked to get the estimate. The CTO said it can't be given yet. No person is assigned to produce it.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-conflict">Unclear owner</span></div><div class="t">Finalizing Q3 forecasts before hiring decisions</div><div class="d">The CEO tied hiring decisions to finalized Q3 forecasts. Who finalizes them is not stated.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-conflict">Unclear owner</span></div><div class="t">Delivering final vendor proposals</div><div class="d">The CFO said proposals are needed. Who provides them is not stated.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-conflict">Unclear owner</span></div><div class="t">Revisiting the conference budget</div><div class="d">The CEO said “Let's revisit” next month. No individual owner is named.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-conflict">Unclear owner</span></div><div class="t">Engineering milestone review</div><div class="d">The CEO referred to “engineering”. No named individual owns the review.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-conflict">Unclear owner</span></div><div class="t">Reporting performance investigation</div><div class="d">The CTO said “the engineering team” has started investigating. No named individual is assigned.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-conflict">Unclear owner</span></div><div class="t">Avoiding public commitments</div><div class="d">The CEO said “let's avoid” public commitments. Who this applies to is not stated.</div></li>
+        <li class="item"><div class="meta"><span class="badge b-conflict">Unclear owner</span></div><div class="t">Follow-up on open items</div><div class="d">The CEO said “We'll follow up”. Owners for individual open items are not assigned.</div></li>
+      </ul>
+    </div>
+  </details>
+</div>
+
+<script>
+(function(){
+  var NS = "Not specified";
+  var actions = [
+    {id:1,task:"Get a cost estimate for additional website work before approving any additional spending",owner:NS,deadline:NS,status:"Pending",note:"CEO asked for the estimate. CTO: not yet, the architecture review hasn't been completed."},
+    {id:2,task:"Website redesign and simplified demo-request process",owner:"VP Marketing",deadline:NS,status:"Pending",note:"Stated as planned. Engineering capacity and cost estimate are open."},
+    {id:3,task:"Investigate reporting performance and dashboard loading times",owner:"Engineering team",deadline:NS,status:"In progress",priority:"High",note:"CTO: the engineering team has already started investigating. CEO called it a priority issue."},
+    {id:4,task:"Finalize Q3 forecasts, then make hiring decisions",owner:NS,deadline:NS,status:"Pending",note:"CEO postponed hiring decisions until Q3 forecasts are finalized."},
+    {id:5,task:"Receive final vendor proposals for the annual customer conference",owner:NS,deadline:NS,status:"Pending",note:"CFO needs them before approving the budget."},
+    {id:6,task:"Revisit the annual customer conference budget",owner:NS,deadline:"Next month, after proposals are received",status:"Pending",note:"Proposed by the CEO."},
+    {id:7,task:"Complete the engineering milestone review",owner:"Engineering",deadline:NS,status:"Pending",note:"CEO: avoid public commitments until engineering completes it."},
+    {id:8,task:"Avoid public commitments, including an analytics dashboard announcement, until the milestone review is complete",owner:NS,deadline:NS,status:"Pending",note:"CEO directive after the question about announcing at the conference."},
+    {id:9,task:"Follow up on open items",owner:"CEO",deadline:"Next week's leadership meeting",status:"Pending",note:"CEO said “We'll follow up”, so the owner is stated as a group."}
+  ];
+  var order = ["Pending","In progress","Completed"];
+  var filter = {s:"all",owner:"all",q:""};
+
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+  function sbadge(s){
+    var cls = s==="Completed"?"b-done":(s==="In progress"?"b-prog":"b-pending");
+    return cls;
+  }
+  function val(v){return v===NS?'<span class="ns">'+NS+'</span>':esc(v);}
+
+  var ownerSel = document.getElementById("owner");
+  var owners = [];
+  actions.forEach(function(a){ if(owners.indexOf(a.owner)<0) owners.push(a.owner); });
+  ownerSel.innerHTML = '<option value="all">All owners</option>' + owners.map(function(o){return '<option value="'+esc(o)+'">'+esc(o)+'</option>';}).join("");
+
+  function renderActions(){
+    var body = document.getElementById("act-body");
+    var rows = actions.filter(function(a){
+      if(filter.s!=="all" && a.status!==filter.s) return false;
+      if(filter.owner!=="all" && a.owner!==filter.owner) return false;
+      if(filter.q && (a.task+" "+a.note+" "+a.owner).toLowerCase().indexOf(filter.q)<0) return false;
+      return true;
+    });
+    if(!rows.length){ body.innerHTML='<tr><td colspan="4" class="empty">No action items match these filters.</td></tr>'; }
+    else body.innerHTML = rows.map(function(a){
+      var pr = a.priority==="High" ? ' <span class="badge b-high">High Priority</span>' : '';
+      return '<tr><td><span class="task">'+esc(a.task)+'</span>'+pr+'<span class="note">'+esc(a.note)+'</span></td>'
+        +'<td>'+val(a.owner)+'</td><td>'+val(a.deadline)+'</td>'
+        +'<td><button class="badge statusbtn '+sbadge(a.status)+'" data-id="'+a.id+'" aria-label="Status '+esc(a.status)+', select to change">'+esc(a.status)+'</button></td></tr>';
+    }).join("");
+    var done = actions.filter(function(a){return a.status==="Completed";}).length;
+    var prog = actions.filter(function(a){return a.status==="In progress";}).length;
+    document.getElementById("act-count").textContent = actions.length;
+    document.getElementById("prog-text").textContent = done+" of "+actions.length+" completed, "+prog+" in progress";
+    document.getElementById("prog-bar").style.width = (done/actions.length*100)+"%";
+    renderByOwner();
+  }
+
+  document.getElementById("act-body").addEventListener("click",function(e){
+    var b = e.target.closest(".statusbtn"); if(!b) return;
+    var a = actions.filter(function(x){return x.id==b.getAttribute("data-id");})[0];
+    a.status = order[(order.indexOf(a.status)+1)%order.length];
+    renderActions();
+  });
+  document.getElementById("q").addEventListener("input",function(e){filter.q=e.target.value.trim().toLowerCase();renderActions();});
+  ownerSel.addEventListener("change",function(e){filter.owner=e.target.value;renderActions();});
+  document.getElementById("statusfilter").addEventListener("click",function(e){
+    var b = e.target.closest("button"); if(!b) return;
+    filter.s = b.getAttribute("data-s");
+    Array.prototype.forEach.call(this.querySelectorAll("button"),function(x){x.setAttribute("aria-pressed", x===b?"true":"false");});
+    renderActions();
+  });
+
+  /* speakers */
+  var speakers = [
+    {name:"CEO",ini:"CE",
+      said:["Opened by stating Q2 revenue grew 12% against the 18% target.","Asked why the remaining deals slipped, what is being done about conversion, and what is driving the support ticket increase.","Called reporting performance a priority issue.","Closed by saying open items will be followed up at next week's leadership meeting."],
+      dec:[["Decision","Get the cost estimate before approving any additional spending."],["Decision","Postpone hiring decisions until Q3 forecasts are finalized."],["Decision","Revisit the conference budget next month after proposals are received."],["Decision","Avoid making any public commitments until engineering completes the milestone review."]]},
+    {name:"Head of Sales",ini:"HS",
+      said:["Reported 14 large contracts were expected to close and 9 were finalized.","Named procurement delays as the biggest reason, and said two clients requested additional security reviews.","Said several prospects mentioned reporting performance during sales calls.","Asked whether to announce the new analytics dashboard at the conference."],
+      dec:[]},
+    {name:"CFO",ini:"CF",
+      said:["Said the delay affects the revenue forecast and the annual target may be missed if the deals move again.","Asked whether there is a cost estimate.","Asked for clarity on next year's hiring plan because department heads submitted different headcount requests.","Said final vendor proposals are still needed before approving the conference budget."],
+      dec:[["Position","Needs final vendor proposals before approving the annual customer conference budget."]]},
+    {name:"VP Marketing",ini:"VM",
+      said:["Reported website traffic up 34% compared to last quarter, with conversion rates still lower than expected.","Described plans for a website redesign and a simpler demo-request process.","Asked for approval of the annual customer conference budget."],
+      dec:[["Position","Planning a website redesign and simplifying the demo-request process. No approval is stated."]]},
+    {name:"Product Director",ini:"PD",
+      said:["Advised caution on timelines because engineering is focused on the analytics dashboard scheduled for August.","Agreed that reporting performance is a priority, and said it may have a larger business impact than some planned feature releases.","Said the dashboard should be announced at the conference only if confident about the August release date."],
+      dec:[["Position","Agreed reporting performance is a priority."],["Position","Announce the dashboard only if confident about the August release date."]]},
+    {name:"CTO",ini:"CT",
+      said:["Confirmed the engineering team is operating close to capacity, and that major website work may require additional contractors.","Said there is no cost estimate yet because the architecture review hasn't been completed.","Called reporting performance a known issue that engineering has already started investigating.","Said he can't guarantee the August date at the moment."],
+      dec:[]},
+    {name:"Customer Success Lead",ini:"CS",
+      said:["Reported customer retention at 94% and a significant increase in support ticket volume.","Said most complaints relate to reporting performance and dashboard loading times."],
+      dec:[]}
+  ];
+  function card(s,inner){return '<div class="sp"><div class="sp-head"><span class="av">'+s.ini+'</span><h3>'+esc(s.name)+'</h3></div>'+inner+'</div>';}
+  document.getElementById("sp-summary").innerHTML = speakers.map(function(s){
+    return card(s,'<ul>'+s.said.map(function(t){return '<li>'+esc(t)+'</li>';}).join("")+'</ul>');
+  }).join("");
+  document.getElementById("sp-decisions").innerHTML = speakers.map(function(s){
+    var inner = s.dec.length ? '<ul>'+s.dec.map(function(d){
+      return '<li><span class="badge '+(d[0]==="Decision"?"b-decision":"b-neutral")+'">'+d[0]+'</span> '+esc(d[1])+'</li>';
+    }).join("")+'</ul>' : '<ul><li class="none">No decisions stated</li></ul>';
+    return card(s,inner);
+  }).join("");
+
+  function renderByOwner(){
+    var groups = [
+      {name:"CEO",ini:"CE",match:["CEO"]},
+      {name:"VP Marketing",ini:"VM",match:["VP Marketing"]},
+      {name:"Engineering team / Engineering",ini:"EN",match:["Engineering team","Engineering"]},
+      {name:"Not specified",ini:"?",match:[NS]}
+    ];
+    var html = groups.map(function(g){
+      var items = actions.filter(function(a){return g.match.indexOf(a.owner)>=0;});
+      var inner = items.length ? '<ul>'+items.map(function(a){
+        return '<li>'+esc(a.task)+' <span class="badge '+sbadge(a.status)+'">'+esc(a.status)+'</span></li>';
+      }).join("")+'</ul>' : '<ul><li class="none">No action items</li></ul>';
+      return card({ini:g.ini,name:g.name},inner);
+    }).join("");
+    var quiet = ["Head of Sales","CFO","Product Director","CTO","Customer Success Lead"];
+    html += '<div class="sp"><div class="sp-head"><span class="av">–</span><h3>No owned items</h3></div><ul><li class="none">No action items are assigned to: '+quiet.join(", ")+'.</li></ul></div>';
+    document.getElementById("sp-actions").innerHTML = html;
+  }
+
+  /* nav */
+  Array.prototype.forEach.call(document.querySelectorAll("[data-go]"),function(b){
+    b.addEventListener("click",function(){
+      var el = document.getElementById(b.getAttribute("data-go"));
+      el.open = true;
+      el.scrollIntoView({behavior:"smooth",block:"start"});
+    });
+  });
+  document.getElementById("expand").addEventListener("click",function(){Array.prototype.forEach.call(document.querySelectorAll("details.sec"),function(d){d.open=true;});});
+  document.getElementById("collapse").addEventListener("click",function(){Array.prototype.forEach.call(document.querySelectorAll("details.sec"),function(d){d.open=false;});});
+
+  renderActions();
+})();
+</script>
+
+</body></html>
