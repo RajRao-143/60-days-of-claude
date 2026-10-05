@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Face Puzzle</title>
+<style>
+:root{
+  --bg:#0f1226; --bg2:#1a1f3d; --card:#ffffff; --ink:#1b1f3b; --muted:#5b6285;
+  --brand:#6c5ce7; --brand2:#00b4d8; --good:#22c55e; --bad:#dc2626; --line:#e4e7f5;
+  --shadow:0 10px 30px rgba(15,18,38,.18);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--ink);
+  background:linear-gradient(160deg,var(--bg),var(--bg2) 55%,#2b2466);
+  min-height:100vh; overflow-x:hidden; -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 40px}
+header.hero{text-align:center;color:#fff;padding:20px 8px 24px}
+.hero h1{margin:0 0 8px;font-size:clamp(2rem,6vw,3.2rem);letter-spacing:-.02em}
+.hero h1 span{background:linear-gradient(90deg,#a29bfe,#48dbfb);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin:0 auto;max-width:560px;color:#cfd3f5;font-size:1.05rem;line-height:1.5}
+.steps{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px;padding:0;list-style:none}
+.steps li{padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.1);color:#cfd3f5;font-size:.85rem;font-weight:600;transition:.25s}
+.steps li.active{background:#fff;color:var(--brand)}
+.steps li.done{background:rgba(34,197,94,.25);color:#d9ffe6}
+.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+.card{background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:20px;transition:box-shadow .25s}
+.card h2{margin:0 0 12px;font-size:1.15rem}
+.stack{display:flex;flex-direction:column;gap:20px;min-width:0}
+.status{padding:12px 14px;border-radius:12px;font-size:.95rem;line-height:1.45;margin-bottom:14px;background:#eef0ff;color:#2d2f6b;border:1px solid #d6dafc}
+.status.error{background:#fff1f1;color:#8a1111;border-color:#f6c4c4}
+.status.error::before{content:"⚠ ";font-weight:700}
+.status.ok{background:#ecfdf3;color:#0b5a2a;border-color:#b7ecc9}
+.stage{position:relative;width:100%;aspect-ratio:4/3;background:#0b0d1e;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.stage video,.stage canvas.photo{width:100%;height:100%;object-fit:cover;display:block}
+.stage video{transform:scaleX(-1)}
+.stage .placeholder{color:#9aa0cf;text-align:center;padding:20px;font-size:.95rem}
+.hidden{display:none !important}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+button{
+  font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:12px;padding:14px 20px;min-height:48px;
+  background:linear-gradient(135deg,var(--brand),#8e7dff);color:#fff;transition:transform .15s,box-shadow .15s,opacity .2s;
+  box-shadow:0 6px 16px rgba(108,92,231,.35);flex:1 1 140px;
+}
+button:hover:not(:disabled){transform:translateY(-1px)}
+button:active:not(:disabled){transform:translateY(0)}
+button.secondary{background:#fff;color:var(--brand);border:2px solid var(--brand);box-shadow:none}
+button:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:3px solid #ffb703;outline-offset:2px}
+.diff{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.diff button{padding:16px 8px;font-size:1.1rem}
+.diff button[aria-pressed="true"]{outline:3px solid var(--good);outline-offset:2px}
+.hint{color:var(--muted);font-size:.9rem;margin:10px 0 0}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#f5f6ff;border-radius:12px;padding:10px 12px;border:1px solid var(--line)}
+.stat small{display:block;color:var(--muted);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em}
+.stat b{font-size:1.25rem;font-variant-numeric:tabular-nums}
+.board{position:relative;width:100%;max-width:640px;margin:0 auto;aspect-ratio:1/1;background:#0b0d1e;border-radius:14px;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+.tile{
+  position:absolute;left:0;top:0;background-repeat:no-repeat;border:2px solid rgba(255,255,255,.55);border-radius:6px;
+  touch-action:none;cursor:grab;transition:transform .2s ease,box-shadow .2s;will-change:transform;
+}
+.tile.correct{border:3px solid var(--good)}
+.tile.correct::after{content:"✓";position:absolute;right:4px;top:2px;font-size:clamp(.7rem,2.5vw,1rem);font-weight:800;color:#fff;background:var(--good);width:1.3em;height:1.3em;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.tile.dragging{z-index:10;cursor:grabbing;transition:none;box-shadow:0 12px 28px rgba(0,0,0,.5);border:3px solid #ffb703;opacity:.95}
+.tile.selected{border:3px dashed #ffb703}
+.tile.target{box-shadow:inset 0 0 0 4px rgba(0,180,216,.9)}
+.board.locked .tile{cursor:default}
+.lb{list-style:none;margin:0;padding:0}
+.lb li{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line);font-size:.92rem}
+.lb li:last-child{border-bottom:0}
+.lb .rank{font-weight:800;color:var(--brand)}
+.lb .t{font-weight:800;font-variant-numeric:tabular-nums}
+.lb small{color:var(--muted);display:block}
+.empty{color:var(--muted);font-size:.92rem}
+.overlay{position:fixed;inset:0;background:rgba(10,12,30,.72);display:flex;align-items:center;justify-content:center;padding:16px;z-index:100;animation:fade .25s}
+.modal{background:#fff;border-radius:22px;padding:28px 24px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:pop .3s}
+.modal h2{margin:0 0 4px;font-size:1.8rem}
+.modal .big{font-size:2.6rem;font-weight:800;color:var(--brand);font-variant-numeric:tabular-nums;margin:8px 0}
+.modal dl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0;text-align:left}
+.modal dl div{background:#f5f6ff;border-radius:12px;padding:10px 12px}
+.modal dt{font-size:.75rem;color:var(--muted);font-weight:700;text-transform:uppercase}
+.modal dd{margin:0;font-weight:800;font-size:1.1rem}
+.modal .rankmsg{color:#0b5a2a;font-weight:700;margin:0 0 6px}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+@media (max-width:820px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .card{padding:16px;border-radius:16px}
+  button{width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>Face <span>Puzzle</span></h1>
+    <p>Snap a selfie, pick a difficulty, and rebuild your own face by swapping tiles. Your photo never leaves your browser.</p>
+    <ol class="steps" aria-label="Game progress" id="steps">
+      <li data-step="CAMERA">1 Camera</li>
+      <li data-step="PHOTO">2 Photo</li>
+      <li data-step="DIFFICULTY">3 Difficulty</li>
+      <li data-step="PLAYING">4 Play</li>
+      <li data-step="COMPLETED">5 Done</li>
+    </ol>
+  </header>
+
+  <main class="layout">
+    <div class="stack">
+      <section class="card" id="cameraCard" aria-labelledby="camTitle">
+        <h2 id="camTitle">Camera</h2>
+        <div id="status" class="status" role="status" aria-live="polite">Click “Start Camera” to begin.</div>
+        <div class="stage" id="stage">
+          <video id="video" playsinline muted autoplay class="hidden" aria-label="Live camera preview"></video>
+          <canvas id="photo" class="photo hidden" aria-label="Captured photo"></canvas>
+          <div class="placeholder" id="placeholder">Your camera preview will appear here.</div>
+        </div>
+        <div class="btns">
+          <button id="startBtn" type="button">Start Camera</button>
+          <button id="takeBtn" type="button" class="hidden" aria-label="Take Photo">Take Photo</button>
+          <button id="retakeBtn" type="button" class="secondary hidden" aria-label="Retake Photo">Retake Photo</button>
+          <button id="newBtn" type="button" class="secondary hidden" aria-label="New Photo">New Photo</button>
+        </div>
+      </section>
+
+      <section class="card hidden" id="diffCard" aria-labelledby="diffTitle">
+        <h2 id="diffTitle">Choose difficulty</h2>
+        <div class="diff" role="group" aria-label="Difficulty choices">
+          <button type="button" data-n="3" aria-label="Easy, 3 by 3, 9 pieces">3×3</button>
+          <button type="button" data-n="4" aria-label="Medium, 4 by 4, 16 pieces">4×4</button>
+          <button type="button" data-n="5" aria-label="Hard, 5 by 5, 25 pieces">5×5</button>
+        </div>
+        <p class="hint">Your photo is cropped to a square and cut into equal pieces.</p>
+      </section>
+
+      <section class="card hidden" id="gameCard" aria-labelledby="gameTitle">
+        <h2 id="gameTitle">Puzzle</h2>
+        <div class="stats" aria-live="off">
+          <div class="stat"><small>Difficulty</small><b id="sDiff">–</b></div>
+          <div class="stat"><small>Time</small><b id="sTime">00:00.0</b></div>
+          <div class="stat"><small>Moves</small><b id="sMoves">0</b></div>
+          <div class="stat"><small>Correct</small><b id="sCorrect">0 / 0</b></div>
+        </div>
+        <div class="board" id="board" role="application" aria-label="Puzzle board. Drag a tile onto another tile to swap them. Keyboard: press Enter on a tile to select it, then Enter on another to swap."></div>
+        <p class="hint">Drag a tile onto another to swap. Tiles with a green border and ✓ are in the right place.</p>
+        <div class="btns">
+          <button id="restartBtn" type="button" class="secondary">Re-shuffle</button>
+          <button id="changeDiffBtn" type="button" class="secondary">Change Difficulty</button>
+        </div>
+      </section>
+    </div>
+
+    <aside class="stack">
+      <section class="card" aria-labelledby="lbTitle">
+        <h2 id="lbTitle">🏆 Top 5 Leaderboard</h2>
+        <ol class="lb" id="lb"></ol>
+        <p class="empty" id="lbEmpty">No results yet. Solve a puzzle to set a record!</p>
+      </section>
+      <section class="card" aria-labelledby="howTitle">
+        <h2 id="howTitle">How to play</h2>
+        <p class="hint" style="margin-top:0">1. Allow camera access and take a photo.<br>2. Pick 3×3, 4×4 or 5×5.<br>3. Swap tiles until the picture is whole again.<br>4. Beat the clock and climb the leaderboard.</p>
+      </section>
+    </aside>
+  </main>
+</div>
+
+<div class="overlay hidden" id="overlay" role="dialog" aria-modal="true" aria-labelledby="resTitle">
+  <div class="modal">
+    <h2 id="resTitle">Puzzle Complete!</h2>
+    <p class="rankmsg hidden" id="rankMsg"></p>
+    <div class="big" id="rTime">00:00.0</div>
+    <dl>
+      <div><dt>Moves</dt><dd id="rMoves">0</dd></div>
+      <div><dt>Difficulty</dt><dd id="rDiff">–</dd></div>
+      <div><dt>Pieces</dt><dd id="rPieces">0</dd></div>
+      <div><dt>Final time</dt><dd id="rTime2">–</dd></div>
+    </dl>
+    <div class="btns">
+      <button id="againBtn" type="button">Play Again</button>
+      <button id="resNewBtn" type="button" class="secondary">New Photo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STORE_KEY = 'facePuzzleLeaderboard.v1';
+  var PHOTO_SIZE = 720;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var el = {
+    status: $('status'), video: $('video'), photo: $('photo'), placeholder: $('placeholder'),
+    startBtn: $('startBtn'), takeBtn: $('takeBtn'), retakeBtn: $('retakeBtn'), newBtn: $('newBtn'),
+    cameraCard: $('cameraCard'), diffCard: $('diffCard'), gameCard: $('gameCard'),
+    board: $('board'), sDiff: $('sDiff'), sTime: $('sTime'), sMoves: $('sMoves'), sCorrect: $('sCorrect'),
+    lb: $('lb'), lbEmpty: $('lbEmpty'), overlay: $('overlay'),
+    rTime: $('rTime'), rTime2: $('rTime2'), rMoves: $('rMoves'), rDiff: $('rDiff'), rPieces: $('rPieces'), rankMsg: $('rankMsg'),
+    restartBtn: $('restartBtn'), changeDiffBtn: $('changeDiffBtn'), againBtn: $('againBtn'), resNewBtn: $('resNewBtn'),
+    steps: $('steps')
+  };
+
+  // Application state: CAMERA -> PHOTO -> DIFFICULTY -> PLAYING -> COMPLETED
+  var state = 'CAMERA';
+  var stream = null;
+  var photoURL = '';
+  var n = 0;              // grid size
+  var slots = [];         // slots[cell] = tile id (tile id i belongs in cell i)
+  var tileEls = [];       // tileEls[id] = element
+  var moves = 0;
+  var timerStart = 0, timerId = null, elapsed = 0;
+  var drag = null;
+  var selectedId = null;
+
+  /* ---------- helpers ---------- */
+  function setStatus(msg, kind) {
+    el.status.textContent = msg;
+    el.status.className = 'status' + (kind ? ' ' + kind : '');
+  }
+  function show(node, on) { node.classList.toggle('hidden', !on); }
+  function formatTime(ms) {
+    var t = Math.floor(ms / 100);
+    var tenth = t % 10;
+    var s = Math.floor(t / 10) % 60;
+    var m = Math.floor(t / 600);
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s + '.' + tenth;
+  }
+
+  function setState(next) {
+    state = next;
+    var order = ['CAMERA', 'PHOTO', 'DIFFICULTY', 'PLAYING', 'COMPLETED'];
+    var idx = order.indexOf(next);
+    Array.prototype.forEach.call(el.steps.children, function (li) {
+      var i = order.indexOf(li.getAttribute('data-step'));
+      li.classList.toggle('active', i === idx);
+      li.classList.toggle('done', i < idx);
+      if (i === idx) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+    });
+  }
+
+  /* ---------- camera ---------- */
+  function initializeCamera() {
+    if (state !== 'CAMERA') return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setStatus('Camera is not available in this browser or context. Open this page over HTTPS or on localhost, and use an up-to-date Chrome, Firefox or Safari. The app needs camera access to work.', 'error');
+      return;
+    }
+    el.startBtn.disabled = true;
+    setStatus('Requesting camera permission… please choose “Allow”.');
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+      .then(function (s) {
+        stream = s;
+        el.video.srcObject = s;
+        var p = el.video.play();
+        if (p && p.catch) p.catch(function () {});
+        show(el.video, true); show(el.placeholder, false); show(el.photo, false);
+        show(el.startBtn, false); show(el.takeBtn, true);
+        el.takeBtn.disabled = true;
+        el.video.onloadedmetadata = function () { el.takeBtn.disabled = false; };
+        if (el.video.readyState >= 1) el.takeBtn.disabled = false;
+        setStatus('Camera ready. Frame your face and press “Take Photo”.', 'ok');
+      })
+      .catch(function (err) {
+        el.startBtn.disabled = false;
+        var name = err && err.name;
+        var msg;
+        if (name === 'NotAllowedError' || name === 'SecurityError' || name === 'PermissionDeniedError') {
+          msg = 'Camera permission was denied. This game needs your camera to turn your photo into a puzzle. Allow camera access in your browser’s address bar or site settings, then press “Start Camera” again.';
+        } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+          msg = 'No camera was found on this device. Connect a webcam and press “Start Camera” again.';
+        } else if (name === 'NotReadableError' || name === 'TrackStartError') {
+          msg = 'Your camera is being used by another app. Close it and press “Start Camera” again.';
+        } else {
+          msg = 'The camera could not be started. Please check permissions and try again. The app requires camera access.';
+        }
+        setStatus(msg, 'error');
+      });
+  }
+
+  function stopCamera() {
+    if (stream) {
+      stream.getTracks().forEach(function (t) { t.stop(); });
+      stream = null;
+    }
+    el.video.srcObject = null;
+  }
+
+  function capturePhoto() {
+    if (state !== 'CAMERA' || !stream) return;
+    var vw = el.video.videoWidth, vh = el.video.videoHeight;
+    if (!vw || !vh) { setStatus('The camera is still warming up. Try again in a second.', 'error'); return; }
+    // Centre-crop to a square so tiles are never stretched.
+    var side = Math.min(vw, vh);
+    var sx = (vw - side) / 2, sy = (vh - side) / 2;
+    el.photo.width = PHOTO_SIZE; el.photo.height = PHOTO_SIZE;
+    var ctx = el.photo.getContext('2d');
+    ctx.save();
+    ctx.translate(PHOTO_SIZE, 0); ctx.scale(-1, 1); // mirror to match the preview
+    ctx.drawImage(el.video, sx, sy, side, side, 0, 0, PHOTO_SIZE, PHOTO_SIZE);
+    ctx.restore();
+    photoURL = el.photo.toDataURL('image/jpeg', 0.92);
+    stopCamera();
+    show(el.video, false); show(el.photo, true);
+    el.stage_aspect(true);
+    show(el.takeBtn, false); show(el.retakeBtn, true); show(el.newBtn, true);
+    show(el.diffCard, true);
+    setState('DIFFICULTY');
+    setStatus('Photo captured! Choose a difficulty below, or retake the photo.', 'ok');
+  }
+  // Show the square capture inside the 4:3 stage without distortion.
+  el.stage_aspect = function (captured) {
+    el.photo.style.objectFit = captured ? 'contain' : 'cover';
+  };
+
+  function retakePhoto() {
+    if (state === 'CAMERA') return;
+    leaveGameUI();
+    photoURL = '';
+    show(el.photo, false); show(el.retakeBtn, false); show(el.newBtn, false); show(el.diffCard, false);
+    el.startBtn.disabled = false;
+    setState('CAMERA');
+    initializeCamera();
+  }
+
+  function newPhoto() {
+    stopTimer();
+    leaveGameUI();
+    stopCamera();
+    photoURL = '';
+    show(el.overlay, false);
+    show(el.photo, false); show(el.video, false); show(el.placeholder, true);
+    show(el.takeBtn, false); show(el.retakeBtn, false); show(el.newBtn, false); show(el.diffCard, false);
+    show(el.startBtn, true); el.startBtn.disabled = false;
+    setState('CAMERA');
+    setStatus('Click “Start Camera” to take a new photo.');
+    el.cameraCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function leaveGameUI() {
+    stopTimer();
+    show(el.gameCard, false);
+    el.board.innerHTML = '';
+    tileEls = []; slots = []; drag = null; selectedId = null;
+  }
+
+  /* ---------- puzzle ---------- */
+  function setupPuzzle(size) {
+    if (state !== 'DIFFICULTY' && state !== 'PLAYING' && state !== 'COMPLETED') return;
+    if (!photoURL) return;
+    n = size;
+    moves = 0; selectedId = null; drag = null;
+    show(el.overlay, false);
+    el.board.classList.remove('locked');
+    createTiles();
+    shufflePuzzle();
+    renderPuzzle();
+    show(el.gameCard, true);
+    el.sDiff.textContent = n + '×' + n;
+    setState('PLAYING');
+    updateStats();
+    startTimer();
+    setStatus('Puzzle started — good luck!', 'ok');
+    Array.prototype.forEach.call(el.diffCard.querySelectorAll('button'), function (b) {
+      b.setAttribute('aria-pressed', String(parseInt(b.getAttribute('data-n'), 10) === n));
+    });
+    el.gameCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function createTiles() {
+    el.board.innerHTML = '';
+    tileEls = [];
+    var total = n * n;
+    for (var id = 0; id < total; id++) {
+      var d = document.createElement('div');
+      d.className = 'tile';
+      d.setAttribute('role', 'button');
+      d.tabIndex = 0;
+      d.dataset.id = String(id);
+      d.style.width = (100 / n) + '%';
+      d.style.height = (100 / n) + '%';
+      d.style.backgroundImage = 'url(' + photoURL + ')';
+      d.style.backgroundSize = (n * 100) + '% ' + (n * 100) + '%';
+      var col = id % n, row = Math.floor(id / n);
+      d.style.backgroundPosition = (n > 1 ? col * 100 / (n - 1) : 0) + '% ' + (n > 1 ? row * 100 / (n - 1) : 0) + '%';
+      d.addEventListener('pointerdown', handlePointerDown);
+      d.addEventListener('pointermove', handlePointerMove);
+      d.addEventListener('pointerup', handlePointerUp);
+      d.addEventListener('pointercancel', handlePointerCancel);
+      d.addEventListener('keydown', handleTileKey);
+      el.board.appendChild(d);
+      tileEls.push(d);
+    }
+  }
+
+  // Swap puzzles allow every permutation, so applying many random legal swaps
+  // from the solved state always yields a solvable board.
+  function shufflePuzzle() {
+    var total = n * n, i;
+    slots = [];
+    for (i = 0; i < total; i++) slots.push(i);
+    var swaps = total * 12;
+    for (i = 0; i < swaps; i++) {
+      var a = Math.floor(Math.random() * total);
+      var b = Math.floor(Math.random() * total);
+      if (a === b) continue;
+      var t = slots[a]; slots[a] = slots[b]; slots[b] = t;
+    }
+    // Never start already solved (or trivially close).
+    var guard = 0;
+    while (countCorrect() > Math.floor(total / 4) && guard++ < 200) {
+      var x = Math.floor(Math.random() * total), y = Math.floor(Math.random() * total);
+      if (x === y) continue;
+      var tmp = slots[x]; slots[x] = slots[y]; slots[y] = tmp;
+    }
+  }
+
+  function cellOf(id) { return slots.indexOf(id); }
+
+  function placeTile(id, dx, dy) {
+    var c = cellOf(id);
+    var col = c % n, row = Math.floor(c / n);
+    var x = 'calc(' + (col * 100) + '% + ' + (dx || 0) + 'px)';
+    var y = 'calc(' + (row * 100) + '% + ' + (dy || 0) + 'px)';
+    tileEls[id].style.transform = 'translate(' + x + ',' + y + ')';
+  }
+
+  function renderPuzzle() {
+    for (var id = 0; id < tileEls.length; id++) {
+      if (!(drag && drag.id === id)) placeTile(id, 0, 0);
+      var ok = slots[id] === id; // id here is a cell; checked below properly
+    }
+    for (var cell = 0; cell < slots.length; cell++) {
+      var tid = slots[cell];
+      var correct = tid === cell;
+      var t = tileEls[tid];
+      t.classList.toggle('correct', correct);
+      t.setAttribute('aria-label', 'Piece ' + (tid + 1) + ' of ' + slots.length + ', row ' + (Math.floor(cell / n) + 1) + ' column ' + (cell % n + 1) + (correct ? ', correctly placed' : ', not in place'));
+    }
+  }
+
+  function countCorrect() {
+    var c = 0;
+    for (var i = 0; i < slots.length; i++) if (slots[i] === i) c++;
+    return c;
+  }
+
+  function swapTiles(cellA, cellB) {
+    if (state !== 'PLAYING' || cellA === cellB) return false;
+    var t = slots[cellA]; slots[cellA] = slots[cellB]; slots[cellB] = t;
+    moves++;
+    renderPuzzle();
+    updateStats();
+    checkWin();
+    return true;
+  }
+
+  /* ---------- pointer interaction ---------- */
+  function cellFromPoint(clientX, clientY) {
+    var r = el.board.getBoundingClientRect();
+    var col = Math.floor((clientX - r.left) / (r.width / n));
+    var row = Math.floor((clientY - r.top) / (r.height / n));
+    col = Math.max(0, Math.min(n - 1, col));
+    row = Math.max(0, Math.min(n - 1, row));
+    return row * n + col;
+  }
+
+  function clearTargets() {
+    for (var i = 0; i < tileEls.length; i++) tileEls[i].classList.remove('target');
+  }
+
+  function handlePointerDown(e) {
+    if (state !== 'PLAYING') return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    var t = e.currentTarget;
+    var id = parseInt(t.dataset.id, 10);
+    drag = { id: id, pid: e.pointerId, sx: e.clientX, sy: e.clientY, fromCell: cellOf(id) };
+    try { t.setPointerCapture(e.pointerId); } catch (err) {}
+    t.classList.add('dragging');
+    e.preventDefault();
+  }
+
+  function handlePointerMove(e) {
+    if (!drag || e.pointerId !== drag.pid) return;
+    var dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+    placeTile(drag.id, dx, dy);
+    clearTargets();
+    var target = cellFromPoint(e.clientX, e.clientY);
+    if (target !== drag.fromCell) tileEls[slots[target]].classList.add('target');
+  }
+
+  function handlePointerUp(e) {
+    if (!drag || e.pointerId !== drag.pid) return;
+    var d = drag;
+    var t = tileEls[d.id];
+    try { t.releasePointerCapture(e.pointerId); } catch (err) {}
+    t.classList.remove('dragging');
+    clearTargets();
+    drag = null;
+    var target = cellFromPoint(e.clientX, e.clientY); // snap to nearest valid cell
+    if (target !== d.fromCell && state === 'PLAYING') {
+      swapTiles(d.fromCell, target);
+    }
+    renderPuzzle(); // snaps everything (including a dropped-in-place tile) back to its cell
+  }
+
+  function handlePointerCancel(e) {
+    if (!drag || e.pointerId !== drag.pid) return;
+    tileEls[drag.id].classList.remove('dragging');
+    clearTargets();
+    drag = null;
+    renderPuzzle();
+  }
+
+  // Keyboard alternative: Enter/Space selects a tile, then another to swap.
+  function handleTileKey(e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    if (state !== 'PLAYING') return;
+    var id = parseInt(e.currentTarget.dataset.id, 10);
+    if (selectedId === null) {
+      selectedId = id;
+      e.currentTarget.classList.add('selected');
+    } else if (selectedId === id) {
+      tileEls[id].classList.remove('selected');
+      selectedId = null;
+    } else {
+      var a = cellOf(selectedId), b = cellOf(id);
+      tileEls[selectedId].classList.remove('selected');
+      selectedId = null;
+      swapTiles(a, b);
+      if (state === 'PLAYING' && tileEls[id]) tileEls[id].focus();
+    }
+  }
+
+  /* ---------- stats & timer ---------- */
+  function updateStats() {
+    el.sMoves.textContent = String(moves);
+    el.sCorrect.textContent = countCorrect() + ' / ' + (n * n);
+    el.sTime.textContent = formatTime(elapsed);
+  }
+
+  function startTimer() {
+    stopTimer();
+    elapsed = 0;
+    timerStart = performance.now();
+    timerId = setInterval(function () {
+      elapsed = performance.now() - timerStart;
+      el.sTime.textContent = formatTime(elapsed);
+    }, 50);
+  }
+
+  function stopTimer() {
+    if (timerId !== null) {
+      clearInterval(timerId);
+      timerId = null;
+      elapsed = performance.now() - timerStart;
+    }
+  }
+
+  /* ---------- win ---------- */
+  function checkWin() {
+    if (state !== 'PLAYING') return;
+    if (countCorrect() !== n * n) return;
+    stopTimer();
+    setState('COMPLETED');
+    el.board.classList.add('locked');
+    updateStats();
+    var rank = saveScore({ date: new Date().toISOString(), timeMs: Math.round(elapsed), moves: moves, difficulty: n + '×' + n });
+    setStatus('Solved! Great job.', 'ok');
+    setTimeout(function () { showResults(rank); }, 450);
+  }
+
+  function showResults(rank) {
+    el.rTime.textContent = formatTime(elapsed);
+    el.rTime2.textContent = formatTime(elapsed);
+    el.rMoves.textContent = String(moves);
+    el.rDiff.textContent = n + '×' + n;
+    el.rPieces.textContent = String(n * n);
+    if (rank > 0) {
+      el.rankMsg.textContent = '🏆 New leaderboard entry — rank #' + rank + '!';
+      show(el.rankMsg, true);
+    } else {
+      show(el.rankMsg, false);
+    }
+    show(el.overlay, true);
+    el.againBtn.focus();
+  }
+
+  /* ---------- leaderboard ---------- */
+  function loadLeaderboard() {
+    try {
+      var raw = window.localStorage.getItem(STORE_KEY);
+      var list = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(list)) return [];
+      return list.filter(function (r) { return r && typeof r.timeMs === 'number'; });
+    } catch (err) { return []; }
+  }
+
+  function saveScore(entry) {
+    var list = loadLeaderboard();
+    list.push(entry);
+    list.sort(function (a, b) { return a.timeMs - b.timeMs || a.moves - b.moves; });
+    var rank = list.indexOf(entry) + 1;
+    list = list.slice(0, 5);
+    if (rank > 5) rank = 0;
+    try { window.localStorage.setItem(STORE_KEY, JSON.stringify(list)); } catch (err) { /* storage unavailable: continue */ }
+    renderLeaderboard(list.length ? list : [entry].slice(0, 5));
+    return rank;
+  }
+
+  function renderLeaderboard(list) {
+    el.lb.innerHTML = '';
+    show(el.lbEmpty, list.length === 0);
+    list.forEach(function (r, i) {
+      var li = document.createElement('li');
+      var rank = document.createElement('span'); rank.className = 'rank'; rank.textContent = '#' + (i + 1);
+      var mid = document.createElement('span');
+      var d = new Date(r.date);
+      var dateStr = isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      mid.innerHTML = '';
+      var top = document.createElement('span'); top.textContent = r.difficulty + ' · ' + r.moves + ' moves';
+      var sm = document.createElement('small'); sm.textContent = dateStr;
+      mid.appendChild(top); mid.appendChild(sm);
+      var t = document.createElement('span'); t.className = 't'; t.textContent = formatTime(r.timeMs);
+      li.appendChild(rank); li.appendChild(mid); li.appendChild(t);
+      el.lb.appendChild(li);
+    });
+  }
+
+  /* ---------- reset ---------- */
+  function resetGame() {
+    if (!photoURL || !n) return;
+    setupPuzzle(n);
+  }
+
+  function changeDifficulty() {
+    stopTimer();
+    leaveGameUI();
+    show(el.overlay, false);
+    setState('DIFFICULTY');
+    setStatus('Choose a difficulty to start a new puzzle with the same photo.');
+    Array.prototype.forEach.call(el.diffCard.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', 'false'); });
+    el.diffCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  /* ---------- wiring ---------- */
+  el.startBtn.addEventListener('click', initializeCamera);
+  el.takeBtn.addEventListener('click', capturePhoto);
+  el.retakeBtn.addEventListener('click', retakePhoto);
+  el.newBtn.addEventListener('click', newPhoto);
+  el.restartBtn.addEventListener('click', resetGame);
+  el.changeDiffBtn.addEventListener('click', changeDifficulty);
+  el.againBtn.addEventListener('click', resetGame);
+  el.resNewBtn.addEventListener('click', newPhoto);
+  Array.prototype.forEach.call(el.diffCard.querySelectorAll('button'), function (b) {
+    b.addEventListener('click', function () { setupPuzzle(parseInt(b.getAttribute('data-n'), 10)); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && state === 'COMPLETED') show(el.overlay, false);
+  });
+  window.addEventListener('pagehide', stopCamera);
+  window.addEventListener('beforeunload', stopCamera);
+
+  setState('CAMERA');
+  renderLeaderboard(loadLeaderboard().slice(0, 5));
+})();
+</script>
+</body>
+</html>
