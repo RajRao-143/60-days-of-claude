@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Day 24 Business Dashboard: Digital Privacy Intelligence Platform</title>
+<style>
+/* Self-contained dashboard. No external fonts, scripts, or images. Dark-first, with a light theme toggle. */
+:root{
+  --bg:#0b1020; --card:#141b33; --card2:#1a2342; --line:#27315a; --ink:#eaf0ff; --muted:#9aa7c7;
+  --teal:#22d3c5; --amber:#fbbf24; --coral:#ff6b81; --violet:#9a8bff; --blue:#4da3ff; --green:#4ade80;
+  --on-accent:#08101f; --shadow:0 8px 24px rgba(0,0,0,.35);
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#f1f5fb; --card:#ffffff; --card2:#eef3fb; --line:#d5deee; --ink:#0e1530; --muted:#53607f;
+  --teal:#0a9c91; --amber:#b7791f; --coral:#d93a55; --violet:#5b4bd6; --blue:#1f6fd1; --green:#1f8a4c;
+  --on-accent:#ffffff; --shadow:0 8px 24px rgba(20,40,90,.10);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --bg:#f1f5fb; --card:#ffffff; --card2:#eef3fb; --line:#d5deee; --ink:#0e1530; --muted:#53607f;
+    --teal:#0a9c91; --amber:#b7791f; --coral:#d93a55; --violet:#5b4bd6; --blue:#1f6fd1; --green:#1f8a4c;
+    --on-accent:#ffffff; --shadow:0 8px 24px rgba(20,40,90,.10);
+    color-scheme:light;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5;padding:20px 16px 56px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(1.5rem,3.6vw,2.2rem);line-height:1.2;letter-spacing:-.01em}
+h2{font-size:1.1rem;display:flex;align-items:center;gap:10px}
+h2::before{content:"";width:6px;height:22px;border-radius:3px;background:linear-gradient(var(--teal),var(--violet))}
+h3{font-size:.95rem}
+.muted{color:var(--muted)}
+.small{font-size:.8rem}
+.mono{font-family:var(--mono)}
+.top{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:flex-start}
+.top .l{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1 1 420px}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--teal)}
+button{font:inherit;color:inherit;cursor:pointer}
+.themebtn{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.82rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{font-family:var(--mono);font-size:.66rem;letter-spacing:.04em;padding:2px 8px;border-radius:5px;white-space:nowrap;font-weight:600}
+.chip.f{background:color-mix(in srgb,var(--blue) 20%,transparent);color:var(--blue)}
+.chip.e{background:color-mix(in srgb,var(--amber) 20%,transparent);color:var(--amber)}
+.chip.a{background:color-mix(in srgb,var(--violet) 22%,transparent);color:var(--violet)}
+.chip.u{background:color-mix(in srgb,var(--muted) 22%,transparent);color:var(--muted)}
+.hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);min-width:0;display:flex;flex-direction:column;gap:10px}
+.verdict{background:linear-gradient(135deg,color-mix(in srgb,var(--amber) 22%,var(--card)),var(--card) 70%);border-color:color-mix(in srgb,var(--amber) 55%,var(--line))}
+.badge{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:1.5rem;letter-spacing:.02em}
+.badge .dot{width:14px;height:14px;border-radius:50%;background:var(--amber);box-shadow:0 0 14px var(--amber)}
+.scale{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.scale div{border:1px solid var(--line);border-radius:8px;padding:6px 4px;text-align:center;font-size:.78rem;color:var(--muted)}
+.scale .on{background:var(--amber);color:var(--on-accent);border-color:var(--amber);font-weight:800}
+.score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.score{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.score .n{font-size:2rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.meter{height:9px;background:var(--line);border-radius:5px;overflow:hidden}
+.meter i{display:block;height:100%;width:var(--w);border-radius:5px;background:var(--c,var(--teal))}
+.score.avg{background:linear-gradient(135deg,color-mix(in srgb,var(--violet) 25%,var(--card)),var(--card))}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:6px 16px;font-size:.85rem}
+.tab[aria-selected="true"]{background:var(--teal);color:var(--on-accent);border-color:var(--teal);font-weight:700}
+.canvas{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.block{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.block b{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--teal)}
+.block span{font-size:.86rem}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.stream{border-left:5px solid var(--c);}
+label{font-size:.82rem;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.ctrl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+input[type=range]{width:100%;accent-color:var(--teal)}
+input[type=number]{width:100%;background:var(--card2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit}
+.out{font-size:1.9rem;font-weight:800;font-variant-numeric:tabular-nums;color:var(--teal)}
+.warn{background:color-mix(in srgb,var(--amber) 16%,transparent);border:1px solid color-mix(in srgb,var(--amber) 45%,transparent);border-radius:10px;padding:8px 12px;font-size:.82rem}
+.bars{display:flex;flex-direction:column;gap:8px}
+.brow{display:grid;grid-template-columns:150px minmax(0,1fr) 92px;gap:10px;align-items:center;font-size:.82rem}
+.brow .bar{height:12px;background:var(--line);border-radius:6px;overflow:hidden}
+.brow .bar i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:6px}
+.brow .v{text-align:right;font-variant-numeric:tabular-nums}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;counter-reset:s}
+.step{position:relative;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px 10px 10px;font-size:.82rem;display:flex;flex-direction:column;gap:4px}
+.step::before{counter-increment:s;content:counter(s);position:absolute;top:-10px;left:10px;background:var(--violet);color:var(--on-accent);font-weight:800;font-size:.72rem;width:22px;height:22px;border-radius:50%;display:grid;place-items:center}
+.step b{font-size:.86rem}
+.funnel{display:flex;flex-direction:column;gap:6px}
+.frow{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;align-items:center;font-size:.82rem}
+.frow .bar{height:24px;border-radius:6px;background:linear-gradient(90deg,var(--violet),var(--teal));width:var(--w);min-width:30px;display:flex;align-items:center;padding-left:8px;color:var(--on-accent);font-weight:800;font-size:.8rem}
+.stack{display:flex;height:34px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.stack i{display:grid;place-items:center;color:var(--on-accent);font-style:normal;font-weight:800;font-size:.8rem;width:var(--w);background:var(--c)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.8rem}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin-right:6px}
+.risks{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.risk{background:var(--card);border:1px solid var(--line);border-top:5px solid var(--c);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.pill{align-self:flex-start;font-size:.7rem;font-weight:800;padding:1px 9px;border-radius:99px;background:var(--c);color:var(--on-accent)}
+table{width:100%;border-collapse:collapse;font-size:.84rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.68rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tw{overflow-x:auto}
+.moat{display:inline-block;width:70px;height:8px;border-radius:4px;background:var(--line);vertical-align:middle;margin-right:6px;overflow:hidden}
+.moat i{display:block;height:100%;width:var(--w);background:var(--coral)}
+.timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.week{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:.82rem;display:flex;flex-direction:column;gap:4px}
+.week b{color:var(--teal);font-family:var(--mono);font-size:.74rem}
+.final{background:linear-gradient(135deg,color-mix(in srgb,var(--coral) 18%,var(--card)),var(--card) 65%)}
+@media (max-width:760px){.hero{grid-template-columns:1fr}.brow{grid-template-columns:110px minmax(0,1fr) 84px}.frow{grid-template-columns:100px minmax(0,1fr)}}
+@media print{body{background:#fff;color:#000}.themebtn,.tabs{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="l">
+    <div class="eyebrow">Day 24 · Business Dashboard · 9 Oct 2026</div>
+    <h1>Digital Privacy Intelligence Platform: can it become a business?</h1>
+    <p class="muted small">India-first · pre-validation student project · Source of truth: Day 23 Customer &amp; MVP Blueprint. There is a prototype, and 0 confirmed external users, paying customers, or revenue.</p>
+    <div class="chips" aria-label="Label legend">
+      <span class="chip f">FACT</span><span class="small muted">told to me or cited</span>
+      <span class="chip e">ESTIMATE</span><span class="small muted">inferred</span>
+      <span class="chip a">ASSUMPTION</span><span class="small muted">needs validation</span>
+      <span class="chip u">UNKNOWN</span><span class="small muted">not determinable</span>
+    </div>
+  </div>
+  <button class="themebtn" id="themebtn" type="button">Switch theme</button>
+</header>
+
+<!-- Verdict -->
+<section class="hero" aria-label="Final verdict">
+  <div class="card verdict">
+    <div class="eyebrow" style="color:var(--amber)">Final verdict</div>
+    <div class="badge"><span class="dot"></span>VALIDATE</div>
+    <div class="scale" aria-label="Verdict scale"><div>Investable</div><div class="on">Validate</div><div>Pivot</div><div>Reject</div></div>
+    <p class="small">No traction, no paying customer, no moat. Plausible and cheap to test, so test it: institutional demand, real user actions, and willingness to pay, before building more.</p>
+  </div>
+  <div class="card">
+    <h3>Sustainability verdict</h3>
+    <p class="small">On current evidence the business is <b>not yet sustainable</b>: no paying customer, small consumer revenue at realistic reach, and an institutional route with a verified awareness hook but an unproven budget.</p>
+    <p class="small muted">Validate next: students act on a sourced plan, one college runs a paid or formal pilot, and trustworthy data can be maintained.</p>
+  </div>
+</section>
+
+<!-- Scorecards -->
+<section class="card" aria-label="Scorecards">
+  <h2>Investment scorecard <span class="chip e">ESTIMATE</span></h2>
+  <div class="score-grid">
+    <div class="score"><span class="small muted">Business Viability</span><span class="n">30</span><div class="meter"><i style="--w:30%;--c:var(--teal)"></i></div><span class="small muted">Cheap to test; no paying customer</span></div>
+    <div class="score"><span class="small muted">Revenue Potential</span><span class="n">25</span><div class="meter"><i style="--w:25%;--c:var(--amber)"></i></div><span class="small muted">Consumer small; institutional price unknown</span></div>
+    <div class="score"><span class="small muted">GTM Strength</span><span class="n">35</span><div class="meter"><i style="--w:35%;--c:var(--blue)"></i></div><span class="small muted">One plausible channel, untested</span></div>
+    <div class="score"><span class="small muted">Competitive Strength</span><span class="n">20</span><div class="meter"><i style="--w:20%;--c:var(--coral)"></i></div><span class="small muted">No moat; free alternatives</span></div>
+    <div class="score"><span class="small muted">Investor Readiness</span><span class="n">10</span><div class="meter"><i style="--w:10%;--c:var(--coral)"></i></div><span class="small muted">Student project, 0 traction</span></div>
+    <div class="score avg"><span class="small muted">Simple average</span><span class="n">24</span><div class="meter"><i style="--w:24%;--c:var(--violet)"></i></div><span class="small muted">Equal weights; my choice</span></div>
+  </div>
+  <p class="small muted">Scores are judgments, not measurements. A score rises only after an experiment passes, such as ≥ 1 paid or formal pilot or ≥ 100 real users.</p>
+</section>
+
+<!-- Business model -->
+<section class="card" aria-label="Business model">
+  <h2>Business model <span class="chip a">ASSUMPTION</span></h2>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-c" aria-selected="true" data-m="c" type="button">Consumer model</button>
+    <button class="tab" role="tab" id="tab-i" aria-selected="false" data-m="i" type="button">Institutional model</button>
+  </div>
+  <div class="canvas" id="canvas"></div>
+  <p class="small muted" id="canvasnote"></p>
+</section>
+
+<!-- Revenue -->
+<section class="card" aria-label="Revenue streams">
+  <h2>Revenue streams</h2>
+  <div class="two">
+    <div class="card stream" style="--c:var(--teal)">
+      <h3>Consumer: free core + Pro <span class="chip a">ASSUMPTION</span></h3>
+      <p class="small muted">₹499/year and ₹99/month are <b>unvalidated pricing hypotheses</b>. Experiment inputs, not forecasts.</p>
+      <div class="ctrl">
+        <label>Registered users: <b id="cu-v">1,000</b><input id="cu" type="range" min="100" max="5000" step="100" value="1000"></label>
+        <label>Paying share (%): <b id="cp-v">1</b><input id="cp" type="range" min="0" max="5" step="0.5" value="1"></label>
+        <label>Price per year (₹)<input id="cpr" type="number" min="0" value="499"></label>
+      </div>
+      <div><span class="small muted">Payers</span> <b id="cpay">10</b></div>
+      <div class="out" id="cout">₹4,990 / year</div>
+      <div class="bars" id="scen" aria-label="Scenario bars"></div>
+      <p class="small muted">Reading: even the top scenario (5,000 users, 3% paying) is about ₹74,850 a year. <span class="chip e">ESTIMATE</span> Jumbo's reported 40% annual churn is a warning for subscriptions. <span class="chip f">FACT</span> as reported</p>
+    </div>
+    <div class="card stream" style="--c:var(--violet)">
+      <h3>Institutional: cyber-hygiene program <span class="chip u">UNKNOWN</span></h3>
+      <div class="warn">Price is <b>unknown</b>. The default ₹50 per student is a <b>placeholder for arithmetic only</b>. Replace it with what institutions say they pay.</div>
+      <div class="ctrl">
+        <label>Colleges: <b id="ic-v">10</b><input id="ic" type="range" min="1" max="20" step="1" value="10"></label>
+        <label>Students per college: <b id="is-v">2,000</b><input id="is" type="range" min="500" max="5000" step="100" value="2000"></label>
+        <label>Placeholder ₹ per student/year<input id="ip" type="number" min="0" value="50"></label>
+      </div>
+      <div class="out" id="iout" style="color:var(--violet)">₹10,00,000 / year</div>
+      <p class="small muted">Options to test: free pilot then paid, per-session fee, per-student license. <span class="chip a">ASSUMPTION</span> Whether colleges have a software budget is <span class="chip u">UNKNOWN</span>; the 2021 UGC notice concerned awareness activities, and state governments were to fund those.</p>
+    </div>
+  </div>
+</section>
+
+<!-- GTM -->
+<section class="card" aria-label="Go-to-market flow">
+  <h2>Go-to-market flow <span class="chip a">ASSUMPTION</span></h2>
+  <p class="small"><b>One segment:</b> final-year undergraduates at Indian colleges, including non-CS students. <b>One channel:</b> campus cyber-awareness sessions with cyber clubs or IT cells.</p>
+  <div class="flow" style="margin-top:8px">
+    <div class="step"><b>Host agrees</b>Cyber club or IT cell books a free 30–45 min session</div>
+    <div class="step"><b>Session</b>Short talk about protecting accounts and payments</div>
+    <div class="step"><b>Check-up</b>Attendees pick apps on their phones</div>
+    <div class="step"><b>Three actions</b>Sourced, ordered, doable in one sitting</div>
+    <div class="step"><b>7-day follow-up</b>"What did you do?"</div>
+    <div class="step"><b>Day-14 return</b>Prompt when the score or apps change</div>
+    <div class="step"><b>Monetize</b>Fake-door Pro; pilot ask to the host</div>
+  </div>
+  <p class="small muted">Verified hooks <span class="chip f">FACT</span>: UGC asked institutions to observe a monthly Cyber Jagrookta Diwas (notice 18 Nov 2021); Delhi University signed an MoU with I4C on cyber hygiene (reported 13 Jul 2026). Whether colleges still run these sessions is <span class="chip u">UNKNOWN</span>.</p>
+</section>
+
+<!-- First 100 -->
+<section class="card" aria-label="First 100 users plan">
+  <h2>First 100 users plan <span class="chip a">EXPERIMENT TARGETS</span></h2>
+  <div class="stack" role="img" aria-label="15 interviews, 15 network, 72 campus sessions">
+    <i style="--w:14.7%;--c:var(--blue)">15</i><i style="--w:14.7%;--c:var(--amber)">15</i><i style="--w:70.6%;--c:var(--teal)">72</i>
+  </div>
+  <div class="legend">
+    <span style="--c:var(--blue)">Student interviews (15)</span>
+    <span style="--c:var(--amber)">Personal network (15, tracked separately: likely biased)</span>
+    <span style="--c:var(--teal)">Campus sessions: 4 × 40 attendees × 45% = 72</span>
+  </div>
+  <p class="small muted">Total 15 + 15 + 72 = 102, reached by about Day 45. Count only non-friends who complete the check-up themselves. The 45% completion rate is an assumption.</p>
+  <h3>Funnel thresholds (pass signals, not forecasts)</h3>
+  <div class="funnel">
+    <div class="frow"><span>Attendees</span><div class="bar" style="--w:100%">160</div></div>
+    <div class="frow"><span>Complete check-up (45%)</span><div class="bar" style="--w:45%">72</div></div>
+    <div class="frow"><span>Act in 7 days (50%)</span><div class="bar" style="--w:22.5%">36</div></div>
+    <div class="frow"><span>Return by day 14 (20%)</span><div class="bar" style="--w:9%">14</div></div>
+    <div class="frow"><span>Click priced Pro (5%)</span><div class="bar" style="--w:2.2%">4</div></div>
+  </div>
+</section>
+
+<!-- Moat -->
+<section class="card" aria-label="Competitive moat">
+  <h2>Competitive position and moat</h2>
+  <div class="tw"><table>
+    <tr><th>Possible moat</th><th>Strength today</th><th>What would build it</th></tr>
+    <tr><td>Sourced India-specific dataset</td><td><span class="moat"><i style="--w:0%"></i></span>None (scores are model estimates)</td><td>Cited, reviewed data for 20–25 services</td></tr>
+    <tr><td>Institutional relationships</td><td><span class="moat"><i style="--w:0%"></i></span>None</td><td>Pilots and referrals from hosts</td></tr>
+    <tr><td>Trust and transparency</td><td><span class="moat"><i style="--w:20%"></i></span>Low</td><td>Public method; expert review</td></tr>
+    <tr><td>Switching costs</td><td><span class="moat"><i style="--w:0%"></i></span>None</td><td>Not obvious for a consumer product</td></tr>
+    <tr><td>Regulatory tailwind</td><td><span class="chip u">UNKNOWN</span></td><td>DPDP Rules notified 14 Nov 2025, phased over 12–18 months; demand impact unproven</td></tr>
+  </table></div>
+  <div class="tw"><table>
+    <tr><th>Alternative</th><th>Verified fact</th><th>Status</th></tr>
+    <tr><td>ToS;DR</td><td>Free community A–E grades of policies; browser extensions</td><td><span class="chip f">FACT</span></td></tr>
+    <tr><td>Exodus Privacy</td><td>Lists trackers embedded in Android apps; pricing not confirmed</td><td><span class="chip f">FACT</span> / <span class="chip u">UNKNOWN</span></td></tr>
+    <tr><td>Google privacy tools</td><td>Privacy Checkup, My Activity, auto-delete; free</td><td><span class="chip f">FACT</span></td></tr>
+    <tr><td>Incogni</td><td>Data-broker removal; $95.88/year on annual billing</td><td><span class="chip f">FACT</span></td></tr>
+    <tr><td>Jumbo Privacy</td><td>Reported 25,000 paid subscribers, 40% annual churn; removed paywall</td><td><span class="chip f">FACT</span> as reported</td></tr>
+    <tr><td>Doing nothing</td><td>Free, zero effort. The real competitor.</td><td><span class="chip e">ESTIMATE</span></td></tr>
+  </table></div>
+</section>
+
+<!-- Risks -->
+<section aria-label="Key risks" style="display:flex;flex-direction:column;gap:12px">
+  <h2>Key risks</h2>
+  <div class="risks">
+    <div class="risk" style="--c:var(--coral)"><span class="pill">HIGH</span><b>Score not trusted or accurate</b><span class="muted">Estimates have no ground truth.</span><span>Test: cite every claim; expert review.</span></div>
+    <div class="risk" style="--c:var(--coral)"><span class="pill">HIGH</span><b>People do not act or return</b><span class="muted">Awareness is not action.</span><span>Test: 7-day action rate; day-14 return.</span></div>
+    <div class="risk" style="--c:var(--coral)"><span class="pill">HIGH</span><b>Sampling bias</b><span class="muted">Your network skews to coders.</span><span>Test: half of testers outside coding circles.</span></div>
+    <div class="risk" style="--c:var(--coral)"><span class="pill">HIGH</span><b>No willingness to pay</b><span class="muted">Consumer subscriptions have struggled.</span><span>Test: fake-door; ask institutions for price ranges.</span></div>
+    <div class="risk" style="--c:var(--amber)"><span class="pill">MEDIUM</span><b>Data upkeep and scope creep</b><span class="muted">Policies change; accounts add regulatory exposure.</span><span>Test: keep to 20–25 services; no connected accounts.</span></div>
+  </div>
+</section>
+
+<!-- 30-day plan -->
+<section class="card" aria-label="30-day validation plan">
+  <h2>30-day business validation plan <span class="chip a">EXPERIMENT THRESHOLDS</span></h2>
+  <div class="timeline">
+    <div class="week"><b>DAYS 1–7</b>Demand and buyer discovery. Contact 20 hosts; 15 student interviews; 5 institution conversations begin.<span class="muted">≥ 5 host replies; ≥ 40% describe a real incident</span></div>
+    <div class="week"><b>DAYS 8–14</b>Trust and product. Sourced dataset (20–25 services); three-action result page; method review request.<span class="muted">Every claim cited</span></div>
+    <div class="week"><b>DAYS 15–21</b>Real user actions. Sessions 1–2; 7-day follow-ups.<span class="muted">≥ 30 check-ups; ≥ 50% report an action</span></div>
+    <div class="week"><b>DAYS 22–30</b>Willingness to pay. Sessions 3–4; fake-door pricing; pilot ask; decision memo.<span class="muted">≥ 5% click Pro; ≥ 1 pilot interest; price ranges from ≥ 3 institutions</span></div>
+  </div>
+  <p class="small muted"><b>Continue</b> if ≥ 50% of users act and either ≥ 5% click Pro or ≥ 1 institution wants a pilot. <b>Pivot</b> if users are interested but nobody pays. <b>Pause</b> if fewer than 20% act or nobody outside your circle completes the check-up. Set your own thresholds before starting.</p>
+</section>
+
+<section class="card final" aria-label="Pitch">
+  <h2>Investor one-liner <span class="chip a">DRAFT, NOT A TRACTION CLAIM</span></h2>
+  <p>"A free, sourced privacy check-up for Indian college students that turns their app list into three actions, delivered through campus cyber-awareness sessions and offered to colleges as a cyber-hygiene program."</p>
+  <p class="small muted">Full report, critique, sources and 30-second pitch are in <span class="mono">day24-business-strategy-report</span>.</p>
+</section>
+
+</div>
+
+<script>
+(function(){
+  var fmt=function(n){return Math.round(n).toLocaleString('en-IN')};
+  var $=function(id){return document.getElementById(id)};
+
+  // Theme toggle (no storage)
+  var root=document.documentElement;
+  $('themebtn').addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    if(!cur){cur=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}
+    root.setAttribute('data-theme',cur==='dark'?'light':'dark');
+  });
+
+  // Business model canvas
+  var model={
+    c:[
+      ['Segment','Final-year students and first-job professionals, 20–25 (assumption)'],
+      ['Value','A 2-minute check-up with three ordered, sourced actions'],
+      ['Channels','Campus sessions; shareable result card'],
+      ['Relationship','Self-serve plus one manual 7-day follow-up'],
+      ['Revenue','Free core; possible Pro at ₹499/year or ₹99/month (unvalidated)'],
+      ['Key resources','Prototype, sourced service dataset, method page'],
+      ['Key activities','Source data, run sessions, follow up, interview users'],
+      ['Key partners','College cyber clubs; one security practitioner for method review'],
+      ['Costs','Hosting and payment fees unknown; founder time not costed'],
+      ['Status','0 users, 0 payers']
+    ],
+    i:[
+      ['Segment','Colleges and universities; cyber clubs and IT cells as entry contacts (assumption)'],
+      ['Value','A ready-made cyber-hygiene activity with a measurable outcome: actions completed'],
+      ['Channels','Direct outreach to cyber clubs, faculty coordinators, IT cells'],
+      ['Relationship','Relationship-led pilot with a named coordinator'],
+      ['Revenue','Pilot fee, per-session fee, or per-student license (price unknown)'],
+      ['Key resources','Same dataset, plus a session format and outcome report'],
+      ['Key activities','Sell pilots, run sessions, report outcomes'],
+      ['Key partners','Faculty coordinators; I4C-linked programs possible (a Delhi University MoU exists)'],
+      ['Costs','Travel and session time unknown'],
+      ['Status','0 conversations held']
+    ]
+  };
+  var notes={c:'Consumer model is the funnel and learning engine.',i:'Institutional model is the main monetization hypothesis. Budget and price are unknown.'};
+  function drawCanvas(m){
+    var h='';
+    model[m].forEach(function(b){h+='<div class="block"><b>'+b[0]+'</b><span>'+b[1]+'</span></div>';});
+    $('canvas').innerHTML=h; $('canvasnote').textContent=notes[m];
+    $('tab-c').setAttribute('aria-selected',m==='c'); $('tab-i').setAttribute('aria-selected',m==='i');
+  }
+  $('tab-c').addEventListener('click',function(){drawCanvas('c')});
+  $('tab-i').addEventListener('click',function(){drawCanvas('i')});
+  drawCanvas('c');
+
+  // Consumer calculator
+  function consumer(){
+    var u=+$('cu').value,p=+$('cp').value,pr=Math.max(0,+$('cpr').value||0);
+    $('cu-v').textContent=fmt(u); $('cp-v').textContent=p;
+    var payers=Math.round(u*p/100);
+    $('cpay').textContent=fmt(payers);
+    $('cout').textContent='₹'+fmt(payers*pr)+' / year';
+  }
+  ['cu','cp','cpr'].forEach(function(id){$(id).addEventListener('input',consumer)});
+  consumer();
+
+  // Scenario bars (fixed at ₹499/year)
+  var sc=[[100,1],[100,3],[1000,1],[1000,3],[5000,1],[5000,3]];
+  var max=5000*0.03*499, sh='';
+  sc.forEach(function(s){
+    var rev=Math.round(s[0]*s[1]/100)*499;
+    sh+='<div class="brow"><span>'+fmt(s[0])+' users, '+s[1]+'%</span><div class="bar"><i style="--w:'+Math.max(rev/max*100,1.5)+'%"></i></div><span class="v">₹'+fmt(rev)+'</span></div>';
+  });
+  $('scen').innerHTML=sh;
+
+  // Institutional calculator
+  function inst(){
+    var c=+$('ic').value,s=+$('is').value,p=Math.max(0,+$('ip').value||0);
+    $('ic-v').textContent=c; $('is-v').textContent=fmt(s);
+    $('iout').textContent='₹'+fmt(c*s*p)+' / year';
+  }
+  ['ic','is','ip'].forEach(function(id){$(id).addEventListener('input',inst)});
+  inst();
+})();
+</script>
+</body>
+</html>
