@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hospital Admission Readiness Simulator</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','-apple-system','Segoe UI','Roboto','Helvetica Neue','Arial','sans-serif'] } } } };
+</script>
+<style>
+  :focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+<noscript><div class="p-4 bg-red-50 text-red-800">This simulator requires JavaScript.</div></noscript>
+<div id="sr-status" class="sr-only" role="status" aria-live="polite"></div>
+
+<header class="bg-gradient-to-r from-blue-800 to-blue-600 text-white shadow">
+  <div class="max-w-7xl mx-auto px-4 py-5">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="text-3xl" aria-hidden="true">🏥</div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold leading-tight">Hospital Admission Readiness Simulator</h1>
+          <p class="text-blue-100 text-sm">You are the Hospital Admission Coordinator · Educational training simulation</p>
+        </div>
+      </div>
+      <span class="text-xs bg-white/15 border border-white/30 rounded-full px-3 py-1">Illustrative training data only</span>
+    </div>
+    <ol id="stepper" class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs sm:text-sm" aria-label="Simulation progress"></ol>
+  </div>
+</header>
+
+<div class="bg-amber-50 border-b border-amber-200 text-amber-900 text-xs sm:text-sm">
+  <div class="max-w-7xl mx-auto px-4 py-2">
+    <strong>Training notice:</strong> All provider, physician, hospital, insurer, and payer names are <strong>illustrative training data</strong>. No real patient, authorization, bed reservation, or admission order is created. Not medical, legal, or coverage advice.
+  </div>
+</div>
+
+<main class="max-w-7xl mx-auto px-4 py-6">
+
+  <!-- ========== SETUP VIEW ========== -->
+  <section id="setup-view" aria-labelledby="setup-heading" class="max-w-3xl mx-auto">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-8">
+      <h2 id="setup-heading" class="text-xl font-bold text-blue-900">Admission Setup</h2>
+      <p class="text-slate-600 mt-1 text-sm">Enter the admission scenario. Your selections stay fixed for the whole scenario. Use Restart to try another combination.</p>
+
+      <form id="setup-form" class="mt-6 space-y-5" novalidate>
+        <div>
+          <label for="provider" class="block text-sm font-semibold text-slate-700">Provider / hospital name <span class="text-red-600" aria-hidden="true">*</span></label>
+          <input id="provider" name="provider" list="provider-list" maxlength="80" autocomplete="off" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500" placeholder="e.g., Riverside General Hospital (illustrative)" aria-describedby="err-provider">
+          <datalist id="provider-list">
+            <option value="Riverside General Hospital (illustrative)"></option>
+            <option value="Lakeview Medical Center (illustrative)"></option>
+            <option value="Summit Regional Health (illustrative)"></option>
+          </datalist>
+          <p id="err-provider" class="text-sm text-red-700 mt-1 hidden" role="alert"></p>
+        </div>
+
+        <div>
+          <label for="physician" class="block text-sm font-semibold text-slate-700">Attending physician <span class="text-red-600" aria-hidden="true">*</span></label>
+          <input id="physician" name="physician" list="physician-list" maxlength="80" autocomplete="off" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500" placeholder="e.g., Dr. Example Alpha (illustrative)" aria-describedby="err-physician">
+          <datalist id="physician-list">
+            <option value="Dr. Example Alpha (illustrative)"></option>
+            <option value="Dr. Example Beta (illustrative)"></option>
+            <option value="Dr. Example Gamma (illustrative)"></option>
+          </datalist>
+          <p id="err-physician" class="text-sm text-red-700 mt-1 hidden" role="alert"></p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-5">
+          <div>
+            <label for="dx" class="block text-sm font-semibold text-slate-700">Diagnosis <span class="text-red-600" aria-hidden="true">*</span></label>
+            <select id="dx" name="dx" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 bg-white" aria-describedby="err-dx">
+              <option value="">Select diagnosis…</option>
+              <option>Acute MI</option><option>CHF</option><option>Pneumonia</option><option>Elective Surgery</option><option>Hip Fracture</option>
+            </select>
+            <p id="err-dx" class="text-sm text-red-700 mt-1 hidden" role="alert"></p>
+          </div>
+          <div>
+            <label for="type" class="block text-sm font-semibold text-slate-700">Admission type <span class="text-red-600" aria-hidden="true">*</span></label>
+            <select id="type" name="type" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 bg-white" aria-describedby="err-type">
+              <option value="">Select admission type…</option>
+              <option>Inpatient</option><option>Observation</option><option>Emergency</option><option>ICU</option><option>Same-Day Surgery</option>
+            </select>
+            <p id="err-type" class="text-sm text-red-700 mt-1 hidden" role="alert"></p>
+          </div>
+          <div>
+            <label for="pa" class="block text-sm font-semibold text-slate-700">Prior Authorization status <span class="text-red-600" aria-hidden="true">*</span></label>
+            <select id="pa" name="pa" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 bg-white" aria-describedby="err-pa">
+              <option value="">Select PA status…</option>
+              <option>Approved</option><option>Pending</option><option>Denied</option><option>Not Required</option>
+            </select>
+            <p id="err-pa" class="text-sm text-red-700 mt-1 hidden" role="alert"></p>
+          </div>
+          <div>
+            <label for="date" class="block text-sm font-semibold text-slate-700">Admission date <span class="text-red-600" aria-hidden="true">*</span></label>
+            <input id="date" name="date" type="date" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 bg-white" aria-describedby="err-date">
+            <p id="err-date" class="text-sm text-red-700 mt-1 hidden" role="alert"></p>
+          </div>
+        </div>
+
+        <div id="setup-notices" class="space-y-3" aria-live="polite"></div>
+
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+          <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white font-bold text-lg rounded-xl px-6 py-3 shadow">🏥 Analyze Admission Readiness</button>
+          <button type="button" id="sample-btn" class="text-blue-700 hover:text-blue-900 underline text-sm">Load illustrative sample</button>
+        </div>
+        <p id="form-error" class="text-sm text-red-700 hidden" role="alert"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ========== SIMULATION VIEW ========== -->
+  <section id="sim-view" class="hidden space-y-6" aria-label="Admission readiness simulation">
+    <div id="scenario-bar"></div>
+    <div id="alerts" class="space-y-3"></div>
+    <div class="grid lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 space-y-6">
+        <div id="readiness"></div>
+        <div id="pa-panel"></div>
+        <div id="actions"></div>
+      </div>
+      <div class="space-y-6">
+        <div id="risks"></div>
+        <div id="timeline"></div>
+      </div>
+    </div>
+    <div id="care"></div>
+    <div id="governance"></div>
+    <div id="final"></div>
+    <div id="log"></div>
+    <p class="text-xs text-slate-500 text-center pb-6">Educational simulation only. A readiness score is not a real authorization, bed reservation, medical clearance, or admission order. Actual admissions require qualified clinical judgment and applicable hospital and payer policies.</p>
+  </section>
+</main>
+
+<script>
+'use strict';
+
+/* ================= helpers (safe DOM) ================= */
+const $ = id => document.getElementById(id);
+function h(tag, props, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v === null || v === undefined || v === false) continue;
+    if (k === 'class') e.className = v;
+    else if (k === 'text') e.textContent = v;
+    else if (k === 'on') { for (const [ev, fn] of Object.entries(v)) e.addEventListener(ev, fn); }
+    else if (k === 'disabled') e.disabled = true;
+    else e.setAttribute(k, v === true ? '' : String(v));
+  }
+  for (const kid of kids.flat(Infinity)) {
+    if (kid === null || kid === undefined || kid === false) continue;
+    e.appendChild(typeof kid === 'object' ? kid : document.createTextNode(String(kid)));
+  }
+  return e;
+}
+function mount(id, ...kids) { $(id).replaceChildren(...kids.flat(Infinity).filter(Boolean)); }
+function card(title, ...kids) {
+  return h('div', { class: 'bg-white rounded-2xl shadow-sm border border-slate-200 p-5' },
+    title ? h('h2', { class: 'text-lg font-bold text-blue-900 mb-3', text: title }) : null, ...kids);
+}
+function btn(label, onClick, o = {}) {
+  const variants = {
+    primary: 'bg-blue-700 hover:bg-blue-800 text-white',
+    secondary: 'bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200',
+    danger: 'bg-red-50 hover:bg-red-100 text-red-800 border border-red-200',
+    success: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200',
+    ghost: 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-300'
+  };
+  return h('button', {
+    type: 'button',
+    class: 'rounded-lg px-3 py-2 text-sm font-semibold transition ' + (variants[o.variant || 'secondary']) + (o.disabled ? ' opacity-50 cursor-not-allowed' : ''),
+    disabled: !!o.disabled, title: o.title || null, 'aria-label': o.aria || null, on: o.disabled ? {} : { click: onClick }
+  }, label);
+}
+const STATUS_STYLE = {
+  'Complete': ['bg-emerald-100 text-emerald-800', '✓'],
+  'Pending': ['bg-amber-100 text-amber-800', '…'],
+  'In Progress': ['bg-blue-100 text-blue-800', '◐'],
+  'Missing': ['bg-red-100 text-red-800', '!']
+};
+function badge(s) {
+  const [cls, ic] = STATUS_STYLE[s] || ['bg-slate-100 text-slate-700', '•'];
+  return h('span', { class: 'inline-flex items-center gap-1 text-xs font-semibold rounded-full px-2 py-0.5 ' + cls }, h('span', { 'aria-hidden': 'true', text: ic }), s);
+}
+const RISK_STYLE = {
+  Low: ['bg-emerald-500', 'bg-emerald-100 text-emerald-800'],
+  Moderate: ['bg-amber-500', 'bg-amber-100 text-amber-800'],
+  High: ['bg-orange-500', 'bg-orange-100 text-orange-800'],
+  Critical: ['bg-red-600', 'bg-red-100 text-red-800']
+};
+function callout(kind, title, text, extra) {
+  const k = { amber: 'bg-amber-50 border-amber-400 text-amber-900', blue: 'bg-blue-50 border-blue-500 text-blue-900', red: 'bg-red-50 border-red-500 text-red-900', slate: 'bg-slate-50 border-slate-400 text-slate-800' }[kind];
+  return h('div', { class: 'border-l-4 rounded-r-lg p-4 ' + k, role: 'note' },
+    title ? h('p', { class: 'font-bold', text: title }) : null,
+    text ? h('p', { class: title ? 'mt-1' : 'font-semibold', text }) : null, extra || null);
+}
+
+/* ================= constants ================= */
+const OBS_NOTE = 'CMS 2-Midnight Rule applies — different cost-sharing, SNF eligibility, and billing than inpatient. Medicare patients require written MOON notification.';
+const MN_NOTE = 'InterQual/Milliman thresholds apply — ensure documentation meets medical necessity standards before UR review.';
+const MN_EXPLAIN = 'InterQual and Milliman are utilization-review criteria frameworks used to help structure review of whether care meets medical necessity and level-of-care standards. They do not replace clinicians: actual clinical decisions require qualified review.';
+const GOV_TEXT = 'Industry benchmarks (estimates only): PA turnaround 3–5 days · Inpatient denial rate ~8–10% (CMS) · PA rework cost ~$11/transaction (CAQH)';
+const PAYER = 'Northbridge Health Plan (illustrative payer)';
+const DENIAL_REASON = {
+  'Acute MI': 'Records submitted do not clearly show the severity indicators used to support inpatient-level cardiac care (illustrative).',
+  'CHF': 'Documentation does not clearly show failure of outpatient/observation management or objective decompensation markers (illustrative).',
+  'Pneumonia': 'Severity scoring and oxygenation findings are not documented well enough to support the requested level of care (illustrative).',
+  'Elective Surgery': 'Pre-operative clinical rationale for the requested setting and length of stay was not included (illustrative).',
+  'Hip Fracture': 'Operative plan and post-acute plan were not included with the request (illustrative).'
+};
+const SAMPLE = { provider: 'Riverside General Hospital (illustrative)', physician: 'Dr. Example Alpha (illustrative)', dx: 'CHF', type: 'Inpatient', pa: 'Pending' };
+
+/* ================= state ================= */
+let S = null;
+
+function newScenario(setup) {
+  return {
+    setup,
+    pa: { current: setup.pa, followUp: false, docs: false, physician: false, reviewed: false, contacted: false, attempts: 0, appealSubmitted: false, appealOutcome: null },
+    flags: { insurance: false, bed: false, docs: false, orders: false, consent: false, nursing: false, arrival: false },
+    finalReviewed: false, actionsTaken: 0, log: []
+  };
+}
+function addLog(msg, kind) {
+  S.log.unshift({ t: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }), msg, kind: kind || 'info' });
+  $('sr-status').textContent = msg;
+}
+
+/* ================= derivation (single source of truth) ================= */
+function level(n) { return n < 30 ? 'Low' : n < 55 ? 'Moderate' : n < 80 ? 'High' : 'Critical'; }
+
+function derive(S) {
+  const u = S.setup, pa = S.pa, f = S.flags, cur = pa.current;
+  const resolved = cur === 'Approved' || cur === 'Not Required';
+  const icu = u.type === 'ICU';
+  const hiDx = u.dx === 'Acute MI' || u.dx === 'CHF';
+  const hiAcuity = hiDx || icu;
+
+  /* --- readiness components --- */
+  let paC;
+  if (resolved) paC = 1;
+  else if (cur === 'Pending') paC = 0.2 + (pa.followUp ? 0.2 : 0) + (pa.docs ? 0.2 : 0) + (pa.physician ? 0.1 : 0);
+  else paC = (pa.reviewed ? 0.1 : 0) + (pa.contacted ? 0.1 : 0) + (pa.attempts > 0 ? 0.1 : 0);
+  const bedBase = icu ? 0.2 : (u.type === 'Emergency' || u.type === 'Same-Day Surgery') ? 0.4 : 0.3;
+
+  let paNote;
+  if (cur === 'Approved') paNote = 'Authorization approved (simulated)' + (u.pa !== 'Approved' ? ', resolved from ' + u.pa + '.' : '.');
+  else if (cur === 'Not Required') paNote = 'Simulated plan-specific determination: no PA required.';
+  else if (cur === 'Pending') paNote = 'Awaiting payer determination. Follow-up ' + (pa.followUp ? 'logged' : 'not logged') + '; supporting documents ' + (pa.docs ? 'sent' : 'not sent') + '; physician input ' + (pa.physician ? 'requested' : 'not requested') + '.';
+  else paNote = 'Denied and unresolved. ' + (pa.appealSubmitted ? 'Appeal submitted, awaiting payer outcome.' : pa.appealOutcome === 'fail' ? 'Last appeal was not successful.' : pa.reviewed ? 'Denial reason reviewed; appeal not yet submitted.' : 'Denial reason not yet reviewed.');
+
+  const comps = [
+    { key: 'pa', name: 'Prior Authorization', w: 25, credit: paC, status: resolved ? 'Complete' : cur === 'Pending' ? 'Pending' : 'Missing', note: paNote },
+    { key: 'ins', name: 'Insurance Verification', w: 15, credit: f.insurance ? 1 : 0.6, status: f.insurance ? 'Complete' : 'Pending', note: f.insurance ? 'Eligibility and benefits verified (simulated).' : 'Partial eligibility on file; full verification not done.' },
+    { key: 'bed', name: 'Bed Availability', w: 10, credit: f.bed ? 1 : bedBase, status: f.bed ? 'Complete' : 'Pending', note: f.bed ? 'Bed assigned (simulated).' : 'Only a provisional census check; no bed assigned.' },
+    { key: 'docs', name: 'Clinical Documentation', w: 20, credit: f.docs ? 1 : 0.5, status: f.docs ? 'Complete' : 'Pending', note: f.docs ? 'Clinical documentation uploaded.' : 'Only triage notes on file; supporting clinical documentation missing.' },
+    { key: 'orders', name: 'Physician Orders', w: 20, credit: f.orders ? 1 : 0.5, status: f.orders ? 'Complete' : 'Pending', note: f.orders ? 'Admission orders confirmed with the attending.' : 'Preliminary orders only; not confirmed with the attending.' },
+    { key: 'consent', name: 'Consent', w: 10, credit: f.consent ? 1 : 0, status: f.consent ? 'Complete' : 'Missing', note: f.consent ? 'Consent completed' + (u.type === 'Observation' ? ' including MOON notice (simulated).' : '.') : 'Consent not yet obtained.' }
+  ];
+  comps.forEach(c => { c.pts = Math.round(c.w * c.credit * 10) / 10; });
+  const raw = Math.round(comps.reduce((a, c) => a + c.w * c.credit, 0));
+
+  /* --- caps --- */
+  const caps = [];
+  const gates = [];
+  if (!resolved) gates.push('prior authorization unresolved');
+  if (!f.docs) gates.push('clinical documentation incomplete');
+  if (!f.orders) gates.push('physician orders unconfirmed');
+  if (!f.consent) gates.push('consent incomplete');
+  if (gates.length) caps.push({ limit: 89, reason: 'Critical gate(s) unmet: ' + gates.join('; ') + '. Readiness cannot reach the 90% threshold until these are complete.' });
+  if (cur === 'Denied' && icu) caps.push({ limit: 65, reason: 'Denied PA combined with ICU admission: administrative actions alone cannot raise readiness above 65%, because the authorization and clinical risks remain unresolved.' });
+  const reported = Math.min(raw, ...caps.map(c => c.limit));
+  const activeCaps = caps.filter(c => raw > c.limit);
+
+  /* --- risks --- */
+  const risks = {};
+  { // documentation
+    let s = 0; const r = [];
+    if (!f.docs) { s += 40; r.push('Clinical documentation is not complete.'); if (hiDx) { s += 10; r.push(u.dx + ': documentation must meet InterQual/Milliman-style medical necessity thresholds before UR review.'); } }
+    if (!f.orders) { s += 20; r.push('Physician orders are not confirmed.'); }
+    if (!f.consent) { s += 15; r.push('Consent is not complete' + (u.type === 'Observation' ? ' (MOON notice outstanding for Medicare patients).' : '.')); }
+    if (cur === 'Pending' && !pa.docs) { s += 10; r.push('Supporting documentation has not been sent to the payer.'); }
+    if (!r.length) r.push('No unresolved documentation items.');
+    risks.doc = { name: 'Documentation Risk', score: Math.min(100, s), reasons: r };
+  }
+  { // insurance
+    let s = 0; const r = [];
+    if (cur === 'Pending') { s += 45 - (pa.followUp ? 10 : 0) - (pa.docs ? 10 : 0); r.push('PA is pending; payer determination outstanding.'); }
+    else if (cur === 'Denied') { s += 70 - (pa.appealSubmitted ? 10 : 0); r.push('PA is denied and unresolved; coverage for this admission is not secured.'); if (pa.appealOutcome === 'fail') { s += 10; r.push('Most recent appeal was unsuccessful.'); } }
+    else if (cur === 'Not Required') { s += 10; r.push('PA marked not required by a simulated, plan-specific determination; confirm with the payer.'); }
+    if (!f.insurance) { s += 25; r.push('Insurance eligibility/benefits not fully verified.'); }
+    if (u.type === 'Observation') { s += 10; r.push('Observation status: different cost-sharing, SNF eligibility, and billing than inpatient.'); }
+    if (!r.length) r.push('No unresolved insurance items.');
+    risks.ins = { name: 'Insurance Risk', score: Math.min(100, s), reasons: r };
+  }
+  { // bed
+    let s = 0; const r = [];
+    if (!f.bed) { s += 40; r.push('No bed assigned.'); if (icu) { s += 25; r.push('ICU capacity is limited and no ICU bed is assigned.'); } if (u.type === 'Emergency') { s += 10; r.push('Emergency arrival can occur before a bed is ready.'); } }
+    else { if (!f.nursing) { s += 15; r.push('Bed assigned but nursing has not been notified.'); if (icu) { s += 10; r.push('ICU nursing handoff is outstanding.'); } } }
+    if (f.bed && !f.arrival) { s += 10; r.push('Patient arrival has not been prepared.'); }
+    if (!r.length) r.push('No unresolved bed items.');
+    risks.bed = { name: 'Bed Risk', score: Math.min(100, s), reasons: r };
+  }
+  let unresolvedClin = 0;
+  { // clinical
+    const inh = { 'Acute MI': 30, 'CHF': 28, 'Hip Fracture': 18, 'Pneumonia': 15, 'Elective Surgery': 8 }[u.dx] + { 'ICU': 20, 'Emergency': 10, 'Inpatient': 5, 'Observation': 5, 'Same-Day Surgery': 0 }[u.type];
+    const W = (hiDx ? 1.4 : 1) * (icu ? 1.3 : 1);
+    const r = [];
+    r.push('Inherent acuity (' + u.dx + ', ' + u.type + '): ' + inh + ' points. Residual clinical risk is not removed by administrative actions.');
+    if (!f.docs) { unresolvedClin += 20; r.push('Clinical documentation incomplete.'); }
+    if (!f.orders) { unresolvedClin += 20; r.push('Physician orders not confirmed.'); }
+    if (!f.nursing) { unresolvedClin += 5; r.push('Nursing not notified of monitoring needs.'); }
+    if (W > 1) r.push('Unresolved clinical items are weighted ×' + (Math.round(W * 100) / 100) + ' for ' + [hiDx ? u.dx : null, icu ? 'ICU' : null].filter(Boolean).join(' + ') + '.');
+    risks.clin = { name: 'Clinical Risk', score: Math.min(100, Math.round(inh + unresolvedClin * W)), reasons: r };
+  }
+  Object.values(risks).forEach(x => { x.level = level(x.score); });
+
+  /* --- flags --- */
+  const flags = [];
+  if (!resolved) flags.push('Required prior authorization is unresolved (current status: ' + cur + ').');
+  const cl = risks.clin.level;
+  if (unresolvedClin > 0 && (hiAcuity || cl === 'High' || cl === 'Critical')) flags.push('Unresolved clinical items remain with ' + cl + ' clinical risk' + (hiAcuity ? ' in a high-acuity scenario (' + [hiDx ? u.dx : null, icu ? 'ICU' : null].filter(Boolean).join(', ') + ')' : '') + '.');
+  else if (cl === 'Critical') flags.push('Clinical risk is Critical.');
+  const advisory = (unresolvedClin === 0 && (cl === 'High' || hiAcuity)) ? 'Residual clinical acuity is ' + cl + '. This requires qualified clinician judgment regardless of the administrative score.' : null;
+
+  /* --- remaining actions --- */
+  const remaining = [];
+  if (!resolved) {
+    if (cur === 'Pending') remaining.push(['Prior Authorization', pa.followUp && pa.docs ? 'Simulate the payer determination.' : 'Follow up with the payer and upload supporting documentation.']);
+    else remaining.push(['Prior Authorization', pa.appealSubmitted ? 'Await/record appeal outcome.' : !pa.reviewed ? 'Review denial reason, then upload clinical documentation and submit an appeal.' : !f.docs ? 'Upload clinical documentation, then submit an appeal.' : 'Submit an appeal (outcome is not guaranteed).']);
+  }
+  if (!f.insurance) remaining.push(['Insurance Verification', 'Run Verify Insurance.']);
+  if (!f.bed) remaining.push(['Bed Availability', 'Assign a bed.']);
+  if (!f.docs) remaining.push(['Clinical Documentation', 'Upload clinical documentation.']);
+  if (!f.orders) remaining.push(['Physician Orders', 'Contact the attending physician to confirm orders.']);
+  if (!f.consent) remaining.push(['Consent', 'Complete consent' + (u.type === 'Observation' ? ' (including written MOON notice for Medicare patients).' : '.')]);
+  if (!f.nursing) remaining.push(['Nursing', 'Notify nursing.']);
+  if (!f.arrival) remaining.push(['Patient Arrival', 'Prepare patient arrival (requires bed assigned and nursing notified).']);
+
+  /* --- final decision & timeline --- */
+  const ready = reported >= 90;
+  const finalAdmit = S.finalReviewed && ready && flags.length === 0 && f.docs && f.orders && f.arrival;
+  const anyPaAction = pa.followUp || pa.docs || pa.physician || pa.reviewed || pa.contacted || pa.appealSubmitted || pa.attempts > 0;
+  const tl = [
+    ['PA Review', resolved ? 'Complete' : anyPaAction ? 'In Progress' : 'Pending'],
+    ['Insurance Verification', f.insurance ? 'Complete' : (pa.followUp || pa.contacted) ? 'In Progress' : 'Pending'],
+    ['Bed Assignment', f.bed ? 'Complete' : f.nursing ? 'In Progress' : 'Pending'],
+    ['Documentation', f.docs && f.orders ? 'Complete' : (f.docs || f.orders) ? 'In Progress' : 'Pending'],
+    ['Consent', f.consent ? 'Complete' : 'Pending'],
+    ['Patient Arrival', f.arrival ? 'Complete' : f.bed ? 'In Progress' : 'Pending'],
+    ['Registration', f.arrival && f.insurance && f.consent ? 'Complete' : f.arrival ? 'In Progress' : 'Pending'],
+    ['Clinical Assessment', finalAdmit ? 'Complete' : (f.docs && f.orders && f.arrival) ? 'In Progress' : 'Pending']
+  ];
+  const earlierDone = tl.slice(0, 7).every(x => x[1] === 'Complete');
+  tl.push(['Admission Complete', finalAdmit && earlierDone ? 'Complete' : 'Pending']);
+
+  const wfItems = [resolved, f.insurance, f.bed, f.docs, f.orders, f.consent, f.nursing, f.arrival];
+  const wfDone = wfItems.filter(Boolean).length;
+
+  return { u, pa, f, cur, resolved, icu, hiDx, hiAcuity, comps, raw, reported, caps, activeCaps, risks, flags, advisory, remaining, ready, finalAdmit, tl, wfDone, wfTotal: wfItems.length };
+}
+
+/* ================= actions ================= */
+function getActions(D) {
+  const f = D.f, u = D.u;
+  return [
+    { key: 'bed', icon: '🛏️', label: 'Assign Bed', done: f.bed, block: null, affects: 'Bed Availability (10%), Bed Risk',
+      desc: u.type === 'ICU' ? 'Assign an ICU bed (simulated).' : u.type === 'Observation' ? 'Assign an observation-unit bed (simulated).' : u.type === 'Same-Day Surgery' ? 'Assign a pre-/post-op bay (simulated).' : 'Assign a bed on the appropriate unit (simulated).',
+      run() { f.bed = true; addLog((u.type === 'ICU' ? 'ICU bed' : u.type === 'Observation' ? 'Observation bed' : 'Bed') + ' assigned (simulated). Bed Availability criterion complete.', 'success'); } },
+    { key: 'insurance', icon: '🪪', label: 'Verify Insurance', done: f.insurance, block: null, affects: 'Insurance Verification (15%), Insurance Risk',
+      desc: 'Confirm eligibility and benefits with ' + PAYER + '. Does not change PA status.',
+      run() { f.insurance = true; addLog('Insurance eligibility and benefits verified with ' + PAYER + '. PA status unchanged.', 'success'); } },
+    { key: 'docs', icon: '📎', label: 'Upload Documentation', done: f.docs, block: null, affects: 'Clinical Documentation (20%), Documentation & Clinical Risk',
+      desc: D.hiDx ? 'Upload clinical documentation structured to support InterQual/Milliman medical necessity review.' : 'Upload H&P, diagnostics, and supporting clinical documentation to the chart.',
+      run() { f.docs = true; addLog('Clinical documentation uploaded to chart. Clinical Documentation criterion complete. (Clinical risk is unchanged apart from the documentation gap.)', 'success'); } },
+    { key: 'consent', icon: '✍️', label: 'Complete Consent', done: f.consent, block: null, affects: 'Consent (10%), Documentation Risk',
+      desc: u.type === 'Observation' ? 'Obtain consent and deliver written MOON notice (required for Medicare patients).' : 'Obtain and record patient/representative consent for admission.',
+      run() { f.consent = true; addLog(u.type === 'Observation' ? 'Consent completed; written MOON notification documented (simulated).' : 'Consent completed and recorded (simulated).', 'success'); } },
+    { key: 'orders', icon: '📞', label: 'Contact Physician', done: f.orders, block: null, affects: 'Physician Orders (20%), Documentation & Clinical Risk',
+      desc: 'Confirm admission orders and level of care with ' + u.physician + '. Orders and clinical judgment remain the physician’s.',
+      run() { f.orders = true; addLog('Contacted ' + u.physician + ' (illustrative); admission orders confirmed (simulated). Level-of-care judgment remains with the physician.', 'success'); } },
+    { key: 'nursing', icon: '👩‍⚕️', label: 'Notify Nursing', done: f.nursing, block: null, affects: 'Bed Risk, Clinical Risk (not weighted in score)',
+      desc: u.type === 'ICU' ? 'Alert ICU charge nurse of the incoming patient and monitoring needs.' : 'Alert the receiving unit of the incoming patient and care needs.',
+      run() { f.nursing = true; addLog('Receiving nursing unit notified (simulated).', 'success'); } },
+    { key: 'arrival', icon: '🚑', label: 'Prepare Patient Arrival', done: f.arrival,
+      block: !f.bed ? 'Assign a bed first.' : !f.nursing ? 'Notify nursing first.' : null, affects: 'Timeline, Bed Risk (not weighted in score)',
+      desc: 'Prepare registration packet, wristband, and transport/arrival plan. Requires bed assigned and nursing notified.',
+      run() { f.arrival = true; addLog('Patient arrival prepared (simulated). Registration can proceed.', 'success'); } }
+  ];
+}
+function doAction(key) {
+  const a = getActions(derive(S)).find(x => x.key === key);
+  if (!a || a.done || a.block) return;
+  a.run(); S.actionsTaken++; renderAll();
+}
+
+/* PA handlers */
+const pa = {
+  followUp() { if (S.pa.followUp) return; S.pa.followUp = true; S.actionsTaken++; addLog('PA follow-up logged with ' + PAYER + '. Review still in progress; PA remains Pending.', 'info'); renderAll(); },
+  docs() { if (S.pa.docs) return; S.pa.docs = true; S.actionsTaken++; addLog('Supporting documentation sent to the payer for PA review. Authorization still pending.', 'info'); renderAll(); },
+  physician() { if (S.pa.physician) return; S.pa.physician = true; S.actionsTaken++; addLog('Attending contacted regarding PA clinical questions / possible peer-to-peer (this is separate from confirming admission orders).', 'info'); renderAll(); },
+  simulate(outcome) {
+    if (S.pa.current !== 'Pending') return;
+    S.actionsTaken++;
+    if (outcome === 'approve') { S.pa.current = 'Approved'; addLog('Simulated payer determination: PA APPROVED.', 'success'); }
+    else { S.pa.current = 'Denied'; S.pa.reviewed = false; S.pa.contacted = false; S.pa.attempts = 0; S.pa.appealSubmitted = false; S.pa.appealOutcome = null; addLog('Simulated payer determination: PA DENIED. Denial workflow now applies.', 'warn'); }
+    renderAll();
+  },
+  review() { if (S.pa.reviewed) return; S.pa.reviewed = true; S.actionsTaken++; addLog('Denial reason reviewed. PA remains Denied.', 'warn'); renderAll(); },
+  contact() { if (S.pa.contacted) return; S.pa.contacted = true; S.actionsTaken++; addLog('Payer contacted regarding denial (' + PAYER + '). Denial not overturned by this contact.', 'info'); renderAll(); },
+  appeal() {
+    if (S.pa.current !== 'Denied' || S.pa.appealSubmitted || !S.pa.reviewed || !S.flags.docs) return;
+    S.pa.appealSubmitted = true; S.pa.appealOutcome = null; S.pa.attempts++; S.actionsTaken++;
+    addLog('Appeal #' + S.pa.attempts + ' submitted with clinical evidence. Awaiting payer review; outcome is not guaranteed.', 'info'); renderAll();
+  },
+  outcome(ok) {
+    if (!S.pa.appealSubmitted) return;
+    S.pa.appealSubmitted = false; S.actionsTaken++;
+    if (ok) { S.pa.current = 'Approved'; S.pa.appealOutcome = 'success'; addLog('Simulated appeal outcome: denial OVERTURNED. PA status changed to Approved.', 'success'); }
+    else { S.pa.appealOutcome = 'fail'; addLog('Simulated appeal outcome: denial UPHELD. PA remains Denied and unresolved.', 'warn'); }
+    renderAll();
+  },
+  another() { if (S.pa.appealOutcome !== 'fail') return; S.pa.appealOutcome = null; addLog('Preparing another appeal / further payer review. PA remains Denied.', 'info'); renderAll(); }
+};
+
+/* ================= rendering ================= */
+function renderStepper() {
+  const idx = !S ? 0 : S.finalReviewed ? 3 : S.actionsTaken > 0 ? 2 : 1;
+  const names = ['Setup', 'Readiness Analysis', 'Workflow Actions', 'Final Decision'];
+  $('stepper').replaceChildren(...names.map((n, i) => h('li', { class: 'rounded-lg px-3 py-2 border ' + (i < idx ? 'bg-white/20 border-white/40' : i === idx ? 'bg-white text-blue-900 border-white font-bold' : 'border-white/20 text-blue-100'), 'aria-current': i === idx ? 'step' : null },
+    h('span', { 'aria-hidden': 'true', text: i < idx ? '✓ ' : (i + 1) + '. ' }), n)));
+}
+
+function renderScenarioBar(D) {
+  const u = D.u;
+  const chip = (k, v, note) => h('div', { class: 'bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 min-w-0' },
+    h('div', { class: 'text-[11px] uppercase tracking-wide text-blue-700 font-semibold', text: k }),
+    h('div', { class: 'text-sm font-semibold break-words', text: v }), note ? h('div', { class: 'text-[11px] text-slate-500', text: note }) : null);
+  const paTxt = u.pa === D.cur ? u.pa : u.pa + ' → ' + D.cur;
+  mount('scenario-bar', card(null,
+    h('div', { class: 'flex flex-wrap items-center justify-between gap-3 mb-3' },
+      h('h2', { class: 'text-lg font-bold text-blue-900', id: 'sim-heading', tabindex: '-1', text: 'Admission Scenario' }),
+      btn('↺ Restart', restart, { variant: 'ghost', aria: 'Restart simulation and reset all scenario data' })),
+    h('div', { class: 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2' },
+      chip('Provider', u.provider, 'illustrative'), chip('Attending', u.physician, 'illustrative'), chip('Diagnosis', u.dx),
+      chip('Admission type', u.type), chip('PA status (intake → current)', paTxt), chip('Admission date', u.date)),
+    h('div', { class: 'mt-4' },
+      h('div', { class: 'flex justify-between text-xs text-slate-600 mb-1' }, h('span', { text: 'Workflow completion' }), h('span', { text: D.wfDone + ' of ' + D.wfTotal + ' steps' })),
+      h('div', { class: 'h-2 bg-slate-200 rounded-full overflow-hidden', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(D.wfTotal), 'aria-valuenow': String(D.wfDone), 'aria-label': 'Workflow completion' },
+        h('div', { class: 'h-2 bg-blue-600 transition-all', style: 'width:' + (D.wfDone / D.wfTotal * 100) + '%' })))));
+}
+
+function renderAlerts(D) {
+  const items = [];
+  if (D.u.type === 'Observation') items.push(callout('amber', '⚠ Observation status', OBS_NOTE));
+  if (D.hiDx) items.push(callout('blue', '📋 Medical necessity criteria', MN_NOTE, h('p', { class: 'mt-2 text-sm', text: MN_EXPLAIN })));
+  mount('alerts', items);
+}
+
+function renderReadiness(D) {
+  const pct = D.reported;
+  const marker = (p, label) => h('div', { class: 'absolute top-0 h-4 border-l-2 border-slate-700', style: 'left:' + p + '%' }, h('span', { class: 'absolute -bottom-5 -translate-x-1/2 text-[10px] text-slate-600 whitespace-nowrap', text: label }));
+  const table = h('div', { class: 'overflow-x-auto mt-8' }, h('table', { class: 'w-full text-sm' },
+    h('thead', {}, h('tr', { class: 'text-left text-xs uppercase text-slate-500 border-b' },
+      ['Criterion', 'Weight', 'Credit', 'Points', 'Status', 'Detail'].map(t => h('th', { class: 'py-2 pr-3 font-semibold', scope: 'col', text: t })))),
+    h('tbody', {}, D.comps.map(c => h('tr', { class: 'border-b border-slate-100 align-top' },
+      h('th', { class: 'py-2 pr-3 text-left font-semibold', scope: 'row', text: c.name }),
+      h('td', { class: 'py-2 pr-3', text: c.w + '%' }),
+      h('td', { class: 'py-2 pr-3', text: Math.round(c.credit * 100) + '%' }),
+      h('td', { class: 'py-2 pr-3', text: c.pts + ' / ' + c.w }),
+      h('td', { class: 'py-2 pr-3' }, badge(c.status)),
+      h('td', { class: 'py-2 text-slate-600', text: c.note }))))));
+  const group = (st, title) => {
+    const list = D.comps.filter(c => c.status === st);
+    return h('div', { class: 'rounded-lg border border-slate-200 p-3' }, h('div', { class: 'flex items-center gap-2 mb-1' }, badge(st), h('span', { class: 'text-xs text-slate-500', text: list.length + ' item(s)' })),
+      list.length ? h('ul', { class: 'text-sm list-disc ml-5' }, list.map(c => h('li', { text: c.name }))) : h('p', { class: 'text-sm text-slate-500', text: 'None' }));
+  };
+  mount('readiness', card('Admission Readiness Assessment',
+    h('div', { class: 'flex items-end gap-4 flex-wrap' },
+      h('div', { class: 'text-5xl font-extrabold text-blue-800', text: pct + '%' }),
+      h('div', { class: 'text-sm text-slate-600 pb-1' }, h('div', { class: 'font-semibold', text: 'Weighted administrative readiness' }), h('div', { text: 'PA 25 · Docs 20 · Orders 20 · Insurance 15 · Consent 10 · Bed 10' }))),
+    h('div', { class: 'relative h-4 bg-slate-200 rounded-full mt-4', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': String(pct), 'aria-label': 'Readiness score' },
+      h('div', { class: 'h-4 rounded-full bg-blue-600 transition-all', style: 'width:' + pct + '%' }), marker(75, '75% governance'), marker(90, '90% threshold')),
+    D.activeCaps.length ? h('div', { class: 'mt-8' }, callout('red', 'Score capped (weighted score before caps: ' + D.raw + '%)', null,
+      h('ul', { class: 'list-disc ml-5 text-sm mt-1' }, D.activeCaps.map(c => h('li', { text: c.reason }))))) : null,
+    table,
+    h('div', { class: 'grid sm:grid-cols-3 gap-3 mt-4' }, group('Complete'), group('Pending'), group('Missing')),
+    h('p', { class: 'text-xs text-slate-500 mt-3', text: 'The score is recalculated from the weights above every time. Each action is counted once. Readiness never reveals or implies the final admission decision.' })));
+}
+
+function paChips(D) {
+  return h('div', { class: 'flex flex-wrap gap-2 mb-3 text-xs' },
+    h('span', { class: 'bg-slate-100 rounded-full px-3 py-1', text: 'Intake status: ' + D.u.pa }),
+    h('span', { class: 'bg-blue-100 text-blue-800 rounded-full px-3 py-1 font-semibold', text: 'Current: ' + D.cur }),
+    h('span', { class: 'bg-slate-100 rounded-full px-3 py-1', text: 'Payer: ' + PAYER }));
+}
+function renderPA(D) {
+  const p = D.pa, f = D.f, body = [];
+  if (D.cur === 'Approved') {
+    body.push(callout('slate', '✅ PA approved (simulated)', D.u.pa === 'Approved' ? 'Authorization is approved in this scenario. The workflow can continue. Approval does not replace clinical judgment or the other readiness criteria.' : 'Authorization was approved after ' + (p.appealOutcome === 'success' ? 'a successful appeal' : 'a simulated payer determination') + '. The workflow can continue. Other readiness criteria and clinical risks are unchanged.'));
+  } else if (D.cur === 'Not Required') {
+    body.push(callout('slate', 'PA not required (simulated)', 'This is a simulated, plan-specific determination. Real requirements vary by payer, plan, service, and contract, and some payers still require notification (for example, for emergency admissions). Confirm with the payer.'));
+  } else if (D.cur === 'Pending') {
+    body.push(h('p', { class: 'text-sm text-slate-600 mb-3', text: 'Authorization is pending and remains unresolved until the payer decides. Actions below raise PA progress only partially; they cannot approve the PA.' }));
+    body.push(h('div', { class: 'flex flex-wrap gap-2' },
+      btn(p.followUp ? '✓ Follow Up logged' : 'Follow Up', pa.followUp, { disabled: p.followUp }),
+      btn(p.docs ? '✓ Documentation sent to payer' : 'Upload Documentation (to payer)', pa.docs, { disabled: p.docs }),
+      btn(p.physician ? '✓ Physician contacted (PA)' : 'Contact Physician (PA clinical info)', pa.physician, { disabled: p.physician })));
+    if (p.followUp && p.docs) {
+      body.push(h('div', { class: 'mt-4 p-3 rounded-lg border border-blue-200 bg-blue-50' },
+        h('p', { class: 'text-sm font-semibold text-blue-900', text: 'Simulate payer determination' }),
+        h('p', { class: 'text-xs text-slate-600 mb-2', text: 'Real payer decisions cannot be forced. Choose an outcome to continue the training scenario.' }),
+        h('div', { class: 'flex flex-wrap gap-2' }, btn('Simulate Approval', () => pa.simulate('approve'), { variant: 'success' }), btn('Simulate Denial', () => pa.simulate('deny'), { variant: 'danger' }))));
+    } else body.push(h('p', { class: 'text-xs text-slate-500 mt-3', text: 'Log a follow-up and send supporting documentation to unlock the simulated payer determination.' }));
+  } else {
+    body.push(callout('red', 'PA denied — unresolved', 'An appeal requires appropriate clinical evidence and payer review. Success is not guaranteed. The denial remains unresolved until an appropriate outcome is selected.'));
+    const canAppeal = p.reviewed && f.docs && !p.appealSubmitted && p.appealOutcome !== 'fail';
+    const why = !p.reviewed ? 'Review the denial reason first.' : !f.docs ? 'Upload clinical documentation (Workflow Actions) first: an appeal needs clinical evidence.' : null;
+    body.push(h('div', { class: 'flex flex-wrap gap-2 mt-3' },
+      btn(p.reviewed ? '✓ Denial reason reviewed' : 'Review Denial Reason', pa.review, { disabled: p.reviewed }),
+      btn(p.contacted ? '✓ Insurance contacted' : 'Contact Insurance', pa.contact, { disabled: p.contacted }),
+      btn(p.appealSubmitted ? 'Appeal submitted…' : 'Submit Appeal', pa.appeal, { variant: 'primary', disabled: !canAppeal, title: why || '' })));
+    if (why && !p.appealSubmitted) body.push(h('p', { class: 'text-xs text-amber-800 mt-2', text: 'Submit Appeal unavailable: ' + why }));
+    if (p.reviewed) body.push(h('div', { class: 'mt-3 p-3 rounded-lg bg-slate-50 border border-slate-200 text-sm' }, h('strong', { text: 'Denial reason (illustrative): ' }), DENIAL_REASON[D.u.dx]));
+    if (p.appealSubmitted) body.push(h('div', { class: 'mt-4 p-3 rounded-lg border border-blue-200 bg-blue-50' },
+      h('p', { class: 'text-sm font-semibold text-blue-900', text: 'Simulate appeal outcome (appeal #' + p.attempts + ')' }),
+      h('div', { class: 'flex flex-wrap gap-2 mt-2' }, btn('Successful — denial overturned', () => pa.outcome(true), { variant: 'success' }), btn('Unsuccessful — denial upheld', () => pa.outcome(false), { variant: 'danger' }))));
+    if (p.appealOutcome === 'fail') body.push(h('div', { class: 'mt-4 p-3 rounded-lg border border-red-200 bg-red-50 text-sm' },
+      h('p', { text: 'The appeal was not successful. PA remains Denied and unresolved; readiness stays capped.' }),
+      h('div', { class: 'mt-2' }, btn('Prepare Another Appeal', pa.another, { variant: 'secondary' }))));
+  }
+  mount('pa-panel', card('Prior Authorization Workflow', paChips(D), body));
+}
+
+function renderActions(D) {
+  mount('actions', card('Workflow Actions',
+    h('p', { class: 'text-sm text-slate-600 mb-3', text: 'Each action counts once and affects only its own criteria. Administrative actions cannot erase clinical risk or override medical judgment.' }),
+    h('div', { class: 'grid sm:grid-cols-2 gap-3' }, getActions(D).map(a => {
+      const disabled = a.done || !!a.block;
+      return h('div', { class: 'border rounded-xl p-3 ' + (a.done ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-200') },
+        h('div', { class: 'flex items-center justify-between gap-2' }, h('div', { class: 'font-semibold' }, h('span', { 'aria-hidden': 'true', text: a.icon + ' ' }), a.label), a.done ? badge('Complete') : null),
+        h('p', { class: 'text-xs text-slate-600 mt-1', text: a.desc }),
+        h('p', { class: 'text-[11px] text-slate-500 mt-1', text: 'Affects: ' + a.affects }),
+        h('div', { class: 'mt-2 flex items-center gap-2 flex-wrap' },
+          btn(a.done ? '✓ Done' : a.label, () => doAction(a.key), { variant: a.done ? 'success' : 'primary', disabled, title: a.block || '' }),
+          a.block && !a.done ? h('span', { class: 'text-xs text-amber-800', text: a.block }) : null));
+    }))));
+}
+
+function renderRisks(D) {
+  const order = ['doc', 'ins', 'bed', 'clin'];
+  mount('risks', card('Risk Tracking', order.map(k => {
+    const r = D.risks[k], [bar, pill] = RISK_STYLE[r.level];
+    return h('div', { class: 'mb-4 last:mb-0' },
+      h('div', { class: 'flex items-center justify-between' }, h('span', { class: 'font-semibold text-sm', text: r.name }), h('span', { class: 'text-xs font-bold rounded-full px-2 py-0.5 ' + pill, text: r.level + ' · ' + r.score })),
+      h('div', { class: 'h-2 bg-slate-200 rounded-full mt-1', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': String(r.score), 'aria-label': r.name + ' ' + r.level }, h('div', { class: 'h-2 rounded-full ' + bar, style: 'width:' + r.score + '%' })),
+      h('ul', { class: 'text-xs text-slate-600 mt-1 list-disc ml-4 space-y-0.5' }, r.reasons.map(x => h('li', { text: x }))));
+  }), h('p', { class: 'text-[11px] text-slate-500 mt-3', text: 'Risks are derived from the scenario and unresolved items. Clinical Risk is kept separate from administrative completion and is weighted more heavily for Acute MI, CHF, and ICU.' })));
+}
+
+function renderTimeline(D) {
+  mount('timeline', card('Admission Timeline', h('ol', { class: 'space-y-2' }, D.tl.map((t, i) => {
+    const st = t[1], ic = st === 'Complete' ? '✓' : st === 'In Progress' ? '◐' : '○';
+    const cls = st === 'Complete' ? 'bg-emerald-600 text-white' : st === 'In Progress' ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600';
+    return h('li', { class: 'flex items-center gap-3' },
+      h('span', { class: 'w-7 h-7 shrink-0 rounded-full flex items-center justify-center text-sm font-bold ' + cls, 'aria-hidden': 'true', text: ic }),
+      h('span', { class: 'flex-1 text-sm', text: (i + 1) + '. ' + t[0] }), badge(st));
+  })), h('p', { class: 'text-[11px] text-slate-500 mt-3', text: 'Admission Complete is never set by score alone: it needs an explicit final review, readiness ≥ 90%, no critical flags, and all earlier milestones complete (simulated).' })));
+}
+
+function renderCare(D) {
+  const f = D.f, u = D.u;
+  const udRisk = D.risks.ins.level;
+  const dcNote = u.dx === 'Hip Fracture' ? 'Post-acute rehab/SNF needs are likely; start early.' : u.type === 'Observation' ? 'SNF eligibility may differ for observation stays; flag early.' : u.dx === 'CHF' ? 'Plan education, follow-up, and possible home health.' : u.dx === 'Elective Surgery' ? 'Confirm post-op home support and equipment.' : 'Screen for post-acute needs.';
+  const cards = [
+    ['🩺', 'Attending Physician', 'Directs care, writes admission orders, and decides level of care. Clinical judgment is never overridden by administrative steps.', u.physician + ' (illustrative)', f.orders ? 'Orders confirmed' : 'Awaiting order confirmation', f.orders ? 'Complete' : 'Pending', null],
+    ['🗂️', 'Case Manager', 'Coordinates authorization, payer communication, appeals, and transitions of care.', null, D.cur === 'Approved' || D.cur === 'Not Required' ? 'PA resolved (' + D.cur + ')' : 'Managing ' + D.cur + ' PA', D.resolved ? 'Complete' : 'In Progress', null],
+    ['👩‍⚕️', 'Nursing', 'Prepares the receiving unit, bed, monitoring, and patient arrival.', null, f.bed ? (f.nursing ? (f.arrival ? 'Bed ready, nursing notified, arrival prepared' : 'Bed ready, nursing notified') : 'Bed assigned, nursing not notified') : 'Awaiting bed assignment', f.bed && f.nursing && f.arrival ? 'Complete' : f.bed || f.nursing ? 'In Progress' : 'Pending', null],
+    ['🔍', 'Utilization Review', 'Performs concurrent review (ongoing review of care against criteria during the stay), identifies denial risk early, and applies InterQual and/or Milliman criteria frameworks to help check medical necessity and level of care. Final clinical decisions require qualified review.', null,
+      'Denial risk: ' + udRisk + '. Criteria documentation: ' + (f.docs && f.orders ? 'ready for UR review.' : 'gaps remain.'), f.docs && f.orders && D.resolved ? 'Complete' : 'In Progress',
+      D.hiDx ? 'Priority: ' + u.dx + ' — InterQual/Milliman thresholds apply.' : null],
+    ['🏡', 'Discharge Planner', 'Begins discharge planning at admission: post-acute needs, equipment, and follow-up.', null, dcNote, f.arrival ? 'In Progress' : 'Pending', null]
+  ];
+  mount('care', card('Care Coordination', h('div', { class: 'grid sm:grid-cols-2 xl:grid-cols-5 gap-3' }, cards.map(c =>
+    h('div', { class: 'border border-slate-200 rounded-xl p-3 bg-slate-50 flex flex-col' },
+      h('div', { class: 'font-semibold' }, h('span', { 'aria-hidden': 'true', text: c[0] + ' ' }), c[1]),
+      c[3] ? h('div', { class: 'text-xs text-slate-500', text: c[3] }) : null,
+      h('p', { class: 'text-xs text-slate-600 mt-1', text: c[2] }),
+      h('p', { class: 'text-xs font-medium mt-2', text: c[4] }), c[6] ? h('p', { class: 'text-xs font-semibold text-blue-800 mt-1', text: c[6] }) : null,
+      h('div', { class: 'mt-auto pt-2' }, badge(c[5])))))));
+}
+
+function renderGovernance(D) {
+  if (D.reported < 75) { mount('governance'); return; }
+  mount('governance', card('Governance Snapshot',
+    h('p', { class: 'text-sm font-semibold text-blue-900', text: GOV_TEXT }),
+    h('p', { class: 'text-xs text-slate-500 mt-2', text: 'These figures are rough estimates supplied for this training simulation. They are not verified live statistics or guarantees, and they do not imply that CMS or CAQH endorses these exact combined estimates. Verify current figures from original sources before relying on them.' })));
+}
+
+function renderFinal(D) {
+  const kids = [];
+  const open = S.finalReviewed;
+  kids.push(h('div', { class: 'flex flex-wrap items-center gap-3' },
+    btn('Review Final Decision', () => { S.finalReviewed = true; S.actionsTaken++; addLog('Final decision reviewed at ' + D.reported + '% readiness.', 'info'); renderAll(); document.getElementById('final-result') && document.getElementById('final-result').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, { variant: 'primary', disabled: open }),
+    open ? btn('Hide decision', () => { S.finalReviewed = false; addLog('Final decision panel closed.', 'info'); renderAll(); }, { variant: 'ghost' }) : null,
+    !open ? h('span', { class: 'text-sm text-slate-500', text: 'The decision is shown only after you click this button.' }) : null));
+  if (open) {
+    const ok = D.ready;
+    const res = h('div', { id: 'final-result', class: 'mt-4 space-y-4', tabindex: '-1' });
+    res.appendChild(h('div', { class: 'rounded-xl p-4 border-2 ' + (ok ? 'bg-emerald-50 border-emerald-500 text-emerald-900' : 'bg-amber-50 border-amber-500 text-amber-900') },
+      h('div', { class: 'text-2xl font-extrabold', text: ok ? '✅ Admit — Readiness Threshold Met' : '⚠ Not Ready' }),
+      h('p', { class: 'mt-1 text-sm', text: 'Readiness ' + D.reported + '% (threshold 90%). ' + (ok ? 'This is a simulated administrative threshold only.' : 'The threshold is ' + (90 - D.reported) + ' point(s) away.') })));
+    if (D.flags.length) res.appendChild(callout('red', '🚩 Critical flags remain', 'These must be resolved or clinically addressed regardless of the score.', h('ul', { class: 'list-disc ml-5 text-sm mt-1' }, D.flags.map(x => h('li', { text: x })))));
+    if (D.advisory) res.appendChild(callout('amber', 'Clinical advisory', D.advisory));
+    if (!ok) {
+      const why = [];
+      if (D.activeCaps.length) D.activeCaps.forEach(c => why.push(c.reason));
+      why.push('Weighted readiness is ' + D.reported + '%, below the 90% threshold; ' + D.remaining.length + ' action(s) remain.');
+      res.appendChild(h('div', { class: 'rounded-xl border border-slate-200 p-4' }, h('h3', { class: 'font-bold mb-1', text: 'Why the threshold was not met' }), h('ul', { class: 'list-disc ml-5 text-sm space-y-1' }, why.map(x => h('li', { text: x })))));
+    }
+    res.appendChild(h('div', { class: 'grid md:grid-cols-2 gap-4' },
+      h('div', { class: 'rounded-xl border border-slate-200 p-4' }, h('h3', { class: 'font-bold mb-2', text: 'Criteria status & score' }),
+        h('ul', { class: 'text-sm space-y-1' }, D.comps.map(c => h('li', { class: 'flex justify-between gap-2' }, h('span', { text: c.name }), h('span', { class: 'flex items-center gap-2' }, h('span', { class: 'text-slate-500', text: c.pts + '/' + c.w }), badge(c.status)))))),
+      h('div', { class: 'rounded-xl border border-slate-200 p-4' }, h('h3', { class: 'font-bold mb-2', text: 'Risks' }),
+        h('ul', { class: 'text-sm space-y-1' }, Object.values(D.risks).map(r => h('li', { class: 'flex justify-between gap-2' }, h('span', { text: r.name }), h('span', { class: 'text-xs font-bold rounded-full px-2 py-0.5 ' + RISK_STYLE[r.level][1], text: r.level + ' · ' + r.score })))))));
+    res.appendChild(h('div', { class: 'grid md:grid-cols-2 gap-4' },
+      h('div', { class: 'rounded-xl border border-slate-200 p-4' }, h('h3', { class: 'font-bold mb-2', text: 'Timeline' }), h('ol', { class: 'text-sm space-y-1' }, D.tl.map((t, i) => h('li', { class: 'flex justify-between gap-2' }, h('span', { text: (i + 1) + '. ' + t[0] }), badge(t[1]))))),
+      h('div', { class: 'rounded-xl border border-slate-200 p-4' }, h('h3', { class: 'font-bold mb-2', text: ok ? 'Remaining actions' : 'Missing items & required actions' }),
+        D.remaining.length ? h('ul', { class: 'text-sm space-y-1 list-disc ml-5' }, D.remaining.map(r => h('li', {}, h('strong', { text: r[0] + ': ' }), r[1]))) : h('p', { class: 'text-sm text-slate-600', text: 'No remaining workflow actions.' }))));
+    res.appendChild(h('div', { class: 'rounded-xl border border-slate-200 p-4 text-sm' }, h('h3', { class: 'font-bold mb-1', text: 'Workflow activity' }), h('p', { text: D.wfDone + ' of ' + D.wfTotal + ' workflow steps complete; ' + S.log.filter(l => l.kind === 'success').length + ' action(s) logged as completed.' })));
+    res.appendChild(callout('slate', 'Educational simulation', 'This score is not a real authorization, bed reservation, medical clearance, or admission order. Actual admissions require qualified clinical judgment and applicable hospital and payer policies. An administrative score alone never authorizes admission.'));
+    kids.push(res);
+  }
+  mount('final', card('Final Decision', h('p', { class: 'text-sm text-slate-600 mb-3', text: 'When you are ready, review the final decision. It reflects the current workflow state and updates if you take further actions.' }), kids));
+}
+
+function renderLog() {
+  mount('log', card('Activity Log', h('ol', { class: 'space-y-1 max-h-72 overflow-y-auto text-sm', 'aria-label': 'Activity log, newest first' }, S.log.map(l =>
+    h('li', { class: 'flex gap-3 border-b border-slate-100 py-1' },
+      h('span', { class: 'text-xs text-slate-500 shrink-0 w-20', text: l.t }),
+      h('span', { class: l.kind === 'warn' ? 'text-red-800' : l.kind === 'success' ? 'text-emerald-800' : 'text-slate-700', text: (l.kind === 'warn' ? '⚠ ' : l.kind === 'success' ? '✓ ' : '• ') + l.msg }))))));
+}
+
+function renderAll() {
+  const y = window.scrollY;
+  renderStepper();
+  if (S) {
+    const D = derive(S);
+    renderScenarioBar(D); renderAlerts(D); renderReadiness(D); renderPA(D); renderActions(D);
+    renderRisks(D); renderTimeline(D); renderCare(D); renderGovernance(D); renderFinal(D); renderLog();
+  }
+  window.scrollTo(0, y);
+}
+
+/* ================= setup form ================= */
+const form = $('setup-form');
+function setErr(id, msg) { const p = $('err-' + id), el = $(id); if (msg) { p.textContent = msg; p.classList.remove('hidden'); el.setAttribute('aria-invalid', 'true'); el.classList.add('border-red-500'); } else { p.textContent = ''; p.classList.add('hidden'); el.removeAttribute('aria-invalid'); el.classList.remove('border-red-500'); } }
+function todayISO() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function updateSetupNotices() {
+  const dx = $('dx').value, type = $('type').value, box = $('setup-notices'), items = [];
+  if (type === 'Observation') items.push(callout('amber', '⚠ Observation status', OBS_NOTE));
+  if (dx === 'Acute MI' || dx === 'CHF') items.push(callout('blue', '📋 Medical necessity criteria', MN_NOTE));
+  if (type === 'Same-Day Surgery' && ['Acute MI', 'CHF', 'Pneumonia'].includes(dx)) items.push(callout('slate', 'Unusual combination', dx + ' with Same-Day Surgery is atypical. The simulation will still run so you can test it.'));
+  if (dx === 'Elective Surgery' && (type === 'Emergency' || type === 'ICU')) items.push(callout('slate', 'Unusual combination', 'Elective Surgery with ' + type + ' admission is atypical. The simulation will still run so you can test it.'));
+  box.replaceChildren(...items);
+}
+$('dx').addEventListener('change', updateSetupNotices);
+$('type').addEventListener('change', updateSetupNotices);
+$('date').value = todayISO();
+
+$('sample-btn').addEventListener('click', () => {
+  $('provider').value = SAMPLE.provider; $('physician').value = SAMPLE.physician; $('dx').value = SAMPLE.dx; $('type').value = SAMPLE.type; $('pa').value = SAMPLE.pa;
+  ['provider', 'physician', 'dx', 'type', 'pa', 'date'].forEach(i => setErr(i, null)); updateSetupNotices();
+});
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const v = { provider: $('provider').value.trim(), physician: $('physician').value.trim(), dx: $('dx').value, type: $('type').value, pa: $('pa').value, date: $('date').value };
+  let bad = null;
+  const chk = (id, cond, msg) => { setErr(id, cond ? null : msg); if (!cond && !bad) bad = id; };
+  chk('provider', v.provider.length >= 2, 'Enter a provider / hospital name (illustrative).');
+  chk('physician', v.physician.length >= 2, 'Enter an attending physician (illustrative).');
+  chk('dx', !!v.dx, 'Select a diagnosis.');
+  chk('type', !!v.type, 'Select an admission type.');
+  chk('pa', !!v.pa, 'Select a prior authorization status.');
+  chk('date', !!v.date && !isNaN(Date.parse(v.date)), 'Enter a valid admission date.');
+  const fe = $('form-error');
+  if (bad) { fe.textContent = 'Please fix the highlighted fields before continuing.'; fe.classList.remove('hidden'); $(bad).focus(); return; }
+  fe.classList.add('hidden');
+  S = newScenario(v);
+  addLog('Scenario started: ' + v.dx + ', ' + v.type + ' admission, PA ' + v.pa + ', date ' + v.date + '.', 'info');
+  addLog('Initial readiness analysis generated. Final decision is not revealed until you request it.', 'info');
+  $('setup-view').classList.add('hidden'); $('sim-view').classList.remove('hidden');
+  renderAll(); window.scrollTo(0, 0); const hd = $('sim-heading'); if (hd) hd.focus();
+});
+
+function restart() {
+  S = null; form.reset(); $('date').value = todayISO();
+  ['provider', 'physician', 'dx', 'type', 'pa', 'date'].forEach(i => setErr(i, null));
+  $('form-error').classList.add('hidden'); updateSetupNotices();
+  ['scenario-bar', 'alerts', 'readiness', 'pa-panel', 'actions', 'risks', 'timeline', 'care', 'governance', 'final', 'log'].forEach(id => mount(id));
+  $('sim-view').classList.add('hidden'); $('setup-view').classList.remove('hidden');
+  $('sr-status').textContent = 'Simulation restarted. All scenario data reset.';
+  renderStepper(); window.scrollTo(0, 0); $('provider').focus();
+}
+renderStepper();
+</script>
+</body>
+</html>
