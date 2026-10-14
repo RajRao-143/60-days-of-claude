@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<!--
+README — Operation Lifeline: Supply Chain Crisis Lab (ABTalks 60 Days Claude Challenge, Day 29)
+Built with VANILLA JAVASCRIPT (not React). One self-contained HTML file: no npm, libraries, APIs, backend, images or external assets. Works offline.
+Scoring (all 0-100, clamped): Overall = Leadership 20% + Negotiation 20% + Resilience 20% + Cost Control 15% + Risk Mgmt 15% + Customer Sat 10%.
+Leadership = avg CEO answer points. Negotiation = Trust 40% + Price 30% + Lead time 30%. Resilience = Inventory 35% + Speed 45% + AI bonus.
+Cost Control = Profit 60% + unspent budget 40%. Risk = 100 - Risk exposure. Customer Sat = satisfaction meter.
+-->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Operation Lifeline — Supply Chain Crisis Lab</title>
+<style>
+:root{--bg:#0a0e17;--p:#121a2a;--p2:#182238;--b:#26344f;--t:#e6ecf7;--m:#8b9bb8;--a:#4da3ff;--g:#34d399;--y:#fbbf24;--r:#f87171}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,#16244a,var(--bg));color:var(--t);font:15px/1.5 system-ui,Segoe UI,Roboto,sans-serif;min-height:100vh}
+header{position:sticky;top:0;z-index:5;background:#0a0e17ee;backdrop-filter:blur(8px);border-bottom:1px solid var(--b);padding:10px 16px}
+.brand{display:flex;justify-content:space-between;align-items:center;max-width:1000px;margin:auto;font-weight:700;letter-spacing:.5px}
+.brand span{color:var(--m);font-weight:400;font-size:13px}
+.bar{height:6px;background:var(--p2);border-radius:9px;overflow:hidden;max-width:1000px;margin:8px auto}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--a),var(--g));transition:width .6s}
+.steps{display:flex;gap:4px;max-width:1000px;margin:auto;font-size:11px;color:var(--m);overflow-x:auto}
+.steps b{flex:1;min-width:64px;text-align:center;padding:2px;border-radius:6px;font-weight:500}.steps .d{color:var(--g)}.steps .c{background:var(--p2);color:var(--t)}
+main{max-width:1000px;margin:20px auto;padding:0 16px 40px}
+.card{background:linear-gradient(180deg,var(--p),var(--p2));border:1px solid var(--b);border-radius:16px;padding:22px;margin-bottom:16px;animation:in .5s both;box-shadow:0 10px 30px #0006}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+h1{font-size:clamp(24px,5vw,38px);margin:0 0 8px;outline:0}h2{margin:0 0 6px;font-size:20px}p{color:var(--m);margin:6px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:14px 0}
+.opt{all:unset;box-sizing:border-box;cursor:pointer;display:block;background:#0e1626;border:1px solid var(--b);border-radius:12px;padding:14px;transition:.2s}
+.opt:hover:not(:disabled){transform:translateY(-3px);border-color:var(--a);box-shadow:0 6px 18px #4da3ff22}
+.opt:focus-visible,.btn:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+.opt.on{border-color:var(--g);background:#0f2a26}.opt[disabled]{opacity:.4;cursor:not-allowed}
+.opt b{display:block}.opt span{display:block;color:var(--m);font-size:13px;margin:3px 0}.opt small{color:var(--y);font-size:12px}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;background:linear-gradient(90deg,#2b7fff,#4da3ff);color:#fff;padding:11px 22px;border-radius:10px;font-weight:600;transition:.2s}
+.btn:hover:not([disabled]){transform:translateY(-2px);box-shadow:0 6px 20px #4da3ff55}.btn[disabled]{opacity:.4;cursor:not-allowed}
+.m{margin:7px 0}.m div{display:flex;justify-content:space-between;font-size:12px;color:var(--m)}.m u{display:block;height:8px;background:#0b1220;border-radius:9px;overflow:hidden;text-decoration:none}.m u i{display:block;height:100%;transition:width .6s,background .6s}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.kpi div{background:#0e1626;border:1px solid var(--b);border-radius:10px;padding:10px}.kpi small{color:var(--m)}.kpi b{display:block;font-size:20px}
+.big{font-size:64px;font-weight:800;background:linear-gradient(90deg,var(--a),var(--g));-webkit-background-clip:text;background-clip:text;color:transparent}
+.note{border-left:3px solid var(--y);padding:8px 12px;background:#fbbf2414;border-radius:6px;margin:10px 0;color:var(--t)}
+.tag{display:inline-block;background:#f8717122;color:var(--r);padding:2px 10px;border-radius:99px;font-size:12px}
+.two{display:grid;grid-template-columns:2fr 1fr;gap:16px}@media(max-width:760px){.two{grid-template-columns:1fr}}
+</style></head><body>
+<header><div class="brand">OPERATION LIFELINE <span>Supply Chain Crisis Lab · Day 29</span></div><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="pb"><i id="pf"></i></div><div class="steps" id="steps"></div></header>
+<main id="root" aria-live="polite"></main>
+<script>
+"use strict";
+const NAMES=["Welcome","Briefing","War Room","Negotiation","CEO","AI Invest","Dashboard","Debrief"];
+const CO=[["Northwind Auto Parts","automotive components"],["Helios MedSupply","medical devices"],["Aurora Foods","packaged foods"],["VoltEdge Electronics","consumer electronics"],["Terra Apparel","fashion retail"],["BlueHarbor Pharma","pharmaceuticals"],["Summit Cycles","e-bikes"]];
+const CR=[{t:"Port Strike",d:"A multi-week strike froze your main port; containers sit offshore.",f:18,r:"Late deliveries to key retailers"},{t:"Supplier Factory Fire",d:"Your sole Tier-1 supplier lost a plant to fire.",f:24,r:"Stock-outs within 2 weeks"},{t:"Raw Material Shortage",d:"A global shortage doubled spot prices and lengthened lead times.",f:15,r:"Margin collapse and partial shipments"},{t:"Logistics Cyberattack",d:"Your freight partner's systems are down after ransomware.",f:20,r:"Untracked shipments, missed SLAs"},{t:"Typhoon Closes Shipping Lanes",d:"Major lanes are shut for 10+ days.",f:16,r:"Delays across Asia-Europe routes"}];
+const ITEMS=["Core components","Packaging","Raw materials","Finished goods","Spare parts","Cold-chain stock"];
+const ACT=[{n:"Air-freight critical parts",d:"Fast but pricey.",c:25,inv:12,pr:-6,sp:18,cs:8,rk:-6},{n:"Dual-source new suppliers",d:"Qualify alternates fast.",c:18,inv:8,pr:-2,sp:6,cs:3,rk:-14},{n:"Prioritize top customers",d:"Allocate scarce stock by value.",c:6,inv:0,pr:4,sp:4,cs:10,rk:-3},{n:"Raise prices 8%",d:"Protect margin, risk goodwill.",c:0,inv:0,pr:12,sp:0,cs:-12,rk:2},{n:"Draw down safety stock",d:"Use buffers now, thinner later.",c:4,inv:-10,pr:5,sp:8,cs:5,rk:8},{n:"Rent overflow warehouse",d:"Stage inventory near customers.",c:14,inv:10,pr:-3,sp:5,cs:2,rk:-5}];
+const R=[{q:"Round 1 — Opening posture",o:[["Open with a collaborative partnership offer",15,-3,8],["Demand a 15% emergency discount",-12,14,-4],["Offer volume commitment for priority slots",6,6,12]]},{q:"Round 2 — Payment terms",o:[["Pay early in exchange for priority",8,4,10],["Stretch payment to 90 days",-10,10,-6],["Hold standard 45-day terms",4,2,2]]},{q:"Round 3 — Capacity guarantee",o:[["Request a 6-month capacity reservation",5,-4,14],["Spot-buy as needed",-6,6,-12],["Co-invest in their line upgrade",14,3,8]]},{q:"Round 4 — Leverage",o:[["Reveal a credible alternative supplier",-4,10,4],["Bluff aggressively about walking away",-18,8,-8],["Propose a long-term pact with review clauses",10,5,6]]}];
+const Q=[{q:"The board wants a public statement. You…",o:[["Publish a transparent update with a recovery timeline",90,[4,0,0,-2]],["Stay silent until resolved",25,[-6,0,0,3]],["Downplay the issue",10,[-10,0,0,6]]]},{q:"Cash is tight. You…",o:[["Protect critical ops, cut discretionary spend",85,[0,4,0,-2]],["Cut every budget 10% across the board",50,[-2,2,-3,1]],["Freeze all spending including logistics",20,[-4,0,-8,4]]]},{q:"Your teams are stretched thin. You…",o:[["Rotate shifts, add temp staff and recognition",85,[2,0,3,-2]],["Mandate overtime",35,[0,1,2,4]],["Ignore it and push on",15,[-2,0,-3,6]]]},{q:"A key customer threatens to leave. You…",o:[["Offer a joint recovery plan with weekly updates",90,[6,-1,0,-2]],["Offer a discount only",50,[3,-4,0,0]],["Hold them to the contract",30,[-6,1,0,3]]]},{q:"Long-term strategy after the crisis?",o:[["Diversify regions and build smart buffers",90,[2,-2,2,-8]],["Return to single-source low cost",30,[0,4,0,8]],["Wait and see",15,[-2,0,-2,5]]]}];
+const AI=[{n:"Demand Forecasting",d:"Predict demand shifts early.",c:15,inv:6,pr:5,sp:3,cs:3,rk:-4,rs:6},{n:"Inventory Optimization",d:"Right stock, right place.",c:12,inv:10,pr:6,sp:2,cs:1,rk:-3,rs:5},{n:"Supplier Risk Monitoring",d:"Early warning on supplier health.",c:14,inv:2,pr:1,sp:2,cs:0,rk:-14,rs:8},{n:"Warehouse Vision",d:"Camera-based picking and tracking.",c:20,inv:5,pr:2,sp:9,cs:5,rk:-3,rs:4},{n:"Procurement Copilot",d:"Assist buyers with sourcing and negotiation.",c:10,inv:2,pr:8,sp:4,cs:0,rk:-5,rs:3}];
+const LESS={lead:"Communicate transparently and protect people and critical operations.",neg:"Negotiate for partnership and capacity, not just price.",res:"Resilience comes from buffers, speed and early-warning data.",cost:"Spend where it buys the most recovery per dollar.",risk:"Diversify suppliers before the crisis, not during it.",cs:"Customers forgive delays but not silence."};
+const REC={lead:"Practice crisis communication and people-first decisions; brief your board early.",neg:"Trade volume or co-investment for capacity guarantees; avoid bluffing.",res:"Add regional buffers and dual-source critical parts.",cost:"Prioritize low-cost, high-impact actions before expensive air-freight.",risk:"Invest in supplier risk monitoring and multi-region sourcing.",cs:"Protect top customers with proactive updates and allocation rules."};
+const LAB={lead:"leadership",neg:"negotiation",res:"resilience",cost:"cost control",risk:"risk management",cs:"customer satisfaction"};
+const cl=v=>Math.max(0,Math.min(100,Math.round(v))),pick=a=>a[Math.random()*a.length|0],shuf=a=>[...a].sort(()=>Math.random()-.5),sg=v=>(v>0?"+":"")+(v||0);
+const $=s=>document.querySelector(s);let S;
+function init(){const [n,ind]=pick(CO),sev=1+(Math.random()*3|0),c=pick(CR);
+S={st:0,co:n,ind,c,sev,fin:c.f*sev,items:shuf(ITEMS).slice(0,3).map(i=>[i,8+(Math.random()*20|0)]),m:{inv:70-sev*10,pr:72-sev*8,sp:68-sev*10,cs:72-sev*8,rk:30+sev*12,spent:0},acts:[],ai:[],neg:{tr:50,pr:50,ln:50},r:0,q:0,ceo:[],rs:0,log:[],note:"",qo:Q.map(x=>shuf(x.o)),ro:R.map(x=>shuf(x.o))}}
+function apply(o){const m=S.m;for(const k of["inv","pr","sp","cs","rk"])m[k]=cl(m[k]+(o[k]||0));m.spent=cl(m.spent+(o.c||0));S.rs+=o.rs||0}
+const val=o=>(o.inv+o.pr+o.sp+o.cs-o.rk)-(o.c||0)*.5+(o.rs||0);
+function meter(l,v,inv,suf){v=cl(v);const g=inv?100-v:v,col=g>=60?"var(--g)":g>=40?"var(--y)":"var(--r)";return`<div class="m"><div><span>${l}</span><span>${v}${suf||""}</span></div><u><i style="width:${v}%;background:${col}"></i></u></div>`}
+function side(){const m=S.m;return`<aside class="card" aria-label="Live metrics"><h2>Live metrics</h2>${meter("Inventory level",m.inv)}${meter("Profit index",m.pr)}${meter("Delivery speed",m.sp)}${meter("Customer satisfaction",m.cs)}${meter("Risk exposure",m.rk,1)}${meter("Budget spent ($M of 100)",m.spent,1)}</aside>`}
+const fx=o=>`Cost $${o.c||0}M · Inv ${sg(o.inv)} · Profit ${sg(o.pr)} · Speed ${sg(o.sp)} · CSAT ${sg(o.cs)} · Risk ${sg(o.rk)}`;
+function opts(list,sel,max,fn){return`<div class="grid">${list.map((o,i)=>{const on=sel.includes(i),dis=!on&&sel.length>=max;return`<button class="opt ${on?"on":""}" aria-pressed="${on}" ${dis?"disabled":""} onclick="H.${fn}(${i})"><b>${o.n}</b><span>${o.d}</span><small>${fx(o)}</small></button>`}).join("")}</div>`}
+function sc(){const m=S.m,n=S.neg,lead=cl(S.ceo.reduce((a,b)=>a+b,0)/Math.max(1,S.ceo.length)),neg=cl(n.tr*.4+n.pr*.3+n.ln*.3),res=cl(m.inv*.35+m.sp*.45+S.rs*1.5),cost=cl(m.pr*.6+(100-m.spent)*.4),risk=cl(100-m.rk),cs=cl(m.cs);
+return{lead,neg,res,cost,risk,cs,all:cl(lead*.2+neg*.2+res*.2+cost*.15+risk*.15+cs*.1)}}
+const H={go(s){if(!S||!(s>=0&&s<=7))return;S.st=s;S.note="";draw()},
+start(){init();draw.k=null;H.go(1)},
+ta(i){if(S.st!==2||!ACT[i])return;const a=S.acts,k=a.indexOf(i);k>=0?a.splice(k,1):a.length<3&&a.push(i);draw()},
+okA(){if(S.st!==2||S.acts.length!==3)return;S.acts.forEach(i=>{apply(ACT[i]);S.log.push(["War Room: "+ACT[i].n,val(ACT[i])])});H.go(3)},
+neg(i){if(S.st!==3)return;const o=S.ro[S.r]&&S.ro[S.r][i];if(!o)return;const n=S.neg,m=S.m;n.tr=cl(n.tr+o[1]);n.pr=cl(n.pr+o[2]);n.ln=cl(n.ln+o[3]);m.sp=cl(m.sp+o[3]*.3);m.pr=cl(m.pr+o[2]*.2);
+S.log.push(["Negotiation: "+o[0],o[1]+o[2]+o[3]]);S.note=`Last move: trust ${sg(o[1])}, price ${sg(o[2])}, lead time ${sg(o[3])}.`;S.r++;S.r>=4?H.go(4):draw()},
+ceo(i){if(S.st!==4)return;const o=S.qo[S.q]&&S.qo[S.q][i];if(!o)return;S.ceo.push(o[1]);const e=o[2];apply({cs:e[0],pr:e[1],sp:e[2],rk:e[3]});S.log.push(["CEO: "+o[0],o[1]-50]);S.q++;S.q>=5?H.go(5):draw()},
+tai(i){if(S.st!==5||!AI[i])return;const a=S.ai,k=a.indexOf(i);k>=0?a.splice(k,1):a.length<2&&a.push(i);draw()},
+okI(){if(S.st!==5||S.ai.length!==2)return;S.ai.forEach(i=>{apply(AI[i]);S.log.push(["AI: "+AI[i].n,val(AI[i])])});H.go(6)}};
+const V=[
+()=>`<section class="card"><h1 tabindex="-1">Operation Lifeline</h1><p>You are the COO of a company hit by a sudden supply-chain crisis. Triage, negotiate, lead and invest — then see how you score.</p><p><span class="tag">Vanilla JavaScript · no React · works offline</span></p><button class="btn" onclick="H.start()">Start game</button></section>`,
+()=>`<section class="card"><h1 tabindex="-1">Crisis Briefing</h1><h2>${S.co} <span class="tag">${S.ind}</span></h2><p><b style="color:var(--r)">${S.c.t}</b> — ${S.c.d}</p><div class="kpi"><div><small>Financial impact</small><b>$${S.fin}M</b></div><div><small>Severity</small><b>${S.sev}/3</b></div><div><small>Delivery risk</small><b style="font-size:14px">${S.c.r}</b></div></div></section><section class="card"><h2>Affected inventory (remaining cover)</h2>${S.items.map(i=>meter(i[0],i[1]*3,0,"% cover")).join("")}</section>${side()}<button class="btn" onclick="H.go(2)">Enter the War Room</button>`,
+()=>`<section class="card"><h1 tabindex="-1">War Room</h1><p>Select exactly 3 of 6 actions (${S.acts.length}/3).</p>${opts(ACT,S.acts,3,"ta")}<button class="btn" ${S.acts.length!==3?"disabled":""} onclick="H.okA()">Execute plan</button></section>${side()}`,
+()=>{const n=S.neg,r=R[S.r],d=Math.round(24-(n.ln-50)*.2);return`<section class="card"><h1 tabindex="-1">Supplier Negotiation</h1><h2>${r.q}</h2>${S.note?`<div class="note">${S.note}</div>`:""}<div class="grid">${S.ro[S.r].map((o,i)=>`<button class="opt" onclick="H.neg(${i})"><b>${o[0]}</b><small>Trust ${sg(o[1])} · Price ${sg(o[2])} · Lead ${sg(o[3])}</small></button>`).join("")}</div></section><section class="card"><h2>Supplier status</h2>${meter("Supplier trust",n.tr)}${meter("Price advantage",n.pr)}<div class="kpi"><div><small>Lead time</small><b>${d} days</b></div><div><small>Price index</small><b>${Math.round(100-(n.pr-50)*.3)}</b></div><div><small>Negotiation score</small><b>${sc().neg}</b></div></div></section>`},
+()=>`<section class="card"><h1 tabindex="-1">CEO Decisions</h1><h2>Question ${S.q+1} of 5</h2><p>${Q[S.q].q}</p><div class="grid">${S.qo[S.q].map((o,i)=>`<button class="opt" onclick="H.ceo(${i})"><b>${o[0]}</b></button>`).join("")}</div></section>${side()}`,
+()=>`<section class="card"><h1 tabindex="-1">AI Investments</h1><p>Choose exactly 2 of 5 (${S.ai.length}/2).</p>${opts(AI,S.ai,2,"tai")}<button class="btn" ${S.ai.length!==2?"disabled":""} onclick="H.okI()">Fund investments</button></section>${side()}`,
+()=>{const s=sc(),g=s.all>=85?"Crisis Commander":s.all>=70?"Strong Operator":s.all>=50?"Survivor":"Needs Recovery";const L=[["Leadership",s.lead],["Negotiation",s.neg],["Resilience",s.res],["Cost control",s.cost],["Risk management",s.risk],["Customer satisfaction",s.cs]];
+return`<section class="card" style="text-align:center"><h1 tabindex="-1">Final Dashboard</h1><div class="big">${s.all}</div><h2>${g}</h2><p>Overall = Leadership 20% + Negotiation 20% + Resilience 20% + Cost 15% + Risk 15% + CSAT 10%</p></section><section class="card"><h2>Score breakdown</h2>${L.map(l=>meter(l[0],l[1])).join("")}</section><button class="btn" onclick="H.go(7)">Open debrief</button>`},
+()=>{const s=sc(),L=S.log.slice().sort((a,b)=>b[1]-a[1]),best=L[0],worst=L[L.length-1],ks=["lead","neg","res","cost","risk","cs"],low=ks.reduce((a,k)=>s[k]<s[a]?k:a,ks[0]),hi=ks.reduce((a,k)=>s[k]>s[a]?k:a,ks[0]);
+return`<section class="card"><h1 tabindex="-1">Debrief — ${S.co}</h1><p>Facing a <b>${S.c.t}</b> ($${S.fin}M impact), you finished with <b>${s.all}/100</b>. ${s.all>=70?"You steadied the company and protected customers.":s.all>=50?"You kept the business afloat, with clear gaps to close.":"The crisis outpaced your response; the lessons below show where to improve."}</p></section>
+<div class="grid"><div class="card"><h2>Best decision</h2><p>${best[0]}</p></div><div class="card"><h2>Biggest mistake</h2><p>${worst[0]}</p></div></div>
+<section class="card"><h2>Expert recommendation</h2><p>Your weakest area was ${LAB[low]} (${s[low]}). ${REC[low]}</p><h2>Key lessons</h2><ul style="color:var(--m)"><li>${LESS[low]}</li><li>Your strongest area was ${LAB[hi]} (${s[hi]}). ${LESS[hi]}</li><li>Speed matters, but trust with suppliers and customers compounds.</li></ul></section><button class="btn" onclick="H.start()">Replay with a new crisis</button>`}];
+function draw(){const root=$("#root");try{if(!S)init();
+const ae=document.activeElement,idx=ae&&ae.classList&&ae.classList.contains("opt")?[...root.querySelectorAll(".opt")].indexOf(ae):-1,key=S.st+"-"+S.r+"-"+S.q;
+root.innerHTML=V[S.st]();const p=Math.round(S.st/7*100);$("#pf").style.width=p+"%";$("#pb").setAttribute("aria-valuenow",p);$("#pb").setAttribute("aria-label","Stage "+(S.st+1)+" of 8: "+NAMES[S.st]);
+$("#steps").innerHTML=NAMES.map((n,i)=>`<b class="${i<S.st?"d":i===S.st?"c":""}">${i<S.st?"✓ ":""}${i+1}. ${n}</b>`).join("");
+if(key!==draw.k){draw.k=key;const h=root.querySelector("h1");h&&h.focus({preventScroll:true});scrollTo({top:0,behavior:"smooth"})}
+else if(idx>=0){const b=root.querySelectorAll(".opt")[idx];b&&!b.disabled&&b.focus({preventScroll:true})}}
+catch(e){console.error(e);root.innerHTML=`<section class="card"><h1>Something went wrong</h1><p>The simulation hit an unexpected error.</p><button class="btn" onclick="S=null;draw.k=null;init();H.go(0)">Restart</button></section>`}}
+init();draw();
+</script></body></html>
