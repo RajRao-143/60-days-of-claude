@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Media Integrity Analyzer — Day 33</title>
+<meta name="description" content="An interactive media literacy experience using fictional, locally generated examples.">
+<style>
+/* ============ Theme tokens ============ */
+:root{
+  --bg:#12100d; --bg2:#1a1612; --card:#211c17; --card2:#2a241e; --line:#3d352c;
+  --orange:#E88752; --orange-soft:#f3b48f; --amber:#e9b44c; --peach:#ffd9bf;
+  --text:#F5F0E8; --muted:#bbb0a2;
+  --green:#6fcf97; --red:#f2796d;
+  --radius:16px;
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --glow:0 0 0 1px rgba(232,135,82,.35),0 8px 30px rgba(232,135,82,.12);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);font-size:1rem;line-height:1.6;color:var(--text);
+  background:radial-gradient(900px 500px at 85% -10%,rgba(232,135,82,.14),transparent 60%),
+  radial-gradient(700px 400px at -10% 10%,rgba(233,180,76,.07),transparent 60%),var(--bg);
+  min-height:100vh;overflow-x:hidden}
+h1,h2,h3,h4{line-height:1.2;margin:0 0 .5rem;font-family:var(--serif);font-weight:700;letter-spacing:.2px}
+h1{font-size:clamp(2rem,5vw,3rem)} h2{font-size:clamp(1.4rem,3vw,1.9rem)} h3{font-size:1.15rem}
+p{margin:.4rem 0 .8rem;max-width:68ch}
+:focus-visible{outline:3px solid var(--peach);outline-offset:3px;border-radius:6px}
+[tabindex="-1"]:focus{outline:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:-999px;top:0;background:var(--orange);color:#1a1612;padding:.5rem 1rem;z-index:100}
+.skip:focus{left:8px;top:8px}
+
+/* ============ Top bar ============ */
+.topbar{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:auto 1fr auto auto auto;gap:.9rem;align-items:center;
+  padding:.65rem clamp(.8rem,3vw,1.6rem);background:rgba(18,16,13,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:.65rem}
+.logo{display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:10px;background:linear-gradient(135deg,var(--orange),#b9582b);
+  color:#1a1612;font-weight:800;font-size:.8rem;letter-spacing:.5px;box-shadow:var(--glow)}
+.brand strong{display:block;font-family:var(--serif);font-size:1rem;line-height:1.1}
+.brand small{color:var(--muted);font-size:.72rem}
+.progress-wrap{min-width:0}
+#stageLabel{font-size:.78rem;color:var(--muted);margin-bottom:.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:8px;border-radius:99px;background:#32291f;overflow:hidden}
+.bar .fill,#stageBar{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#c2602f,var(--orange),var(--amber));transition:width .6s ease}
+.score-pill{display:flex;flex-direction:column;align-items:center;line-height:1.1;padding:.3rem .8rem;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.score-pill span{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.score-pill strong{font-size:1.25rem;color:var(--orange)}
+
+/* ============ Buttons ============ */
+.btn{font:inherit;font-weight:600;cursor:pointer;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--text);
+  padding:.65rem 1.1rem;min-height:44px;transition:transform .15s,background .2s,border-color .2s,box-shadow .2s}
+.btn:hover:not(:disabled){border-color:var(--orange);transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,var(--orange),#d2693a);color:#1a1612;border-color:transparent}
+.btn.primary:hover:not(:disabled){box-shadow:var(--glow)}
+.btn.ghost{background:transparent}
+.btn.big{padding:.85rem 1.7rem;font-size:1.08rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.small{padding:.4rem .8rem;min-height:40px;font-size:.9rem}
+
+/* ============ Metrics ============ */
+#metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;max-width:1100px;margin:1rem auto 0;padding:0 clamp(.8rem,3vw,1.6rem)}
+#metrics[hidden]{display:none}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.7rem .85rem}
+.metric-top{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem}
+.metric h3{font-family:var(--sans);font-size:.82rem;margin:0;color:var(--peach)}
+.metric-val{font-weight:700;font-size:1.1rem}
+.metric .bar{margin:.4rem 0 .3rem}
+.metric-level{font-size:.76rem;font-weight:600;color:var(--amber)}
+.metric-level::before{content:"● ";font-size:.6rem}
+.metric-desc{font-size:.72rem;color:var(--muted);margin:.2rem 0 0;line-height:1.35}
+.metric.pulse{animation:pulse 1s ease}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(232,135,82,.6)}100%{box-shadow:0 0 0 12px rgba(232,135,82,0)}}
+
+/* ============ Layout / cards ============ */
+main{max-width:1100px;margin:0 auto;padding:1.2rem clamp(.8rem,3vw,1.6rem) 4rem}
+.view{animation:rise .5s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card{background:linear-gradient(180deg,var(--card),#1c1814);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(1rem,3vw,1.7rem);margin-bottom:1.1rem}
+.card h3{color:var(--peach)}
+.eyebrow{color:var(--orange);text-transform:uppercase;letter-spacing:1.5px;font-size:.78rem;font-weight:700;margin:0 0 .4rem}
+.lede{font-size:1.2rem;color:var(--peach);font-family:var(--serif)}
+.hero{border-color:rgba(232,135,82,.4);box-shadow:var(--glow)}
+.goals{padding-left:0;list-style:none;display:grid;gap:.5rem;margin:1rem 0}
+.goals li{padding:.7rem .9rem .7rem 2.6rem;position:relative;background:var(--card2);border-radius:12px;border:1px solid var(--line)}
+.goals li::before{content:attr(data-n);position:absolute;left:.8rem;top:.65rem;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--orange);color:#1a1612;font-weight:800;display:grid;place-items:center;font-size:.85rem}
+.meta-row{display:flex;flex-wrap:wrap;gap:.5rem;margin:.8rem 0 1.2rem}
+.tag{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.6px;padding:.25rem .65rem;border-radius:99px;border:1px solid var(--orange);color:var(--peach);background:rgba(232,135,82,.1)}
+.tag.fict{border-color:var(--amber);color:var(--amber)}
+.note{font-size:.88rem;color:var(--muted)}
+.phases{display:flex;flex-wrap:wrap;gap:.35rem;list-style:none;padding:0;margin:0 0 1rem}
+.phases li{font-size:.76rem;padding:.2rem .65rem;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.phases li.done{color:var(--text)}
+.phases li.done::before{content:"✓ "}
+.phases li.active{border-color:var(--orange);color:#1a1612;background:var(--orange);font-weight:700}
+.phases li.active::before{content:"▶ "}
+.lesson-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}
+.lesson-grid .item{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem}
+.lesson-grid .item h4{font-family:var(--sans);font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--orange)}
+.lesson-grid ul{margin:.3rem 0 0;padding-left:1.1rem}
+.actions{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem;align-items:center}
+
+/* news + social cards */
+.news{background:#f5f0e8;color:#1d1813;border-radius:14px;padding:1.2rem 1.4rem;border-left:6px solid var(--orange)}
+.news .tag{color:#7a3a14;border-color:#b9582b;background:#ffe9d9}
+.news h3{font-size:clamp(1.4rem,3.4vw,2rem);color:#1d1813;margin:.5rem 0}
+.news .byline{font-size:.8rem;color:#6a5e50;margin:0 0 .6rem}
+.news p{color:#2a231b;max-width:70ch}
+.news .article p{font-family:var(--serif);font-size:1.05rem;line-height:1.7}
+.post{background:#1b1713;border:1px solid var(--line);border-radius:18px;padding:1.1rem 1.2rem;max-width:560px}
+.post-head{display:flex;gap:.7rem;align-items:center;margin-bottom:.7rem}
+.avatar{width:2.6rem;height:2.6rem;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--amber),var(--orange));color:#1a1612;font-weight:800}
+.post-head strong{display:block;line-height:1.2}
+.post-head small{color:var(--muted)}
+.post-text{font-size:1.1rem;line-height:1.6;margin:.3rem 0}
+
+/* choices */
+fieldset{border:0;padding:0;margin:1rem 0}
+legend{font-weight:700;font-size:1.05rem;margin-bottom:.6rem;padding:0;color:var(--peach)}
+.choices{display:grid;gap:.55rem}
+.choices.row{grid-template-columns:repeat(3,1fr)}
+.choices.grid{grid-template-columns:repeat(2,1fr)}
+.choices.chips{display:flex;flex-wrap:wrap}
+.choice{position:relative;display:flex;gap:.7rem;align-items:flex-start;padding:.75rem .95rem;min-height:48px;border:1px solid var(--line);border-radius:12px;background:var(--card2);cursor:pointer;transition:border-color .2s,box-shadow .2s,background .2s}
+.choice:hover{border-color:var(--orange-soft)}
+.choice input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.choice .mark{flex:none;width:1.35rem;height:1.35rem;margin-top:.1rem;border:2px solid var(--muted);border-radius:6px;display:grid;place-items:center;font-size:.85rem;font-weight:800;color:transparent}
+.choice.radio .mark{border-radius:50%}
+.choice input:checked ~ .mark{background:var(--orange);border-color:var(--orange);color:#1a1612}
+.choice:has(input:checked){border-color:var(--orange);box-shadow:var(--glow);background:#33281f}
+.choice:focus-within{outline:3px solid var(--peach);outline-offset:2px}
+.choice .body strong{display:block}
+.choice .body span{font-size:.86rem;color:var(--muted)}
+.choices.chips .choice{padding:.5rem .8rem;border-radius:99px;min-height:44px;align-items:center}
+.choices.chips .mark{margin-top:0;border-radius:50%}
+details{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem 1rem;margin:.8rem 0}
+summary{cursor:pointer;font-weight:700;color:var(--peach);min-height:32px;display:flex;align-items:center}
+details[open]>summary{margin-bottom:.4rem}
+label.field{display:block;font-weight:600;margin:.9rem 0 .35rem}
+textarea{width:100%;font:inherit;color:var(--text);background:#17130f;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;resize:vertical;min-height:84px}
+textarea:focus{border-color:var(--orange)}
+.hint{font-size:.85rem;color:var(--muted)}
+
+/* analysis */
+.analysis{border-color:rgba(232,135,82,.45);animation:rise .6s ease both}
+.score-big{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.score-big .num{font-family:var(--serif);font-size:3rem;font-weight:700;color:var(--orange);line-height:1}
+.hl{background:rgba(232,135,82,.18);color:inherit;padding:0 .15rem;border-radius:4px;text-decoration-thickness:2px;text-underline-offset:4px}
+.hl.bad{text-decoration:underline wavy #c0392b}
+.hl.part{text-decoration:underline dashed #9a6a00}
+.hl.ok{text-decoration:underline dotted #1e7a46}
+.news .hl{background:rgba(232,135,82,.28)}
+.hl-n{font-size:.62rem;font-weight:800;margin-left:.15rem;font-family:var(--sans);white-space:nowrap}
+.headline-hl{font-family:var(--serif);font-size:clamp(1.3rem,3vw,1.8rem);line-height:1.4;background:#f5f0e8;color:#1d1813;border-radius:12px;padding:1rem 1.2rem}
+.legend{display:flex;flex-wrap:wrap;gap:.8rem;font-size:.82rem;color:var(--muted);margin:.6rem 0}
+.claim{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;margin:.6rem 0}
+.claim .stance{font-weight:700;font-size:.85rem}
+.claim.bad{border-left:5px solid var(--red)} .claim.part{border-left:5px solid var(--amber)} .claim.ok{border-left:5px solid var(--green)}
+blockquote{margin:.4rem 0;padding:.4rem .9rem;border-left:3px solid var(--orange);color:var(--peach);font-family:var(--serif);font-style:italic}
+.rewrite{background:rgba(111,207,151,.08);border:1px solid rgba(111,207,151,.5);border-radius:12px;padding:.9rem 1rem}
+.rewrite strong.t{font-family:var(--serif);font-size:1.2rem}
+.takeaway{background:linear-gradient(135deg,rgba(232,135,82,.18),rgba(233,180,76,.08));border:1px solid var(--orange);border-radius:12px;padding:1rem 1.2rem;font-family:var(--serif);font-size:1.15rem}
+.takeaway small{display:block;font-family:var(--sans);font-size:.72rem;letter-spacing:1px;text-transform:uppercase;color:var(--orange);margin-bottom:.2rem}
+.compare{list-style:none;padding:0;margin:.4rem 0}
+.compare li{padding:.35rem 0;border-bottom:1px dashed var(--line)}
+.delta{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;margin:.6rem 0}
+.delta div{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.5rem .8rem;font-size:.9rem}
+.cols{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+
+/* final */
+.final-top{display:grid;grid-template-columns:auto 1fr;gap:1.5rem;align-items:center}
+.ring{width:170px;height:170px}
+.ring-bg{fill:none;stroke:#32291f;stroke-width:10}
+.ring-fg{fill:none;stroke:var(--orange);stroke-width:10;stroke-linecap:round;transform:rotate(-90deg);transform-origin:60px 60px;transition:stroke-dashoffset 1s ease}
+.ring text{fill:var(--text);font-family:Georgia,serif;font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:.45rem .5rem;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:600}
+.habits{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+.habit{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:1rem}
+.habit .n{display:inline-grid;place-items:center;width:1.8rem;height:1.8rem;border-radius:50%;background:var(--orange);color:#1a1612;font-weight:800;margin-bottom:.4rem}
+.flag{border-left:6px solid var(--red)}
+.flag h3::before{content:"⚑ ";color:var(--red)}
+.own{font-style:italic;color:var(--peach);white-space:pre-wrap}
+
+/* dialogs */
+dialog{background:var(--card);color:var(--text);border:1px solid var(--orange);border-radius:var(--radius);padding:1.4rem;max-width:min(640px,92vw);box-shadow:var(--glow)}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+dialog h2{font-size:1.4rem}
+dialog ul{padding-left:1.2rem}
+
+/* ============ Responsive ============ */
+@media (max-width:900px){
+  #metrics{grid-template-columns:repeat(2,1fr)}
+  .habits{grid-template-columns:1fr}
+  .final-top{grid-template-columns:1fr;justify-items:start}
+}
+@media (max-width:640px){
+  .topbar{grid-template-columns:1fr auto auto;grid-template-areas:"brand score help" "prog prog restart"}
+  .brand{grid-area:brand}.score-pill{grid-area:score}#helpBtn{grid-area:help}#restartBtn{grid-area:restart}.progress-wrap{grid-area:prog}
+  .brand small{display:none}
+  .lesson-grid,.choices.row,.choices.grid,.cols,.delta{grid-template-columns:1fr}
+  .metric-desc{display:none}
+  .news{padding:1rem}
+  .btn.big{width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#app">Skip to main content</a>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">MIA</span>
+    <div><strong>Media Integrity Analyzer</strong><small>Fictional scenarios only</small></div>
+  </div>
+  <div class="progress-wrap">
+    <div id="stageLabel"></div>
+    <div class="bar" id="stageTrack" role="progressbar" aria-label="Learning journey progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="stageBar"></span></div>
+  </div>
+  <div class="score-pill" title="Weighted learning-session score. Not a scientific measure."><span>Integrity score</span><strong id="scoreVal">50</strong></div>
+  <button class="btn small ghost" id="helpBtn" type="button">? Help</button>
+  <button class="btn small ghost" id="restartBtn" type="button" hidden>Restart</button>
+</header>
+
+<section id="metrics" aria-label="Live media integrity metrics" hidden></section>
+<main id="app" aria-label="Learning content"></main>
+<div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<dialog id="helpDlg" aria-labelledby="helpTitle">
+  <h2 id="helpTitle">How this works</h2>
+  <p><strong>Purpose:</strong> Media Integrity Analyzer teaches media literacy by exploring <em>fictional</em> examples. It is not a quiz on what you already know.</p>
+  <ul>
+    <li><strong>Challenge 1 — Headline Detective:</strong> decide whether you would click a headline, read the matching article, flag possible warning signs, and judge how well the two match.</li>
+    <li><strong>Challenge 2 — Emotion Detector:</strong> notice how a fictional post makes you feel, pick the phrases and techniques you think shape that reaction, and guess the audience.</li>
+    <li><strong>When analysis appears:</strong> only after you press “Reveal Analysis”. Nothing is revealed early.</li>
+    <li><strong>Metrics:</strong> Headline Accuracy, Source Reliability, Emotional Manipulation and Audience Targeting start at a baseline of 50 and move based on your choices. Mistakes are learning moments, and strong feelings are never penalized.</li>
+    <li><strong>The score is educational:</strong> it reflects the analysis you demonstrated in this session. It is not a measure of intelligence, and this app cannot tell whether real-world news is true. It teaches you to inspect evidence, wording, context and persuasion.</li>
+    <li><strong>Replay:</strong> on the final dashboard choose “Replay with New Scenarios” for fresh fictional examples and a clean score.</li>
+  </ul>
+  <p class="note">Fictional scenarios: every headline, article and post is invented and generated locally. Nothing is fetched from the internet.</p>
+  <button class="btn primary" type="button" id="helpClose">Got it</button>
+</dialog>
+
+<dialog id="confirmDlg" aria-labelledby="confirmTitle">
+  <h2 id="confirmTitle"></h2>
+  <p id="confirmMsg"></p>
+  <div class="actions">
+    <button class="btn primary" type="button" id="confirmOk">Yes, restart</button>
+    <button class="btn" type="button" id="confirmCancel">Keep my progress</button>
+  </div>
+</dialog>
+
+<script>
+"use strict";
+/*DATA_START*/
+/* ================================================================
+   SCENARIO DATA — every scenario is fictional and self-contained.
+   Headline accuracy is computed from weighted claims:
+   support s: 1 = supported, 0.5 = partly, 0 = contradicted.
+   ================================================================ */
+const WARN={
+  exaggerated:'Exaggerated language', unsupported:'Unsupported numbers or claims', context:'Missing context',
+  comparison:'Misleading comparison', causation:'Causation claimed without evidence',
+  qualification:'Important qualification missing', none:'No obvious mismatch'
+};
+const MATCH={closely:'Closely matches',partially:'Partially matches',misrepresents:'Misrepresents important details'};
+
+const HS=[
+{ id:'bus', topic:'Local transport', byline:'Marlow Valley Courier · Transport desk',
+  headline:'City Buses to Run Free for Everyone Starting Next Month',
+  article:[
+   'The Marlow Valley Transit Authority announced on Monday an eight-week pilot of fare-free rides on Route 14, which links Eastgate Station with the university campus.',
+   'The pilot begins on 4 November and applies on weekdays only. Riders must show a valid student ID card to board without paying; all other passengers will pay the regular fare of $2.40.',
+   'Authority spokesperson Lena Ortiz said the pilot is meant to measure whether free fares increase student ridership. “We will review passenger counts after eight weeks before deciding anything further,” she said.',
+   'The other 21 routes in the network are not part of the trial.'],
+  claims:[
+   {phrase:'City Buses',w:2,s:0,ev:['The other 21 routes in the network are not part of the trial.'],why:'The headline suggests the whole bus network, but the pilot covers one route out of 22.'},
+   {phrase:'Run Free',w:2,s:1,ev:['Riders must show a valid student ID card to board without paying'],why:'Rides really are free, but only for riders who meet the condition described next.'},
+   {phrase:'for Everyone',w:3,s:0,ev:['all other passengers will pay the regular fare of $2.40'],why:'Only students with a valid ID ride free. Everyone else still pays.'},
+   {phrase:'Starting Next Month',w:1,s:1,ev:['The pilot begins on 4 November'],why:'The start date is stated in the article.'}],
+  warnings:['exaggerated','context','qualification'], match:'misrepresents',
+  mismatch:'The headline stretches two limits. “City buses” suggests the whole network, but the trial covers one route of 22. “For everyone” suggests all riders, but only students with a valid ID ride free and others pay $2.40. It also leaves out that this is an eight-week, weekday-only trial, not a permanent policy.',
+  fairRewrite:'Marlow Valley Launches Eight-Week Free-Fare Pilot on One Student Route',
+  whyBetter:'It names the scope (one route), the audience (students) and the temporary nature of the trial, so someone who only reads and shares the headline will not believe the whole network is free.',
+  takeaway:'Words like “everyone” and “all” are claims about scope. Find the sentence in the article that says who is really included.',
+  flag:{title:'A headline claiming a wider scope than the article supports',spot:'Watch for sweeping words such as “everyone”, “all” or “every”, then look for the sentence in the article that sets the real limits.'} },
+
+{ id:'tea', topic:'Health research', byline:'Calderwood Gazette · Science desk',
+  headline:'Study Proves Green Tea Boosts Memory in Adults',
+  article:[
+   'Researchers at the Calderwood Institute reported on Thursday the results of a six-week pilot study on green tea and memory involving 42 adults aged 60 to 75.',
+   'Volunteers who drank two cups of green tea daily scored about 4% higher on a word-recall test than a comparison group that drank water. The institute said the difference was within the margin of error and could be due to chance.',
+   'Lead researcher Dr. Imani Okafor described the findings as “preliminary” and said a larger, longer trial would be needed before any conclusions could be drawn.',
+   'The study was funded by the institute and has not yet been reviewed by outside scientists.'],
+  claims:[
+   {phrase:'Study',w:1,s:1,ev:['six-week pilot study on green tea and memory involving 42 adults aged 60 to 75'],why:'A study did take place, though it was a small pilot.'},
+   {phrase:'Proves',w:3,s:0,ev:['a larger, longer trial would be needed before any conclusions could be drawn'],why:'The researcher herself says no conclusions can be drawn yet.'},
+   {phrase:'Boosts Memory',w:2,s:0,ev:['the difference was within the margin of error and could be due to chance'],why:'A 4% gap that may be due to chance is not evidence of a boost.'},
+   {phrase:'in Adults',w:1,s:0.5,ev:['42 adults aged 60 to 75'],why:'The participants were a small group aged 60 to 75, not adults in general.'}],
+  warnings:['exaggerated','unsupported','qualification'], match:'misrepresents',
+  mismatch:'“Proves” is far stronger than anything in the article: the researcher calls the findings preliminary and says a larger trial is needed. “Boosts memory” treats a 4% difference as real, though the institute says it is within the margin of error. Omitted: the small sample of 42 adults aged 60 to 75, and that outside scientists have not reviewed the study.',
+  fairRewrite:'Small Green Tea Study Sees Tiny Memory Difference, Researchers Urge Larger Trial',
+  whyBetter:'It keeps the finding (a small difference), the size of the study and the researchers’ own caution, without turning a hint into a proof.',
+  takeaway:'“Proves” is a red-flag verb. Look for words like “preliminary”, “pilot” and “more research needed” in the article.',
+  flag:{title:'A strong verb (“proves”) that the evidence cannot carry',spot:'When a headline says “proves”, “cures” or “confirms”, scan the article for sample size, caveats and whether other scientists have reviewed the work.'} },
+
+{ id:'library', topic:'University announcement', byline:'Riverside Campus News',
+  headline:'Riverside University Extends Library Hours During Exam Weeks',
+  article:[
+   'Riverside University Library will extend its weekday opening hours during the two exam weeks in December, the university announced on Friday.',
+   'From 1 to 12 December, the main library will stay open until 2 a.m., instead of the usual 10 p.m. Weekend hours are unchanged.',
+   'Student council representative Tom Hale said students had asked for later hours after crowded study rooms last term. The extra opening hours will be staffed from the existing budget, according to the library.'],
+  claims:[
+   {phrase:'Extends Library Hours',w:2,s:1,ev:['the main library will stay open until 2 a.m., instead of the usual 10 p.m.'],why:'The article states the new closing time directly.'},
+   {phrase:'During Exam Weeks',w:1,s:1,ev:['during the two exam weeks in December'],why:'The extension is tied to the December exam period.'}],
+  warnings:['none'], match:'closely',
+  mismatch:'No meaningful mismatch. Each part of the headline is backed by a specific sentence in the article: the hours are extended, and the extension covers the December exam weeks.',
+  accurateNote:'Not every attention-grabbing headline is misleading. A short, direct headline can be fully accurate. The habit to build is checking first, not suspecting everything.',
+  fairRewrite:'Riverside University Library to Stay Open Until 2 a.m. on Weekdays During December Exams',
+  whyBetter:'The original was already fair. This version only adds the new closing time and the weekday detail from the article.',
+  takeaway:'A headline can be punchy and still accurate. Compare it with the article before deciding.',
+  flag:null },
+
+{ id:'phone', topic:'Consumer products', byline:'Harbor Tech Digest',
+  headline:'New Zentra X2 Battery Lasts 3 Full Days',
+  article:[
+   'Zentra Mobile on Tuesday unveiled the Zentra X2 smartphone, which the company says has its longest-lasting battery yet.',
+   'In a test run in the company’s own laboratory, the X2 lasted 71 hours with screen brightness set to 30%, 5G switched off and background apps limited. Under a mixed-use routine of calls, video and browsing, the same lab measured about 38 hours.',
+   'No independent reviewer has yet tested the phone. Zentra said the X2 goes on sale on 14 November.'],
+  claims:[
+   {phrase:'New Zentra X2 Battery',w:1,s:1,ev:['Zentra Mobile on Tuesday unveiled the Zentra X2 smartphone'],why:'The phone and its battery are new, as the article reports.'},
+   {phrase:'Lasts 3 Full Days',w:3,s:0.4,ev:['with screen brightness set to 30%, 5G switched off and background apps limited','the same lab measured about 38 hours','No independent reviewer has yet tested the phone'],why:'Roughly three days was the best case in the company’s own lab with favourable settings. Typical use measured about 38 hours, and nobody independent has tested it.'}],
+  warnings:['context','qualification','unsupported'], match:'partially',
+  mismatch:'“Lasts 3 full days” is stated as plain fact, but it comes from the company’s own lab test under favourable settings: low brightness, 5G off and background apps limited. Under mixed use the same lab measured about 38 hours, and no independent reviewer has tested the phone. The headline keeps the best-case figure and drops the conditions.',
+  fairRewrite:'Zentra Says X2 Battery Lasted 71 Hours in Its Own Lab Test; Mixed Use Closer to 38',
+  whyBetter:'It attributes the claim to the company, names the test setting, and gives the more typical figure, so readers can judge for themselves.',
+  takeaway:'When the evidence is the seller’s own test, ask who tested it, and under what conditions.',
+  flag:{title:'A best-case result presented as the everyday result',spot:'Look for phrases like “in tests”, “under ideal conditions” or “the company says”. If the headline drops them, the claim may be bigger than the proof.'} },
+
+{ id:'garden', topic:'Community news', byline:'Elmwood Bulletin',
+  headline:'Community Garden Cuts Neighborhood Crime by Half',
+  article:[
+   'The Elmwood Block Association opened a community garden on Elm Street in March, and neighbors say the street feels livelier.',
+   'Police records show 6 reported incidents on Elm Street between March and August, compared with 12 in the same months last year. Records for neighboring streets were not included in the comparison.',
+   'A police spokesperson cautioned that many factors affect incident numbers, including new street lighting installed on Elm Street in April, and that the figures cannot show what effect the garden had on its own.'],
+  claims:[
+   {phrase:'Community Garden',w:1,s:1,ev:['opened a community garden on Elm Street in March'],why:'The garden exists and opened in March.'},
+   {phrase:'Cuts',w:3,s:0,ev:['the figures cannot show what effect the garden had on its own','new street lighting installed on Elm Street in April'],why:'“Cuts” claims the garden caused the drop. Police say the data cannot show that, and other changes happened at the same time.'},
+   {phrase:'Neighborhood Crime',w:2,s:0.5,ev:['Records for neighboring streets were not included in the comparison.'],why:'The numbers describe reported incidents on one street, not crime across the neighborhood.'},
+   {phrase:'by Half',w:2,s:0.5,ev:['6 reported incidents on Elm Street between March and August, compared with 12 in the same months last year'],why:'12 to 6 is literally half, but with such small numbers a change of six incidents is easy to produce by chance.'}],
+  warnings:['causation','context','unsupported'], match:'misrepresents',
+  mismatch:'The headline says the garden caused the drop (“cuts”). The article only shows two things that happened together: the garden opened, and reported incidents on one street fell from 12 to 6. New street lighting was installed in the same period, and police say the figures cannot show the garden’s effect alone. “Neighborhood crime” also stretches one street’s incident count to the whole neighborhood.',
+  fairRewrite:'Reported Incidents on Elm Street Halve Since Community Garden Opened, Though Police Cite Other Factors',
+  whyBetter:'It reports the real number (incidents, one street), keeps the timing (since the garden opened) and notes that other factors exist, without claiming the garden caused the change.',
+  takeaway:'“A happened, then B changed” does not mean A caused B. Look for other explanations.',
+  flag:{title:'Cause and effect claimed without evidence',spot:'Verbs like “cuts”, “causes”, “boosts” and “fixes” claim causation. Ask what else changed at the same time.'} },
+
+{ id:'remote', topic:'Workplace', byline:'Brightwave Business Wire',
+  headline:'Remote Workers 3x More Productive Than Office Staff, Survey Finds',
+  article:[
+   'A survey of 60 employees at Brightwave Software, published by the company’s HR team, compared how many tasks staff reported finishing each week.',
+   'Remote employees reported completing an average of 9 tasks per week, while office-based employees reported an average of 7.',
+   'The survey did not measure the difficulty or quality of the tasks, and it covered a single company. The HR team said the results should not be generalized to other workplaces.'],
+  claims:[
+   {phrase:'Remote Workers',w:1,s:0.5,ev:['it covered a single company','should not be generalized to other workplaces'],why:'The survey covered one company, so it says little about remote workers in general.'},
+   {phrase:'3x',w:4,s:0,ev:['an average of 9 tasks per week, while office-based employees reported an average of 7'],why:'9 versus 7 is about 29% more, not three times as many.'},
+   {phrase:'More Productive',w:2,s:0.5,ev:['The survey did not measure the difficulty or quality of the tasks'],why:'The survey counted self-reported tasks. It did not measure the quality or difficulty of the work.'},
+   {phrase:'Office Staff',w:1,s:1,ev:['office-based employees reported an average of 7'],why:'The comparison group is described in the article.'},
+   {phrase:'Survey Finds',w:1,s:1,ev:['A survey of 60 employees at Brightwave Software'],why:'A survey really was the source.'}],
+  warnings:['exaggerated','comparison','context'], match:'misrepresents',
+  mismatch:'The article reports 9 tasks a week for remote staff versus 7 for office staff, about 29% more, not three times as many. “More productive” also stretches a self-reported task count: the survey did not measure difficulty or quality. It covered one company, whose HR team said the results should not be generalized.',
+  fairRewrite:'Survey at One Software Firm: Remote Staff Report Finishing 9 Tasks a Week, Office Staff 7',
+  whyBetter:'It uses the actual numbers, says the figures are self-reported and limits the claim to one firm.',
+  takeaway:'When a headline gives a multiplier, find the original numbers and do the arithmetic yourself.',
+  flag:{title:'A number in the headline that the article’s own figures do not support',spot:'If a headline says “double”, “triple” or gives a big percentage, find the underlying figures in the article and check them.'} },
+
+{ id:'trees', topic:'Community event', byline:'Canal Path Times',
+  headline:'Dozens of Volunteers Plant 1,200 Trees Along Canal Path in One Day',
+  article:[
+   'Volunteers planted 1,214 saplings along the Canal Path on Saturday, the Greenway Trust said.',
+   'A total of 86 volunteers took part between 9 a.m. and 4 p.m., planting native oak, alder and hazel between Lock 3 and Millbridge.',
+   'Trust organizer Priya Nand said the saplings will need watering through next summer and that a second planting day is planned for spring.'],
+  claims:[
+   {phrase:'Dozens of Volunteers',w:1,s:1,ev:['86 volunteers'],why:'86 volunteers is several dozen.'},
+   {phrase:'Plant 1,200 Trees',w:2,s:0.9,ev:['planted 1,214 saplings'],why:'1,214 rounds naturally to 1,200, and saplings are young trees.'},
+   {phrase:'Along Canal Path',w:1,s:1,ev:['between Lock 3 and Millbridge'],why:'The planting stretch is named in the article.'},
+   {phrase:'in One Day',w:1,s:1,ev:['between 9 a.m. and 4 p.m.'],why:'All the planting took place on one Saturday.'}],
+  warnings:['none'], match:'closely',
+  mismatch:'No meaningful mismatch. 86 volunteers is “dozens”, 1,214 saplings is fairly rounded to “1,200 trees”, and the work took place in a single day along the named stretch. The only softness is that saplings are young trees, which readers would find natural.',
+  accurateNote:'Not every attention-grabbing headline is misleading. This one uses a big, specific number and is still faithful to the article.',
+  fairRewrite:'86 Volunteers Plant 1,214 Saplings Along Canal Path in One Day',
+  whyBetter:'It is slightly more precise, but the original was already fair. Rounding a number is not misleading when it stays close to the facts.',
+  takeaway:'Vivid is not the same as misleading. Check the details before you doubt.',
+  flag:null },
+
+{ id:'lights', topic:'Public technology', byline:'Quay Street Chronicle',
+  headline:'New Smart Streetlights Slash Energy Bills by 80%',
+  article:[
+   'The city council has finished installing smart streetlights on Quay Street, replacing 20 older sodium lamps in a pilot project.',
+   'The new LED lamps dim automatically when no one is nearby. Engineers measured that the 20 pilot lamps now use 80% less electricity than the lamps they replaced.',
+   'The council says that if the lights were installed across the whole city, total street-lighting electricity use would fall by about 12%, because most existing lamps are already LED. No funding for a citywide rollout has been approved.',
+   'The council did not publish figures for savings in money terms.'],
+  claims:[
+   {phrase:'New Smart Streetlights',w:1,s:0.5,ev:['replacing 20 older sodium lamps in a pilot project'],why:'The lights exist, but only 20 lamps on one street in a pilot.'},
+   {phrase:'Slash Energy Bills',w:2,s:0.5,ev:['The council did not publish figures for savings in money terms.'],why:'The article measures electricity use. It gives no figures for bills or money saved.'},
+   {phrase:'by 80%',w:3,s:0.5,ev:['now use 80% less electricity than the lamps they replaced','total street-lighting electricity use would fall by about 12%'],why:'80% is true for the 20 pilot lamps. The council’s estimate for the whole city is about 12%.'}],
+  warnings:['context','qualification'], match:'partially',
+  mismatch:'The 80% figure is real, but it describes electricity use of the 20 pilot lamps, not energy bills. The council’s own estimate for a citywide rollout is about 12%, and no funding has been approved. The headline applies a pilot statistic to a much larger scope and turns electricity use into “energy bills”, which the council did not report.',
+  fairRewrite:'Pilot Smart Streetlights Use 80% Less Electricity; Citywide Savings Estimated Near 12%',
+  whyBetter:'It keeps the impressive true number, labels it as a pilot result, and adds the more realistic citywide estimate.',
+  takeaway:'A true statistic can still mislead if it is attached to the wrong scope.',
+  flag:{title:'A true number applied to a bigger scope than it covers',spot:'Ask “80% of what, and where?” Check whether the figure describes a pilot, a sample or the whole population.'} }
+];
+
+const TECH={
+  fear:{label:'Fear or threat',desc:'Raises alarm about danger so you act quickly.'},
+  urgency:{label:'Urgency',desc:'Deadlines, scarcity or “act now” wording that shortens your thinking time.'},
+  outrage:{label:'Outrage',desc:'Frames events to provoke anger, often before the facts are checked.'},
+  social:{label:'Social pressure',desc:'Suggests that everyone is doing it, or that you should join or share to belong.'},
+  guilt:{label:'Guilt or shame',desc:'Implies you are failing or letting yourself or others down.'},
+  loaded:{label:'Loaded language',desc:'Words chosen to carry strong judgments rather than neutral description.'},
+  selective:{label:'Selective presentation',desc:'Shows some facts prominently while hiding or shrinking others.'},
+  curiosity:{label:'Curiosity gap',desc:'Teases a surprise without telling you the facts, to earn your click.'},
+  none:{label:'No obvious manipulation',desc:'The wording is mostly informative.'},
+  unsure:{label:'Unsure yet',desc:'You are still thinking, which is a fine place to be.'}
+};
+const EMO={curious:'Curious',worried:'Worried',angry:'Angry',excited:'Excited',pressured:'Pressured',reassured:'Reassured',skeptical:'Skeptical',neutral:'Neutral'};
+const AUD={
+  students:'Students and young learners', parents:'Parents and caregivers', commuters:'People who rely on public transport',
+  shoppers:'Online shoppers hunting for deals', wellness:'People building health or fitness habits', local:'Local residents and community members',
+  gamers:'Online gamers and fans', smallbiz:'Small business owners', seniors:'Older adults'
+};
+
+const ES=[
+{ id:'blender', format:'Sponsored reel caption', author:'@aurora.kitchen', topic:'Kitchen appliance advert',
+  text:'LAST CHANCE! Only 17 Aurora Blenders left at this price. Over 10,000 households already own one — don’t be the only kitchen without it. Sale ends at midnight tonight.',
+  audience:'shoppers', audienceWhy:'Deal-focused online shoppers, especially people who feel a pull to buy before a discount disappears.',
+  techniques:['urgency','social'], emotions:['pressured','excited'],
+  intended:'Pressure to buy right now, mixed with fear of missing out and a wish to belong with the “10,000 households”.',
+  phrases:[
+   {t:'LAST CHANCE!',effect:'Capital letters and “last chance” create a sense of emergency.'},
+   {t:'Only 17 Aurora Blenders left',effect:'Scarcity: a small number suggests stock could vanish at any moment.'},
+   {t:'Over 10,000 households already own one',effect:'Social proof: popularity is presented as a reason to buy, with no source for the figure.'},
+   {t:'don’t be the only kitchen without it',effect:'Social pressure: hints that you will be left out or judged if you do not buy.'},
+   {t:'Sale ends at midnight tonight',effect:'A hard deadline limits time to compare prices or reconsider.'}],
+  decoys:['Aurora Blender'],
+  explanation:'The message stacks several pressure cues (deadline, scarcity and popularity). Together they most likely encourage a quick purchase before the reader compares options. Wording alone cannot show the advertiser’s intent, but the likely effect is hurried decision-making.',
+  neutral:'The Aurora Blender is on sale at a reduced price until midnight tonight. 17 units remain at this price. The company says more than 10,000 households own one.',
+  questions:['Is this price really lower than the usual price, and where can I check?','Where does the “10,000 households” figure come from?','Would I still want this if there were no countdown?'],
+  takeaway:'If a message hurries you, slow down. Real bargains survive a five-minute comparison.',
+  flag:{title:'Artificial urgency and scarcity',spot:'Countdowns, “last chance” and “only X left” are designed to cut your thinking time. Ask whether the offer would still exist tomorrow.'} },
+
+{ id:'picshare', format:'Forwarded group-chat message', author:'Forwarded many times', topic:'Child online safety',
+  text:'WARNING to all parents!! A new app called PicShare is putting your kids in danger. Experts are saying it is a disaster waiting to happen. Delete it from every device tonight and forward this to every parent you know!!',
+  audience:'parents', audienceWhy:'Parents and caregivers, who are highly motivated to protect children and likely to forward warnings quickly.',
+  techniques:['fear','urgency','social'], emotions:['worried','pressured'],
+  intended:'Worry and a sense of duty, pushing the reader to act and to forward the message before checking it.',
+  phrases:[
+   {t:'WARNING to all parents!!',effect:'Capitals and double exclamation marks signal alarm before any facts appear.'},
+   {t:'putting your kids in danger',effect:'Threat language aimed at the reader’s children, with no specific danger described.'},
+   {t:'Experts are saying',effect:'Vague attribution: no expert, organization or evidence is named.'},
+   {t:'a disaster waiting to happen',effect:'Loaded, predictive wording that suggests certainty about a future harm.'},
+   {t:'Delete it from every device tonight',effect:'A same-night deadline adds urgency.'},
+   {t:'forward this to every parent you know',effect:'Spreads the message through social obligation rather than evidence.'}],
+  decoys:['PicShare'],
+  explanation:'The message combines a threat to children with a deadline and a request to forward it. The “experts” are unnamed and no incident is described, so the reader cannot check the claim. The likely effect is fear-driven sharing. That does not prove the app is safe or unsafe; it means this message gives no way to tell.',
+  neutral:'A forwarded message says an app called PicShare may put children at risk. It does not name the experts it mentions or describe any specific incident. It asks parents to remove the app and share the message.',
+  questions:['Who are the “experts”, and can I find their statement myself?','Does the message describe a specific, checkable incident?','What does the app’s developer or a child-safety organization say?'],
+  takeaway:'Fear plus “forward this” is a classic mix. Check before you pass it on.',
+  flag:{title:'Fear combined with pressure to forward and vague sourcing',spot:'Ask who said it, what exactly happened, and where you can verify it before you forward a warning.'} },
+
+{ id:'fountain', format:'Local community post', author:'Riverbend Neighbors (group)', topic:'Local government spending',
+  text:'Unbelievable. The council just approved $2 million for a new fountain while hardworking families like ours have waited months for road repairs. They clearly don’t care about us. Share if you’re sick of being ignored!',
+  audience:'local', audienceWhy:'Local residents who feel unheard and who already care about road conditions and council decisions.',
+  techniques:['outrage','social','selective'], emotions:['angry'],
+  intended:'Anger at the council and a sense of belonging to an “us” that is being ignored.',
+  phrases:[
+   {t:'Unbelievable.',effect:'Opens with a reaction instead of a fact, setting an angry tone.'},
+   {t:'hardworking families like ours',effect:'Us-versus-them framing that invites the reader to identify with the author.'},
+   {t:'They clearly don’t care about us.',effect:'A claim about the council’s motives, stated as obvious fact.'},
+   {t:'Share if you’re sick of being ignored!',effect:'Turns sharing into a way to show loyalty to the group.'}],
+  decoys:['approved $2 million for a new fountain','waited months for road repairs'],
+  explanation:'Two facts (a fountain approval and delayed road repairs) are placed side by side, which invites the reader to link them. The post does not say whether the money comes from the same budget. Anger and group identity are the likely intended responses. Some of the underlying frustration may well be legitimate.',
+  neutral:'The council has approved $2 million for a new fountain. The author says residents have waited months for road repairs. The post does not say how the two items are funded.',
+  questions:['Are the fountain and the road repairs paid for from the same budget?','What do council records say about how long repairs have been waiting?','What am I being asked to feel, and what am I being asked to do?'],
+  takeaway:'Two true facts placed side by side can imply a connection that was never shown.',
+  flag:{title:'Outrage framing that links two facts without context',spot:'When two facts are set against each other, ask whether they are really connected: same budget, same decision-makers, same timeframe.'} },
+
+{ id:'reset', format:'Fitness reel caption', author:'@reset30.coach', topic:'Fitness programme advert',
+  text:'Skipped the gym again this week? Then you’re basically choosing to fail. Your future self will never forgive you. Join the 30-Day Reset today.',
+  audience:'wellness', audienceWhy:'People trying to build fitness habits who may already feel guilty about missed workouts.',
+  techniques:['guilt','loaded'], emotions:['pressured','worried'],
+  intended:'Guilt and self-doubt, which are then relieved by joining the programme.',
+  phrases:[
+   {t:'Skipped the gym again this week?',effect:'A question that targets a likely source of guilt.'},
+   {t:'you’re basically choosing to fail',effect:'Loaded wording: a missed workout becomes a character failure.'},
+   {t:'Your future self will never forgive you',effect:'Exaggerated, absolute language that raises the emotional stakes.'},
+   {t:'Join the 30-Day Reset today',effect:'The call to action arrives right after the guilt, with a “today” deadline.'}],
+  decoys:[],
+  explanation:'The caption first creates guilt and then offers a product as the way out. The likely effect is to make the reader feel behind and to link that feeling to signing up. The programme itself may be perfectly good; the caption just gives no information about what it contains.',
+  neutral:'The 30-Day Reset, a fitness programme, is inviting sign-ups. It is aimed at people who have missed workouts recently.',
+  questions:['What does the programme actually include, and what does it cost?','Is one skipped week really “failure”, or is that the advert’s framing?','Would I still be interested without the guilt?'],
+  takeaway:'If a message makes you feel bad first and offers a solution second, notice the order.',
+  flag:{title:'Guilt used to drive a purchase',spot:'Notice when a message makes you feel inadequate and then presents a product as the fix.'} },
+
+{ id:'phonestand', format:'Short-video caption', author:'@studyhacks.daily', topic:'Study tips video',
+  text:'You won’t believe what this student did with a $5 phone stand. Teachers hate it! Watch to the end for the surprising trick.',
+  audience:'students', audienceWhy:'Students looking for study shortcuts, who are curious about “tricks” and receptive to anti-teacher humour.',
+  techniques:['curiosity','loaded'], emotions:['curious'],
+  intended:'Curiosity strong enough to make the reader watch to the end, which increases views.',
+  phrases:[
+   {t:'You won’t believe',effect:'Promises a shock without giving any information.'},
+   {t:'Teachers hate it!',effect:'A loaded, unsupported claim that makes the trick feel rebellious.'},
+   {t:'Watch to the end for the surprising trick',effect:'Withholds the payoff to keep the viewer watching.'}],
+  decoys:['$5 phone stand'],
+  explanation:'This caption is a classic curiosity gap: it teases a surprise but gives no facts. The aim is most likely to earn views rather than to inform. It is low-risk here, but the same pattern is used to pull people toward misleading content.',
+  neutral:'A video shows how one student used a $5 phone stand. The technique is shown at the end of the video.',
+  questions:['Does the caption tell me anything real about the trick?','Is there any evidence that teachers “hate” it?','What does the video want from me: views, follows or purchases?'],
+  takeaway:'A caption that hides the point is selling your attention.',
+  flag:{title:'A curiosity gap that withholds the facts',spot:'Phrases like “you won’t believe” and “wait for it” promise a reveal. Ask what you actually learn, and what the creator gains from your click.'} },
+
+{ id:'workshop', format:'Community notice', author:'Maple Grove Library · Notice', topic:'Library event',
+  text:'The Maple Grove Library will host a free workshop on spotting online scams on Thursday, 6 November, from 2 to 3:30 p.m. Registration is open at the front desk and by phone. Seating is limited to 40 people.',
+  audience:'local', audienceWhy:'Local library users and residents who want practical help with online safety.',
+  techniques:['none'], emotions:['neutral'],
+  intended:'Mostly informational: it states who, what, when and how to register, and does not push an emotional reaction.',
+  phrases:[],
+  decoys:['free workshop','Thursday, 6 November, from 2 to 3:30 p.m.','Seating is limited to 40 people'],
+  explanation:'This notice uses plain, factual wording. “Seating is limited” is a practical detail with a stated number, not an invented deadline. Not every message that mentions a limit is pressuring you. This is an example of low-emotion, informative language.',
+  neutral:'No rewrite is needed. It is already neutral: Maple Grove Library will host a free workshop on spotting online scams on Thursday, 6 November, 2 to 3:30 p.m. Register at the front desk or by phone; seating is limited to 40.',
+  questions:['Can I confirm this with the library directly?','Is anything asked of me other than registering?','Do the date and time fit my schedule?'],
+  takeaway:'Calm, specific, checkable information is a good sign. Not everything is manipulation.',
+  flag:null },
+
+{ id:'vitaglow', format:'Product advert post', author:'@vitaglow.official', topic:'Dietary supplement advert',
+  text:'9 out of 10 users saw results with VitaGlow Gummies! Customer Dana says, “I feel 10 years younger.” Order today and see why everyone is talking. (Based on feedback from 10 users who chose to submit reviews.)',
+  audience:'wellness', audienceWhy:'People interested in health, appearance and wellness products, who may be drawn to quick, easy-sounding results.',
+  techniques:['selective','social'], emotions:['excited','pressured'],
+  intended:'Excitement about easy results, and trust built through numbers, a testimonial and a sense that “everyone” is talking.',
+  phrases:[
+   {t:'9 out of 10 users saw results',effect:'A big-sounding ratio with the tiny sample size left to the fine print.'},
+   {t:'I feel 10 years younger',effect:'A dramatic testimonial that works as emotional proof but cannot be verified.'},
+   {t:'see why everyone is talking',effect:'Social proof: suggests wide popularity without evidence.'},
+   {t:'Order today',effect:'A mild call to act immediately.'}],
+  decoys:['(Based on feedback from 10 users who chose to submit reviews.)'],
+  explanation:'The headline statistic is based on 10 people who chose to submit reviews, which is a small, self-selected group, and this appears only in brackets at the end. That is selective presentation: the striking figure is prominent and the limit is not. The fine print itself is honest; the issue is its placement.',
+  neutral:'In feedback from 10 users who chose to submit reviews, 9 reported seeing results from VitaGlow Gummies. One customer, Dana, said they felt 10 years younger.',
+  questions:['How were the 10 users chosen, and what counts as “results”?','Is Dana an independent customer?','What would independent evidence for this product look like?'],
+  takeaway:'Read the fine print first: a small sample can hide behind a big percentage.',
+  flag:{title:'A striking statistic whose small sample sits in the fine print',spot:'When a percentage is impressive, look for how many people it is based on and how they were chosen.'} },
+
+{ id:'patch', format:'Gaming forum post', author:'u/ArenaVeteran88', topic:'Online game update',
+  text:'Patch 4.2 RUINED Starfall Arena. The devs are lying to you about drop rates and they think you won’t notice. Quit now and show them what happens when real players stand together.',
+  audience:'gamers', audienceWhy:'Active players of the game who feel loyal to the community and invested in how it changes.',
+  techniques:['outrage','loaded','social'], emotions:['angry','pressured'],
+  intended:'Anger at the developers and a feeling that “real players” should join a protest.',
+  phrases:[
+   {t:'RUINED',effect:'A capitalized, absolute verdict presented as fact.'},
+   {t:'The devs are lying to you',effect:'An accusation of deliberate deception with no evidence shown.'},
+   {t:'they think you won’t notice',effect:'Attributes motives to the developers and flatters the reader as perceptive.'},
+   {t:'Quit now',effect:'A call to immediate collective action.'},
+   {t:'real players stand together',effect:'Us-versus-them framing: joining makes you a “real” player.'}],
+  decoys:['Patch 4.2','Starfall Arena'],
+  explanation:'Opinions about the patch and a claim of lying are written as facts, and the reader is invited to join a group. The likely effect is anger and loyalty to the group. Drop rates may genuinely have changed, but the post gives no measurement, so the reader cannot judge.',
+  neutral:'The author says Patch 4.2 made Starfall Arena worse and believes the developers have misstated item drop rates. They are encouraging players to stop playing in protest.',
+  questions:['Has anyone measured the drop rates, and how?','What do the developers’ published numbers say?','Who benefits if I act on this right now?'],
+  takeaway:'An opinion written like a fact still needs evidence.',
+  flag:{title:'An accusation stated as fact, wrapped in us-versus-them framing',spot:'Ask what evidence supports a serious accusation, and whether the post invites you to join a side before you have seen it.'} },
+
+{ id:'route7', format:'Transit service notice', author:'Marlow Valley Transit · Rider notice', topic:'Bus route change',
+  text:'We are sorry to announce that Route 7 will pause for road resurfacing from 3 to 10 November. We know this is inconvenient. Route 9 will run every 10 minutes as a detour, and timetables are posted at the depot office.',
+  audience:'commuters', audienceWhy:'Regular bus riders on Route 7 who need to plan alternative journeys.',
+  techniques:['none'], emotions:['neutral','reassured'],
+  intended:'Mainly informational, with a little empathy. It aims to inform riders and soften the inconvenience, not to provoke a reaction.',
+  phrases:[
+   {t:'We are sorry to announce',effect:'Emotional wording, but it is honest empathy and not pressure.',benign:true},
+   {t:'We know this is inconvenient',effect:'Acknowledges the rider’s situation. It is followed by concrete alternatives.',benign:true}],
+  decoys:['Route 9 will run every 10 minutes as a detour'],
+  explanation:'This notice does contain emotional words, but they are transparent and paired with specific facts: dates, the reason and the detour. Emotional language is not automatically manipulative. The key question is whether the claims are supported and whether the message pushes you toward a hasty reaction. Here it does not.',
+  neutral:'Route 7 will be paused for road resurfacing from 3 to 10 November. Route 9 will run every 10 minutes as a detour. Timetables are posted at the depot office.',
+  questions:['Can I confirm the dates on the operator’s official channels?','Do the detour details work for my journey?','Is anything here asking me to act urgently? (Here, no.)'],
+  takeaway:'Emotion is not the same as manipulation. Look at whether the facts are specific and checkable.',
+  flag:null }
+];
+/*DATA_END*/
+
+/* ================================================================
+   LESSON TEXT, METRIC META, STAGES
+   ================================================================ */
+const LESSONS={
+ h:{title:'Lesson 1 · Headline Detective',
+  what:'A headline is a short promise about a story. Its job is to grab attention, so it may stretch the facts: exaggerate, leave out context, hint at cause and effect without evidence, or claim more than the article actually says.',
+  why:'Many people share links after reading only the headline. A stretched headline can travel much further than the careful article behind it, and shape what friends, family and colleagues believe.',
+  example:'A friend drops a bold headline in your group chat with “everyone needs to see this”. Before anyone opens the article, the chat is already arguing about the headline.',
+  look:['Which words make big claims (all, everyone, proves, doubles)?','Which numbers or comparisons are used, and who measured them?','Does the article state the claim with the same limits as the headline?']},
+ e:{title:'Lesson 2 · Emotion Detector',
+  what:'Media messages often use emotion to get attention: fear, anger, urgency, belonging, guilt or curiosity. Emotional language is not automatically dishonest. What matters is how it steers your reading and whether the claims behind it are supported.',
+  why:'Strong feelings make us react quickly: tapping, buying or forwarding before checking anything. Messages designed to spark that reaction can spread faster than calm, accurate ones.',
+  example:'A reel caption says “only a few left, everyone already has one!”, or a forwarded chat message says “share with every parent you know”. Both ask you to act on a feeling rather than on evidence.',
+  look:['Notice your own reaction first: what do you feel, and which words triggered it?','Look for pressure: deadlines, “everyone”, or “you must”.','Ask what the message wants you to do, and what facts back it up.']}
+};
+const METRICS=[
+ {key:'headline',name:'Headline Accuracy',weight:.30,desc:'How carefully you check whether a headline is supported by its article.'},
+ {key:'source',name:'Source Reliability',weight:.25,desc:'How well you consider evidence, attribution, verification and transparency.'},
+ {key:'emotion',name:'Emotional Manipulation',weight:.25,desc:'How well you recognize language that provokes or exploits emotions.'},
+ {key:'audience',name:'Audience Targeting',weight:.20,desc:'How well you identify who a message is trying to influence.'}
+];
+const STAGES=[
+ {id:'welcome',label:'Welcome'},
+ {id:'learn1',label:'Headline Detective · Learn'},{id:'h1',label:'Headline Detective · Observe'},
+ {id:'h2',label:'Headline Detective · Think & respond'},{id:'h3',label:'Headline Detective · Reveal & reflect'},
+ {id:'learn2',label:'Emotion Detector · Learn'},{id:'e1',label:'Emotion Detector · Observe'},
+ {id:'e2',label:'Emotion Detector · Think & respond'},{id:'e3',label:'Emotion Detector · Reveal & reflect'},
+ {id:'final',label:'Final dashboard'}
+];
+const PHASES=['Learn','Observe','Think','Respond','Reveal','Reflect'];
+const PHASE_ACTIVE={learn1:[0],h1:[1],h2:[2,3],h3:[4,5],learn2:[0],e1:[1],e2:[2,3],e3:[4,5]};
+const EVIDENCE_TYPES=['unsupported','context','qualification','causation'];
+
+/* ================================================================
+   STATE
+   ================================================================ */
+const lastIds={h:null,e:null}; // survives replay so scenarios don't repeat back-to-back
+function freshState(){
+  return {
+    stage:'welcome', complete:false,
+    metrics:{headline:50,source:50,emotion:50,audience:50},
+    used:{h:[],e:[]},
+    h:{id:null,click:null,clickWhy:'',signs:new Set(),match:null,why:'',revealed:false,scored:false,reflect:'',reflectScored:false,result:null},
+    e:{id:null,emotions:new Set(),phrases:new Set(),why:'',techs:new Set(),aud:null,audOptions:[],chipOrder:[],revealed:false,scored:false,reflect:'',reflectScored:false,result:null}
+  };
+}
+let S=freshState();
+
+/* ================================================================
+   HELPERS
+   ================================================================ */
+const $=(s,r=document)=>r.querySelector(s);
+const clamp=n=>Math.max(0,Math.min(100,Math.round(Number.isFinite(n)?n:0)));
+const shuffle=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;};
+function h(tag,attrs,...kids){
+  const el=document.createElement(tag);
+  if(attrs)for(const [k,v] of Object.entries(attrs)){
+    if(v==null||v===false)continue;
+    if(k==='class')el.className=v;
+    else if(k==='text')el.textContent=v;
+    else if(k==='value')el.value=v;
+    else if(k==='checked')el.checked=!!v;
+    else if(k.startsWith('on')&&typeof v==='function')el.addEventListener(k.slice(2),v);
+    else el.setAttribute(k,v===true?'':String(v));
+  }
+  for(const kid of kids.flat(Infinity)){
+    if(kid==null||kid===false)continue;
+    el.append(kid.nodeType?kid:document.createTextNode(String(kid)));
+  }
+  return el;
+}
+const announce=msg=>{const l=$('#live');l.textContent='';setTimeout(()=>{l.textContent=msg;},30);};
+const levelOf=v=>v<60?'Developing':v<80?'Good':'Strong';
+const overall=m=>clamp(.30*m.headline+.25*m.source+.25*m.emotion+.20*m.audience);
+const HSC=()=>HS.find(x=>x.id===S.h.id);
+const ESC=()=>ES.find(x=>x.id===S.e.id);
+const listText=a=>a.length?a.join('; '):'none';
+
+/* Accuracy of a headline, derived from weighted claims */
+function headlineAccuracy(sc){
+  const tw=sc.claims.reduce((a,c)=>a+c.w,0);
+  const ts=sc.claims.reduce((a,c)=>a+c.w*c.s,0);
+  return clamp(100*ts/tw);
+}
+function accLabel(v){return v>=85?'Well supported by the article':v>=60?'Partly supported':'Poorly supported';}
+
+function pickScenario(kind){
+  const list=kind==='h'?HS:ES;
+  let pool=list.filter(x=>!S.used[kind].includes(x.id)&&x.id!==lastIds[kind]);
+  if(!pool.length)pool=list.filter(x=>x.id!==lastIds[kind]);
+  const sc=pool[Math.floor(Math.random()*pool.length)];
+  S.used[kind].push(sc.id); lastIds[kind]=sc.id; return sc;
+}
+function startSession(stage){
+  S=freshState();
+  const hs=pickScenario('h'), es=pickScenario('e');
+  S.h.id=hs.id; S.e.id=es.id;
+  const distract=shuffle(Object.keys(AUD).filter(k=>k!==es.audience)).slice(0,3);
+  S.e.audOptions=shuffle([es.audience,...distract]);
+  S.e.chipOrder=shuffle([...es.phrases.map(p=>p.t),...es.decoys]);
+  S.stage=stage; updateMetrics(); render();
+}
+function go(stage){S.stage=stage;render();}
+
+/* ================================================================
+   LIVE METRICS
+   ================================================================ */
+function buildMetrics(){
+  const wrap=$('#metrics'); wrap.replaceChildren();
+  METRICS.forEach(m=>{
+    wrap.append(h('article',{class:'metric',id:'m-'+m.key,title:m.desc},
+      h('div',{class:'metric-top'},h('h3',{text:m.name}),h('span',{class:'metric-val',id:'mv-'+m.key})),
+      h('div',{class:'bar',role:'progressbar','aria-valuemin':0,'aria-valuemax':100,id:'mb-'+m.key},h('span',{class:'fill'})),
+      h('div',{class:'metric-level',id:'ml-'+m.key}),
+      h('p',{class:'metric-desc',text:m.desc})));
+  });
+}
+function updateMetrics(pulseKeys){
+  METRICS.forEach(m=>{
+    const v=clamp(S.metrics[m.key]);
+    $('#mv-'+m.key).textContent=v+'%';
+    $('#ml-'+m.key).textContent=levelOf(v);
+    const bar=$('#mb-'+m.key);
+    bar.setAttribute('aria-valuenow',v);
+    bar.setAttribute('aria-label',m.name+': '+v+' percent, '+levelOf(v));
+    bar.firstElementChild.style.width=v+'%';
+    if(pulseKeys&&pulseKeys.includes(m.key)){const c=$('#m-'+m.key);c.classList.remove('pulse');void c.offsetWidth;c.classList.add('pulse');}
+  });
+  $('#scoreVal').textContent=overall(S.metrics);
+}
+/* Blend the old value with a scenario component score (each response applied once) */
+function applyMetric(key,comp){
+  const from=S.metrics[key]; const to=clamp(.25*from+.75*clamp(comp));
+  S.metrics[key]=to; return {key,from,to};
+}
+function bumpMetric(key,pts){
+  const from=S.metrics[key]; const to=clamp(from+pts); S.metrics[key]=to; return {key,from,to};
+}
+const metricName=k=>METRICS.find(m=>m.key===k).name;
+
+/* ================================================================
+   SHARED UI PIECES
+   ================================================================ */
+function phaseStrip(stage){
+  const active=PHASE_ACTIVE[stage]||[]; const first=Math.min(...active);
+  return h('ol',{class:'phases','aria-label':'Learning flow'},PHASES.map((p,i)=>
+    h('li',{class:i<first?'done':active.includes(i)?'active':'','aria-current':active.includes(i)?'step':null,text:p})));
+}
+const fictTag=()=>h('span',{class:'tag fict',text:'FICTIONAL EXAMPLE'});
+function heading(text,sub,stage){
+  return h('div',{},phaseStrip(stage),h('p',{class:'eyebrow',text:sub}),h('h2',{tabindex:'-1',text}));
+}
+function btn(label,opts={}){
+  return h('button',{type:'button',class:'btn '+(opts.cls||''),disabled:opts.disabled,onclick:opts.onclick,id:opts.id},label);
+}
+/* Accessible choice group built from native radios/checkboxes */
+function choiceGroup({legend,name,type,items,isChecked,onChange,layout}){
+  const inputs=[];
+  const wrap=h('div',{class:'choices '+(layout||'')});
+  items.forEach((it,i)=>{
+    const input=h('input',{type,name,value:it.value,id:name+'-'+i,checked:isChecked(it.value)});
+    inputs.push(input);
+    input.addEventListener('change',()=>onChange(it.value,input.checked,inputs));
+    wrap.append(h('label',{class:'choice '+(type==='radio'?'radio':''),for:name+'-'+i},input,
+      h('span',{class:'mark','aria-hidden':'true',text:'✓'}),
+      h('span',{class:'body'},h('strong',{text:it.label}),it.desc?h('span',{text:it.desc}):null)));
+  });
+  return h('fieldset',{},h('legend',{text:legend}),wrap);
+}
+function exclusive(set,value,checked,inputs,excl){
+  if(checked){
+    if(excl.includes(value)){set.clear();set.add(value);inputs.forEach(i=>{if(i.value!==value)i.checked=false;});}
+    else{excl.forEach(x=>{set.delete(x);const i=inputs.find(i=>i.value===x);if(i)i.checked=false;});set.add(value);}
+  }else set.delete(value);
+}
+function textField(id,label,value,placeholder,cb){
+  const ta=h('textarea',{id,rows:3,maxlength:500,placeholder,value,oninput:e=>cb(e.target.value)});
+  return h('div',{},h('label',{class:'field',for:id,text:label}),ta);
+}
+function renderHighlighted(text,items,keyName){
+  const spans=[];
+  items.forEach((it,i)=>{const idx=text.indexOf(it[keyName]);if(idx>=0)spans.push({s:idx,e:idx+it[keyName].length,i,it});});
+  spans.sort((a,b)=>a.s-b.s);
+  const out=[];let pos=0;
+  spans.forEach(sp=>{
+    if(sp.s<pos)return;
+    if(sp.s>pos)out.push(text.slice(pos,sp.s));
+    out.push(h('mark',{class:'hl '+sp.it.cls},text.slice(sp.s,sp.e),h('sup',{class:'hl-n'},'['+(sp.i+1)+(sp.it.sym?' '+sp.it.sym:'')+']')));
+    pos=sp.e;
+  });
+  if(pos<text.length)out.push(text.slice(pos));
+  return out;
+}
+const supportClass=s=>s>=0.85?'ok':s>=0.35?'part':'bad';
+const supportSym=s=>s>=0.85?'✓':s>=0.35?'◐':'✕';
+const supportText=s=>s>=0.85?'✓ Supported by the article':s>=0.35?'◐ Only partly supported':'✕ Not supported / contradicted';
+
+function newsCard(sc,withArticle){
+  return h('article',{class:'news'},
+    h('div',{},fictTag()),
+    h('p',{class:'byline',text:sc.topic+' · '+sc.byline}),
+    h('h3',{text:sc.headline}),
+    withArticle?h('div',{class:'article'},sc.article.map(p=>h('p',{text:p}))):null);
+}
+function postCard(sc){
+  return h('article',{class:'post'},
+    h('div',{},fictTag()),
+    h('div',{class:'post-head',style:'margin-top:.6rem'},h('div',{class:'avatar','aria-hidden':'true',text:sc.author.replace(/[^A-Za-z]/g,'').charAt(0).toUpperCase()}),
+      h('div',{},h('strong',{text:sc.author}),h('small',{text:sc.format+' · '+sc.topic}))),
+    h('p',{class:'post-text',text:sc.text}));
+}
+
+/* ================================================================
+   SCORING
+   ================================================================ */
+function scoreHeadline(sc,st){
+  const rank={closely:0,partially:1,misrepresents:2};
+  const dist=Math.abs(rank[st.match]-rank[sc.match]);
+  const matchPts=[100,55,10][dist];
+  const target=new Set(sc.warnings);
+  let sel=new Set(st.signs);
+  if(!sel.size&&target.has('none'))sel=new Set(['none']); // ticking nothing on a fair headline = "no mismatch"
+  const inter=[...sel].filter(x=>target.has(x)).length;
+  const union=new Set([...sel,...target]).size;
+  const signPts=union?100*inter/union:100;
+  const comp=.55*matchPts+.45*signPts;
+  const R=sc.warnings.filter(w=>EVIDENCE_TYPES.includes(w));
+  let srcPts;
+  if(!R.length)srcPts=[...sel].some(x=>EVIDENCE_TYPES.includes(x))?55:95;
+  else srcPts=85*([...sel].filter(x=>R.includes(x)).length/R.length)+(sel.has('none')?0:15);
+  if(st.why.trim())srcPts+=8;
+  return {matchPts,signPts,comp,srcPts:Math.min(100,srcPts),sel};
+}
+function scoreEmotion(sc,st){
+  const target=new Set(sc.techniques);
+  const sel=[...st.techs].filter(x=>x!=='unsure');
+  let techPts;
+  if(!sel.length)techPts=30;
+  else{const inter=sel.filter(x=>target.has(x)).length;const uni=new Set([...sel,...target]).size;techPts=100*inter/uni;}
+  const P=sc.phrases.filter(p=>!p.benign).map(p=>p.t); const ps=[...st.phrases];
+  let phrasePts;
+  if(!P.length)phrasePts=ps.length?70:100;
+  else if(!ps.length)phrasePts=25;
+  else{const hit=ps.filter(x=>P.includes(x)).length;phrasePts=100*(.7*hit/P.length+.3*hit/ps.length);}
+  const comp=.65*techPts+.35*phrasePts;
+  const audPts=st.aud===sc.audience?100:st.aud==='unsure'?45:20;
+  return {techPts,phrasePts,comp,audPts};
+}
+function revealHeadline(){
+  const st=S.h; if(st.scored||!st.match)return;
+  st.scored=true; st.revealed=true;
+  const sc=HSC(); const r=scoreHeadline(sc,st);
+  r.accuracy=headlineAccuracy(sc);
+  r.deltas=[applyMetric('headline',r.comp),applyMetric('source',r.srcPts)];
+  st.result=r; updateMetrics(['headline','source']);
+  S.stage='h3'; render();
+  announce('Analysis revealed. Headline Accuracy is now '+S.metrics.headline+' percent and Source Reliability '+S.metrics.source+' percent.');
+}
+function revealEmotion(){
+  const st=S.e; if(st.scored||!st.techs.size||!st.aud)return;
+  st.scored=true; st.revealed=true;
+  const sc=ESC(); const r=scoreEmotion(sc,st);
+  r.deltas=[applyMetric('emotion',r.comp),applyMetric('audience',r.audPts)];
+  st.result=r; updateMetrics(['emotion','audience']);
+  S.stage='e3'; render();
+  announce('Analysis revealed. Emotional Manipulation is now '+S.metrics.emotion+' percent and Audience Targeting '+S.metrics.audience+' percent.');
+}
+
+/* ================================================================
+   VIEWS
+   ================================================================ */
+const views={};
+
+views.welcome=v=>{
+  v.append(h('section',{class:'card hero','aria-labelledby':'wt'},
+    h('p',{class:'eyebrow',text:'Media literacy · learn by exploring'}),
+    h('h1',{id:'wt',tabindex:'-1',text:'Media Integrity Analyzer'}),
+    h('p',{class:'lede',text:'Learn to look beyond the headline, recognize emotional manipulation, and question what you see online.'}),
+    h('p',{text:'This is not a quiz on what you already know. You will examine fictional examples, form your own judgment, and then reveal an analysis that explains the reasoning.'}),
+    h('h3',{text:'What you will practice'}),
+    h('ul',{class:'goals'},
+      h('li',{'data-n':'1',text:'Evaluate headlines critically.'}),
+      h('li',{'data-n':'2',text:'Recognize emotionally manipulative language.'}),
+      h('li',{'data-n':'3',text:'Build everyday media literacy habits.'})),
+    h('div',{class:'meta-row'},h('span',{class:'tag',text:'⏱ About 5–7 minutes'}),h('span',{class:'tag fict',text:'All scenarios are FICTIONAL and generated locally'})),
+    btn('Start Learning',{cls:'primary big',onclick:()=>startSession('learn1'),id:'startBtn'}),
+    h('p',{class:'note',style:'margin-top:1rem',text:'Everything runs in your browser, offline. No real news, people or organizations are used.'})));
+};
+
+function lessonView(kind,next,btnLabel,stage){
+  return v=>{
+    const L=LESSONS[kind];
+    v.append(h('div',{},phaseStrip(stage),h('p',{class:'eyebrow',text:'Before you begin'}),h('h2',{tabindex:'-1',text:L.title})));
+    v.append(h('section',{class:'card'},
+      h('div',{class:'lesson-grid'},
+        h('div',{class:'item'},h('h4',{text:'What it is'}),h('p',{text:L.what})),
+        h('div',{class:'item'},h('h4',{text:'Why it matters'}),h('p',{text:L.why})),
+        h('div',{class:'item'},h('h4',{text:'Everyday example'}),h('p',{text:L.example})),
+        h('div',{class:'item'},h('h4',{text:'What to look for'}),h('ul',{},L.look.map(t=>h('li',{text:t}))))),
+      h('div',{class:'actions'},btn(btnLabel,{cls:'primary',onclick:()=>go(next)}),fictTag())));
+  };
+}
+views.learn1=lessonView('h','h1','Start Headline Detective →','learn1');
+views.learn2=lessonView('e','e1','Start Emotion Detector →','learn2');
+
+/* ---------- Challenge 1 ---------- */
+views.h1=v=>{
+  const sc=HSC(), st=S.h;
+  v.append(heading('Would you click this?','Challenge 1 · Headline Detective','h1'));
+  v.append(newsCard(sc,false));
+  const next=btn('Read the article →',{cls:'primary',disabled:!st.click,onclick:()=>go('h2')});
+  v.append(h('section',{class:'card'},
+    choiceGroup({legend:'If this appeared in your feed, would you click it?',name:'click',type:'radio',layout:'row',
+      items:[{value:'yes',label:'Yes'},{value:'maybe',label:'Maybe'},{value:'no',label:'No'}],
+      isChecked:x=>st.click===x,
+      onChange:(val)=>{st.click=val;next.disabled=false;hint.textContent='';}}),
+    textField('clickWhy','What made this headline catch your attention, or made you hesitate? (optional)',st.clickWhy,'In your own words — no special vocabulary needed.',t=>st.clickWhy=t),
+    h('div',{class:'actions'},next),
+  ));
+  const hint=h('p',{class:'hint',text:st.click?'':'Choose Yes, Maybe or No to continue.'});
+  v.lastChild.append(hint);
+};
+
+views.h2=v=>{
+  const sc=HSC(), st=S.h;
+  v.append(heading('Read the article','Challenge 1 · Headline Detective','h2'));
+  v.append(newsCard(sc,true));
+  const reveal=btn('Reveal Analysis',{cls:'primary',disabled:!st.match,onclick:e=>{e.currentTarget.disabled=true;revealHeadline();}});
+  const warnItems=Object.keys(WARN).map(k=>({value:k,label:WARN[k]}));
+  const chk=h('details',{open:true},
+    h('summary',{text:'Checklist: possible warning signs (select any you notice)'}),
+    choiceGroup({legend:'Which warning signs, if any, do you notice when you compare headline and article?',name:'sign',type:'checkbox',layout:'grid',
+      items:warnItems,isChecked:x=>st.signs.has(x),
+      onChange:(val,c,inputs)=>exclusive(st.signs,val,c,inputs,['none'])}));
+  v.append(h('section',{class:'card'},chk,
+    choiceGroup({legend:'How well does the headline match the article?',name:'match',type:'radio',layout:'row',
+      items:[{value:'closely',label:MATCH.closely},{value:'partially',label:MATCH.partially},{value:'misrepresents',label:MATCH.misrepresents}],
+      isChecked:x=>st.match===x,
+      onChange:val=>{st.match=val;reveal.disabled=false;hint.textContent='';}}),
+    textField('matchWhy','Explain your thinking (optional)',st.why,'Which words or numbers did you compare?',t=>st.why=t),
+    h('div',{class:'actions'},reveal)));
+  const hint=h('p',{class:'hint',text:st.match?'':'Not sure? Pick the closest option. You will see the full reasoning next.'});
+  v.lastChild.append(hint);
+};
+
+function compareList(label,sel,target,names){
+  const matched=sel.filter(x=>target.includes(x)), extra=sel.filter(x=>!target.includes(x)), missed=target.filter(x=>!sel.includes(x));
+  const nm=x=>names[x]||x;
+  return h('ul',{class:'compare'},
+    h('li',{text:'✓ Matched the analysis: '+listText(matched.map(nm))}),
+    h('li',{text:'＋ You also flagged (not in this analysis): '+listText(extra.map(nm))}),
+    h('li',{text:'○ In the analysis but not flagged: '+listText(missed.map(nm))}));
+}
+function metricDeltas(deltas){
+  return h('div',{class:'delta','aria-label':'How your metrics moved'},deltas.map(d=>
+    h('div',{text:metricName(d.key)+': '+d.from+'% → '+d.to+'% ('+(d.to>=d.from?'+':'')+(d.to-d.from)+')'})));
+}
+
+function headlineReveal(v,ro){
+  const sc=HSC(), st=S.h, r=st.result;
+  v.append(heading(ro?'Review: Headline Detective':'Analysis: Headline Detective','Challenge 1 · Headline Detective',ro?null:'h3'));
+  const items=sc.claims.map(c=>({phrase:c.phrase,cls:supportClass(c.s),sym:supportSym(c.s)}));
+  const card=h('section',{class:'card analysis',role:'region','aria-label':'Headline analysis'});
+  card.append(
+    h('h3',{text:'1 · Headline Accuracy Score (for this example)'}),
+    h('div',{class:'score-big'},h('span',{class:'num',text:r.accuracy+'%'}),
+      h('div',{},h('strong',{text:accLabel(r.accuracy)}),
+        h('div',{class:'bar',role:'progressbar','aria-label':'Headline accuracy '+r.accuracy+' percent','aria-valuemin':0,'aria-valuemax':100,'aria-valuenow':r.accuracy,style:'width:240px;max-width:60vw'},h('span',{class:'fill',style:'width:'+r.accuracy+'%'})),
+        h('p',{class:'hint',text:'Calculated from the weight and support of each claim in the headline. This is the headline’s score, not yours.'}))),
+    h('h3',{text:'2 · Highlighted headline',style:'margin-top:1.2rem'}),
+    h('p',{class:'headline-hl'},renderHighlighted(sc.headline,items,'phrase')),
+    h('div',{class:'legend'},h('span',{text:'✓ supported (dotted underline)'}),h('span',{text:'◐ partly supported (dashed)'}),h('span',{text:'✕ not supported (wavy)'})),
+    h('h3',{text:'3 · Article evidence'}));
+  sc.claims.forEach((c,i)=>{
+    card.append(h('details',{class:'claim '+supportClass(c.s),open:true},
+      h('summary',{text:'['+(i+1)+'] “'+c.phrase+'”  —  '+supportText(c.s)}),
+      c.ev.map(e=>h('blockquote',{text:'“'+e+'”'})),
+      h('p',{text:c.why})));
+  });
+  card.append(
+    h('h3',{text:'4 · Mismatch explanation',style:'margin-top:1rem'}),
+    h('p',{text:sc.mismatch}),
+    sc.accurateNote?h('p',{class:'takeaway'},h('small',{text:'Worth remembering'}),sc.accurateNote):null,
+    h('h3',{text:'5 · Fair rewritten headline'}),
+    h('div',{class:'rewrite'},h('strong',{class:'t',text:sc.fairRewrite})),
+    h('h3',{text:'6 · Why the rewrite is better',style:'margin-top:1rem'}),
+    h('p',{text:sc.whyBetter}),
+    h('div',{class:'takeaway'},h('small',{text:'7 · Key takeaway'}),sc.takeaway),
+    h('details',{},h('summary',{text:'Re-read the full article'}),sc.article.map(p=>h('p',{text:p}))));
+  v.append(card);
+  const clickName={yes:'Yes',maybe:'Maybe',no:'No'};
+  v.append(h('section',{class:'card'},
+    h('h3',{text:'How your judgment compared'}),
+    h('p',{text:'You said you would click: '+(clickName[st.click]||'—')+'. (Curiosity is normal and is not scored.) You judged the match as “'+MATCH[st.match]+'”; the analysis says “'+MATCH[sc.match]+'”.'}),
+    compareList('signs',[...r.sel],sc.warnings,WARN),
+    ro?null:h('p',{class:'hint',text:'Scoring: Headline Accuracy = 55% how close your match judgment was + 45% overlap between your warning signs and the analysis. Source Reliability looks at whether you noticed evidence-related warning signs (unsupported claims, missing context or qualifications, causation), plus a small bonus for explaining your thinking. Each result is blended with your previous value, applied once.'}),
+    metricDeltas(r.deltas),
+    st.clickWhy.trim()||st.why.trim()?h('div',{},h('h4',{text:'In your own words'}),st.clickWhy.trim()?h('p',{class:'own',text:st.clickWhy}):null,st.why.trim()?h('p',{class:'own',text:st.why}):null):null));
+}
+views.h3=v=>{
+  headlineReveal(v,false);
+  const st=S.h;
+  v.append(h('section',{class:'card'},
+    textField('hReflect','What is one thing you would check before sharing a headline like this? (optional)',st.reflect,'For example: who is quoted, what the numbers are, what the article leaves out…',t=>st.reflect=t),
+    h('div',{class:'actions'},btn('Continue to Emotion Detector',{cls:'primary',onclick:()=>{
+      if(!st.reflectScored&&st.reflect.trim()){st.reflectScored=true;st.result.deltas.push(bumpMetric('source',4));updateMetrics(['source']);}
+      go('learn2');}}))));
+};
+views.reviewH=v=>{
+  headlineReveal(v,true);
+  v.append(h('div',{class:'actions'},btn('← Back to Final Dashboard',{cls:'primary',onclick:()=>go('final')})));
+};
+
+/* ---------- Challenge 2 ---------- */
+views.e1=v=>{
+  const sc=ESC(), st=S.e;
+  v.append(heading('Observe your reaction','Challenge 2 · Emotion Detector','e1'));
+  v.append(postCard(sc));
+  const next=btn('Next: identify the technique →',{cls:'primary',disabled:!st.emotions.size,onclick:()=>go('e2')});
+  const hint=h('p',{class:'hint',text:st.emotions.size?'':'Select at least one feeling (“Neutral” is a valid answer).'});
+  v.append(h('section',{class:'card'},
+    choiceGroup({legend:'How does this message make you feel? (select all that apply)',name:'emo',type:'checkbox',layout:'grid',
+      items:Object.keys(EMO).map(k=>({value:k,label:EMO[k]})),isChecked:x=>st.emotions.has(x),
+      onChange:(val,c)=>{c?st.emotions.add(val):st.emotions.delete(val);next.disabled=!st.emotions.size;hint.textContent=st.emotions.size?'':'Select at least one feeling (“Neutral” is a valid answer).';}}),
+    choiceGroup({legend:'Which words or phrases influenced your reaction? (optional)',name:'chip',type:'checkbox',layout:'chips',
+      items:st.chipOrder.map(t=>({value:t,label:t})),isChecked:x=>st.phrases.has(x),
+      onChange:(val,c)=>{c?st.phrases.add(val):st.phrases.delete(val);}}),
+    textField('eWhy','Anything else you noticed? (optional)',st.why,'A short reflection in your own words.',t=>st.why=t),
+    h('p',{class:'note',text:'There are no wrong feelings here. Your reaction is never scored.'}),
+    h('div',{class:'actions'},next),hint));
+};
+
+views.e2=v=>{
+  const sc=ESC(), st=S.e;
+  v.append(heading('Identify the technique','Challenge 2 · Emotion Detector','e2'));
+  v.append(postCard(sc));
+  const reveal=btn('Reveal Analysis',{cls:'primary',disabled:!(st.techs.size&&st.aud),onclick:e=>{e.currentTarget.disabled=true;revealEmotion();}});
+  const sync=()=>{reveal.disabled=!(st.techs.size&&st.aud);};
+  const techKeys=['fear','urgency','outrage','social','guilt','loaded','selective','curiosity','none','unsure'];
+  v.append(h('section',{class:'card'},
+    choiceGroup({legend:'Which techniques, if any, do you think this message uses? (select one or more)',name:'tech',type:'checkbox',layout:'grid',
+      items:techKeys.map(k=>({value:k,label:TECH[k].label,desc:TECH[k].desc})),isChecked:x=>st.techs.has(x),
+      onChange:(val,c,inputs)=>{exclusive(st.techs,val,c,inputs,['none','unsure']);sync();}}),
+    choiceGroup({legend:'Who do you think this message is trying to reach?',name:'aud',type:'radio',layout:'grid',
+      items:[...st.audOptions.map(k=>({value:k,label:AUD[k]})),{value:'unsure',label:'Not sure yet'}],isChecked:x=>st.aud===x,
+      onChange:val=>{st.aud=val;sync();}}),
+    h('p',{class:'hint',text:'It is fine to choose “Unsure yet”. You will see the reasoning next.'}),
+    h('div',{class:'actions'},reveal)));
+};
+
+function emotionReveal(v,ro){
+  const sc=ESC(), st=S.e, r=st.result;
+  v.append(heading(ro?'Review: Emotion Detector':'Analysis: Emotion Detector','Challenge 2 · Emotion Detector',ro?null:'e3'));
+  const items=sc.phrases.map(p=>({t:p.t,cls:p.benign?'ok':'bad'}));
+  const card=h('section',{class:'card analysis',role:'region','aria-label':'Emotion analysis'});
+  card.append(
+    h('h3',{text:'The message'}),
+    h('div',{class:'post'},h('div',{},fictTag()),h('p',{class:'post-text',style:'margin-top:.6rem'},renderHighlighted(sc.text,items,'t'))),
+    h('div',{class:'legend'},h('span',{text:'Numbered marks show emotionally loaded phrases. Wavy underline: persuasive effect. Dotted underline: emotional but transparent.'})),
+    h('h3',{text:'1 · Likely target audience',style:'margin-top:1rem'}),
+    h('p',{},h('strong',{text:AUD[sc.audience]+'. '}),sc.audienceWhy),
+    h('p',{text:'Your pick: '+(st.aud==='unsure'?'Not sure yet':AUD[st.aud])+(st.aud===sc.audience?' ✓ matches.':'.')}),
+    h('h3',{text:'2 · Likely intended emotional response'}),
+    h('p',{text:sc.intended+' (Likely emotions: '+sc.emotions.map(x=>EMO[x]).join(', ')+'.)'}),
+    h('p',{class:'hint',text:'You reported feeling: '+[...st.emotions].map(x=>EMO[x]).join(', ')+'. Reactions vary from person to person and are not scored.'}),
+    h('h3',{text:'3 · Persuasive technique'}),
+    h('p',{text:sc.techniques[0]==='none'?'No clear manipulative technique. ':'Likely techniques (a likely persuasive effect, not proof of the author’s intent): '}),
+    h('ul',{},sc.techniques.map(t=>h('li',{},h('strong',{text:TECH[t].label+': '}),TECH[t].desc))),
+    h('p',{text:sc.explanation}),
+    h('h3',{text:'4 · Highlighted emotional phrases'}),
+    sc.phrases.length?h('ol',{},sc.phrases.map(p=>h('li',{},h('strong',{text:'“'+p.t+'”'}),' — '+p.effect+(p.benign?' (emotional but transparent)':'')))):h('p',{text:'No emotionally loaded phrases to flag. The wording is informative and specific.'}),
+    h('h3',{text:'5 · Neutral rewrite',style:'margin-top:1rem'}),
+    h('div',{class:'rewrite'},h('p',{style:'margin:0',text:sc.neutral})),
+    h('h3',{text:'6 · Critical-thinking questions',style:'margin-top:1rem'}),
+    h('ul',{},sc.questions.map(q=>h('li',{text:q}))),
+    h('div',{class:'takeaway'},h('small',{text:'7 · Key takeaway'}),sc.takeaway));
+  v.append(card);
+  const P=sc.phrases.filter(p=>!p.benign).map(p=>p.t);
+  v.append(h('section',{class:'card'},
+    h('h3',{text:'How your observations compared'}),
+    compareList('techs',[...st.techs],sc.techniques,Object.fromEntries(Object.keys(TECH).map(k=>[k,TECH[k].label]))),
+    h('p',{text:P.length?'Phrases you picked that match the loaded phrases: '+listText([...st.phrases].filter(x=>P.includes(x))):'This message had no strongly loaded phrases. Phrases you picked: '+listText([...st.phrases])}),
+    ro?null:h('p',{class:'hint',text:'Scoring: Emotional Manipulation = 65% overlap between your techniques and the analysis + 35% phrase spotting. Audience Targeting depends only on your audience guess (matching = full credit, “not sure” = partial credit). Your feelings are never scored. Each result is blended with your previous value and applied once.'}),
+    metricDeltas(r.deltas),
+    st.why.trim()?h('div',{},h('h4',{text:'In your own words'}),h('p',{class:'own',text:st.why})):null));
+}
+views.e3=v=>{
+  emotionReveal(v,false);
+  const st=S.e;
+  v.append(h('section',{class:'card'},
+    textField('eReflect','What would you check before reacting to or sharing a message like this? (optional)',st.reflect,'For example: who wrote it, whether the facts are checkable, what it wants me to do…',t=>st.reflect=t),
+    h('div',{class:'actions'},btn('View Final Dashboard',{cls:'primary',onclick:()=>{
+      if(!st.reflectScored&&st.reflect.trim()){st.reflectScored=true;st.result.deltas.push(bumpMetric('emotion',4));updateMetrics(['emotion']);}
+      S.complete=true;go('final');}}))));
+};
+views.reviewE=v=>{
+  emotionReveal(v,true);
+  v.append(h('div',{class:'actions'},btn('← Back to Final Dashboard',{cls:'primary',onclick:()=>go('final')})));
+};
+
+/* ---------- Final dashboard ---------- */
+function ring(value,label){
+  const NS='http://www.w3.org/2000/svg', C=2*Math.PI*52;
+  const svg=document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox','0 0 120 120');svg.setAttribute('class','ring');svg.setAttribute('role','img');svg.setAttribute('aria-label',label);
+  const mk=(t,a)=>{const e=document.createElementNS(NS,t);Object.entries(a).forEach(([k,x])=>e.setAttribute(k,x));return e;};
+  svg.append(mk('circle',{class:'ring-bg',cx:60,cy:60,r:52}));
+  const fg=mk('circle',{class:'ring-fg',cx:60,cy:60,r:52,'stroke-dasharray':C,'stroke-dashoffset':C});
+  svg.append(fg);
+  const t=mk('text',{x:60,y:66,'text-anchor':'middle','font-size':28});t.textContent=String(value);svg.append(t);
+  const t2=mk('text',{x:60,y:84,'text-anchor':'middle','font-size':9});t2.textContent='out of 100';svg.append(t2);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>fg.setAttribute('stroke-dashoffset',C*(1-value/100))));
+  return svg;
+}
+views.final=v=>{
+  const m=S.metrics, total=overall(m), hs=HSC(), es=ESC(), hr=S.h.result, er=S.e.result;
+  v.append(h('div',{},h('p',{class:'eyebrow',text:'Session complete'}),h('h2',{tabindex:'-1',text:'Your Media Integrity Dashboard'})));
+  v.append(h('section',{class:'card hero'},
+    h('div',{class:'final-top'},ring(total,'Overall learning-session score: '+total+' out of 100'),
+      h('div',{},h('h3',{text:'Overall Media Integrity Score: '+total+'/100 · '+levelOf(total)}),
+        h('p',{text:'A weighted blend of your four live metrics. It is a learning-session score based on the analysis you demonstrated in these fictional examples, not a validated assessment of your real-world media literacy.'}),
+        h('table',{},h('thead',{},h('tr',{},h('th',{text:'Metric'}),h('th',{text:'Value'}),h('th',{text:'Weight'}),h('th',{text:'Contribution'}))),
+          h('tbody',{},METRICS.map(x=>h('tr',{},h('td',{text:x.name}),h('td',{text:m[x.key]+'%'}),h('td',{text:Math.round(x.weight*100)+'%'}),h('td',{text:(m[x.key]*x.weight).toFixed(1)})))),
+          h('tfoot',{},h('tr',{},h('th',{text:'Total (30% + 25% + 25% + 20% = 100%)'}),h('th',{}),h('th',{text:'100%'}),h('th',{text:String(total)})))))))); 
+
+  v.append(h('section',{class:'card'},h('h3',{text:'Metric breakdown'}),
+    h('div',{class:'cols'},METRICS.map(x=>h('div',{class:'claim'},
+      h('strong',{text:x.name+': '+m[x.key]+'% · '+levelOf(m[x.key])}),
+      h('div',{class:'bar',role:'progressbar','aria-label':x.name+' '+m[x.key]+' percent','aria-valuemin':0,'aria-valuemax':100,'aria-valuenow':m[x.key],style:'margin:.4rem 0'},h('span',{class:'fill',style:'width:'+m[x.key]+'%'})),
+      h('p',{class:'hint',text:x.desc}))))));
+
+  /* What you learned — only claims supported by the metrics */
+  const STR={headline:'You compared the headline against the article’s evidence instead of taking it at face value.',
+    source:'You noticed where evidence, qualifications or context were needed.',
+    emotion:'You spotted the persuasion techniques in the message.',
+    audience:'You worked out who the message was written to reach.'};
+  const PRAC={headline:'Keep practicing matching each claim in a headline to a specific sentence in the article.',
+    source:'Keep practicing asking “who says so, and how do they know?” and looking for missing context.',
+    emotion:'Keep practicing separating emotional wording from the facts it carries.',
+    audience:'Keep practicing asking who a message is designed for and why it speaks to them.'};
+  const sorted=METRICS.slice().sort((a,b)=>m[b.key]-m[a.key]);
+  const best=sorted[0], worst=sorted[sorted.length-1];
+  v.append(h('section',{class:'card'},h('h3',{text:'What you learned'}),
+    h('ul',{},
+      h('li',{},h('strong',{text:'Strength: '}),m[best.key]>=60?STR[best.key]+' ('+best.name+', '+m[best.key]+'%)':'No single skill stood out yet, but you completed both challenges and read the reasoning. That is how the habit starts.'),
+      h('li',{},h('strong',{text:'Keep practicing: '}),PRAC[worst.key]+' ('+worst.name+', '+m[worst.key]+'%)'),
+      h('li',{},h('strong',{text:'Headline Detective insight: '}),'On “'+hs.headline+'”, you judged the match as “'+MATCH[S.h.match]+'”; the analysis says “'+MATCH[hs.match]+'” (headline accuracy '+hr.accuracy+'%). '+hs.takeaway),
+      h('li',{},h('strong',{text:'Emotion Detector insight: '}),'For the '+es.format.toLowerCase()+' about '+es.topic.toLowerCase()+', the analysis found '+(es.techniques[0]==='none'?'no clear manipulative technique':'likely '+es.techniques.map(t=>TECH[t].label.toLowerCase()).join(', '))+'. '+es.takeaway)),
+    (S.h.reflect.trim()||S.e.reflect.trim())?h('div',{},h('h4',{text:'Your own reflections'}),
+      S.h.reflect.trim()?h('p',{class:'own',text:'Headlines: '+S.h.reflect}):null,
+      S.e.reflect.trim()?h('p',{class:'own',text:'Emotional messages: '+S.e.reflect}):null):null));
+
+  /* Biggest red flag */
+  const cands=[{flag:hs.flag,risk:100-hr.accuracy},{flag:es.flag,risk:es.flag?50+10*es.techniques.length:0}].sort((a,b)=>b.risk-a.risk);
+  const top=cands[0];
+  v.append(top.flag&&top.risk>=15?h('section',{class:'card flag'},h('h3',{text:'Biggest red flag: '+top.flag.title}),h('p',{text:'How to recognize it in everyday content: '+top.flag.spot})):
+    h('section',{class:'card'},h('h3',{text:'Biggest red flag'}),h('p',{text:'The examples in this session were mostly accurate and informative, so there was no strong red flag. The lesson: not everything is misleading. Check first, then trust.'})));
+
+  const tailoredEmo=es.techniques[0]==='none'?'The message you saw was calm and specific, which is a good sign. Still pause when something feels urgent.':'The message you saw used '+es.techniques.map(t=>TECH[t].label.toLowerCase()).join(' and ')+'. Noticing that feeling is the moment to pause.';
+  v.append(h('section',{class:'card'},h('h3',{text:'Three practical media literacy habits'}),
+    h('div',{class:'habits'},
+      h('div',{class:'habit'},h('span',{class:'n',text:'1'}),h('h4',{text:'Pause before sharing'}),h('p',{text:'Avoid reacting immediately to emotionally charged content. '+tailoredEmo})),
+      h('div',{class:'habit'},h('span',{class:'n',text:'2'}),h('h4',{text:'Check the evidence'}),h('p',{text:'Read beyond the headline and look for the source, attribution and supporting details. In your headline example (“'+hs.topic.toLowerCase()+'”), the evidence was in the article, not the headline.'})),
+      h('div',{class:'habit'},h('span',{class:'n',text:'3'}),h('h4',{text:'Compare and contextualize'}),h('p',{text:'Check whether other reliable sources support the claim and whether important context is missing, such as scope, timeframe, sample size and conditions.'}))),
+    h('p',{class:'note',style:'margin-top:1rem',text:'Reminder: every example here was fictional. This app teaches how to inspect evidence, wording and context. It cannot tell you whether real news is true.'})));
+
+  v.append(h('section',{class:'card'},h('h3',{text:'What next?'}),
+    h('div',{class:'actions'},
+      btn('Replay with New Scenarios',{cls:'primary',onclick:()=>startSession('learn1')}),
+      btn('Review Headline Detective',{onclick:()=>go('reviewH')}),
+      btn('Review Emotion Detector',{onclick:()=>go('reviewE')}),
+      btn('Restart Learning',{onclick:()=>{S=freshState();updateMetrics();render();}}))));
+};
+
+/* ================================================================
+   RENDER + CHROME
+   ================================================================ */
+function render(){
+  const v=h('div',{class:'view'});
+  views[S.stage](v);
+  $('#app').replaceChildren(v);
+  updateChrome();
+  const hd=v.querySelector('h1,h2');
+  window.scrollTo(0,0);
+  if(hd)hd.focus({preventScroll:true});
+}
+function updateChrome(){
+  let idx=STAGES.findIndex(s=>s.id===S.stage); const review=idx<0; if(review)idx=STAGES.length-1;
+  const pct=Math.round(idx/(STAGES.length-1)*100);
+  $('#stageLabel').textContent=review?'Reviewing a challenge':'Step '+(idx+1)+' of '+STAGES.length+' · '+STAGES[idx].label;
+  $('#stageBar').style.width=pct+'%';
+  $('#stageTrack').setAttribute('aria-valuenow',pct);
+  $('#stageTrack').setAttribute('aria-valuetext','Step '+(idx+1)+' of '+STAGES.length);
+  $('#metrics').hidden=S.stage==='welcome';
+  const rb=$('#restartBtn');
+  rb.hidden=S.stage==='welcome';
+  rb.textContent=(S.stage==='final'||review)?'New scenarios':'Restart';
+  $('#scoreVal').textContent=overall(S.metrics);
+}
+function confirmDialog(title,msg,okLabel,cancelLabel,onOk){
+  const d=$('#confirmDlg');
+  $('#confirmTitle').textContent=title;$('#confirmMsg').textContent=msg;
+  $('#confirmOk').textContent=okLabel;$('#confirmCancel').textContent=cancelLabel;
+  $('#confirmOk').onclick=()=>{d.close();onOk();};
+  $('#confirmCancel').onclick=()=>d.close();
+  d.showModal();
+}
+
+/* ================================================================
+   INIT
+   ================================================================ */
+buildMetrics();
+$('#helpBtn').addEventListener('click',()=>$('#helpDlg').showModal());
+$('#helpClose').addEventListener('click',()=>$('#helpDlg').close());
+$('#restartBtn').addEventListener('click',()=>{
+  if(S.stage==='final'||S.stage==='reviewH'||S.stage==='reviewE'){startSession('learn1');return;}
+  confirmDialog('Restart the experience?','Your current responses and metrics will be cleared and you will return to the welcome screen. Your progress cannot be recovered.','Yes, restart','Keep my progress',()=>{S=freshState();updateMetrics();render();announce('Session restarted.');});
+});
+window.addEventListener('beforeunload',e=>{
+  if(S.stage!=='welcome'&&S.stage!=='final'&&S.stage!=='reviewH'&&S.stage!=='reviewE'){e.preventDefault();e.returnValue='';}
+});
+updateMetrics();
+render();
+</script>
+</body>
+</html>
