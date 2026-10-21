@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🧩 Prompt Puzzle — Master AI Prompting Through Play</title>
+<style>
+:root{--bg:#0b1020;--panel:rgba(255,255,255,.06);--panel2:rgba(255,255,255,.1);--line:rgba(255,255,255,.14);--txt:#eef1ff;--mut:#9aa4c7;--a:#7c5cff;--b:#22d3ee;--ok:#34d399;--bad:#fb7185;--warn:#fbbf24}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:var(--txt);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;background:radial-gradient(1200px 600px at 10% -10%,rgba(124,92,255,.35),transparent 60%),radial-gradient(900px 500px at 100% 0%,rgba(34,211,238,.22),transparent 60%),radial-gradient(900px 600px at 50% 120%,rgba(251,113,133,.15),transparent 60%),#0b1020;background-attachment:fixed}
+.wrap{max-width:1120px;margin:0 auto;padding:18px 16px 60px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px;backdrop-filter:blur(14px);box-shadow:0 20px 50px rgba(0,0,0,.35)}
+h1,h2,h3{margin:0 0 8px}
+h1{font-size:clamp(28px,5vw,46px);letter-spacing:-.02em;line-height:1.1}
+h2{font-size:clamp(20px,3vw,28px)}
+h3{font-size:15px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;margin:20px 0 10px}
+p{margin:0 0 10px}
+.grad{background:linear-gradient(90deg,#a78bfa,#22d3ee,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:700;color:#fff;padding:12px 22px;border-radius:14px;background:linear-gradient(135deg,var(--a),#4f8cff);box-shadow:0 8px 24px rgba(124,92,255,.4);transition:transform .15s,box-shadow .15s,filter .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(124,92,255,.55);filter:brightness(1.08)}
+.btn:active{transform:translateY(0) scale(.98)}
+.btn.ghost{background:var(--panel2);box-shadow:none;border:1px solid var(--line)}
+.btn.ghost:hover{background:rgba(255,255,255,.16)}
+.btn.go{background:linear-gradient(135deg,#10b981,#22d3ee);box-shadow:0 8px 24px rgba(16,185,129,.4)}
+.btn[disabled],.btn.dis{opacity:.45;cursor:not-allowed;transform:none}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chip{display:inline-flex;gap:6px;align-items:center;padding:5px 12px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:13px;color:var(--mut)}
+.chip b{color:var(--txt)}
+.hero{text-align:center;padding:40px 22px}
+.hero p.lead{color:var(--mut);max-width:640px;margin:0 auto 20px;font-size:17px}
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:26px 0}
+.mini{padding:18px;border-radius:16px;background:var(--panel);border:1px solid var(--line);text-align:left;transition:transform .2s,border-color .2s}
+.mini:hover{transform:translateY(-4px);border-color:var(--a)}
+.mini .ic{font-size:30px}
+.hud{position:sticky;top:0;z-index:20;margin:0 -4px 14px;padding:10px 12px;border-radius:18px;background:rgba(11,16,32,.82);backdrop-filter:blur(16px);border:1px solid var(--line)}
+.hudtop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.brand{font-weight:800;font-size:17px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:8px}
+.tile{padding:8px 10px;border-radius:12px;background:var(--panel);border:1px solid var(--line);text-align:center}
+.tile small{display:block;color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.tile b{font-size:19px;font-variant-numeric:tabular-nums}
+.tile.big b{font-size:24px;color:#a5f3fc}
+.progress{display:flex;align-items:center;gap:8px;margin:0 0 14px}
+.bar{flex:1;height:8px;border-radius:99px;background:var(--panel2);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--a),var(--b),var(--ok));border-radius:99px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.dots{display:flex;gap:6px}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);transition:all .3s}
+.dot.done{background:var(--ok);border-color:var(--ok)}
+.dot.now{background:var(--b);border-color:var(--b);box-shadow:0 0 0 4px rgba(34,211,238,.25)}
+.shead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+.badge{padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px}
+.t-build{background:rgba(124,92,255,.25);color:#c4b5fd}
+.t-clean{background:rgba(251,191,36,.2);color:#fde68a}
+.t-choose{background:rgba(34,211,238,.2);color:#a5f3fc}
+.meta{color:var(--mut);font-size:14px}
+#sTime.late{color:var(--bad)}
+.ins{color:var(--mut)}
+.desired{padding:14px 16px;border-radius:14px;border:1px dashed rgba(52,211,153,.55);background:rgba(52,211,153,.08);margin:12px 0}
+.desired b{color:#6ee7b7}
+.desired p{margin:4px 0 0}
+.slots{display:grid;gap:10px}
+.slot{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:stretch;border-radius:14px;border:2px dashed var(--line);padding:8px;transition:border-color .2s,background .2s,transform .2s}
+.slot.over{border-color:var(--b);background:rgba(34,211,238,.1);transform:scale(1.01)}
+.slot.filled{border-style:solid;border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.07)}
+.slot.hint{animation:glow 1s ease-in-out infinite}
+.slot.shake{animation:shake .45s;border-color:var(--bad)}
+.slabel{display:flex;flex-direction:column;justify-content:center;font-weight:800;padding:4px 8px;border-left:4px solid var(--c,#999)}
+.slabel small{font-weight:500;color:var(--mut);font-size:12px}
+.sbody{display:flex;align-items:center;min-height:46px;color:var(--mut);font-size:14px}
+.pool{display:flex;flex-wrap:wrap;gap:10px;padding:12px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid var(--line);min-height:60px}
+.block{cursor:grab;user-select:none;padding:10px 14px;border-radius:12px;background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(79,140,255,.25));border:1px solid rgba(165,180,252,.4);font-size:14px;max-width:100%;transition:transform .15s,box-shadow .15s,border-color .15s}
+.block:hover{transform:translateY(-3px) rotate(-.4deg);box-shadow:0 10px 22px rgba(0,0,0,.4);border-color:#fff}
+.block.sel{outline:3px solid var(--b);transform:translateY(-3px)}
+.block.dragging{opacity:.4}
+.block.hint{animation:glow 1s ease-in-out infinite}
+.block.placed{cursor:pointer;width:100%;background:transparent;border:0;padding:6px 10px;color:var(--txt)}
+.block.placed:hover{transform:none;box-shadow:none;background:rgba(255,255,255,.06)}
+.lines{display:grid;gap:8px}
+.cline{padding:12px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--line);cursor:pointer;transition:all .2s;font-size:14.5px}
+.cline:hover{transform:translateX(4px);border-color:var(--warn)}
+.cline.removed{text-decoration:line-through;opacity:.45;background:rgba(251,113,133,.1);border-color:rgba(251,113,133,.5)}
+.cline.hint{animation:glow 1s ease-in-out infinite}
+.preview{padding:14px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid var(--line);font-size:14px;color:#dbe4ff}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.opt{position:relative;padding:20px 18px 16px;border-radius:16px;background:var(--panel);border:2px solid var(--line);cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s;font-size:14.5px}
+.opt:hover{transform:translateY(-5px);border-color:var(--b);box-shadow:0 14px 30px rgba(0,0,0,.4)}
+.opt.elim{opacity:.3;pointer-events:none;filter:grayscale(1)}
+.oletter{position:absolute;top:-12px;left:14px;background:linear-gradient(135deg,var(--a),var(--b));width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:14px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;justify-content:space-between}
+.verdict{padding:16px;border-radius:14px;margin-bottom:14px;font-weight:600}
+.verdict.good{background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.5)}
+.verdict.bad{background:rgba(251,113,133,.12);border:1px solid rgba(251,113,133,.5)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+.cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:10px}
+.cbox{padding:16px;border-radius:16px;border:1px solid var(--line);background:var(--panel)}
+.cbox.weak{border-color:rgba(251,113,133,.5)}
+.cbox.good{border-color:rgba(52,211,153,.55)}
+.cbox.over{border-color:rgba(251,191,36,.5)}
+.ctag{font-weight:800;font-size:13px;margin-bottom:6px}
+.ctag.sub{margin-top:12px;color:var(--mut)}
+.pr{font-size:14px;padding:10px;border-radius:10px;background:rgba(0,0,0,.25)}
+.ao{font-size:14px;color:#cdd6f6}
+.principle{margin-top:14px;padding:16px;border-radius:14px;background:linear-gradient(135deg,rgba(124,92,255,.22),rgba(34,211,238,.14));border:1px solid rgba(165,180,252,.4)}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
+.rtile{padding:16px;border-radius:16px;background:var(--panel);border:1px solid var(--line);text-align:center}
+.rtile small{color:var(--mut);text-transform:uppercase;letter-spacing:.07em;font-size:11px}
+.rtile b{display:block;font-size:26px}
+.rtile.hero2{grid-column:span 2;background:linear-gradient(135deg,rgba(124,92,255,.3),rgba(34,211,238,.2))}
+.rtile.hero2 b{font-size:54px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:16px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;color:var(--mut);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.seg{display:block;padding:8px 10px;margin:6px 0;border-left:4px solid var(--c);background:rgba(0,0,0,.22);border-radius:8px;font-size:14px}
+.seg b{color:var(--c);font-size:12px;text-transform:uppercase;letter-spacing:.06em;display:block}
+ul.fb{padding-left:20px;margin:6px 0}
+ul.fb li{margin:6px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase}
+details{margin-top:12px}
+summary{cursor:pointer;color:var(--b);font-weight:600}
+#toasts{position:fixed;top:14px;right:14px;z-index:100;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:min(360px,calc(100vw - 28px))}
+.toast{padding:12px 16px;border-radius:14px;font-size:14px;font-weight:600;background:rgba(20,26,50,.95);border:1px solid var(--line);box-shadow:0 12px 30px rgba(0,0,0,.45);animation:tin .35s cubic-bezier(.2,.9,.3,1.3)}
+.toast.ok{border-color:var(--ok);color:#a7f3d0}
+.toast.bad{border-color:var(--bad);color:#fecdd3}
+.toast.warn{border-color:var(--warn);color:#fde68a}
+.toast.out{opacity:0;transform:translateX(30px);transition:all .45s}
+.fpts{position:fixed;left:50%;top:45%;z-index:90;font-size:64px;font-weight:900;pointer-events:none;transform:translateX(-50%);animation:fup 1.3s ease-out forwards;text-shadow:0 8px 30px rgba(0,0,0,.6)}
+.cf{position:fixed;top:-20px;width:10px;height:14px;z-index:80;pointer-events:none;animation:cfall linear forwards}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,.0)}50%{box-shadow:0 0 0 6px rgba(251,191,36,.45)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes tin{from{opacity:0;transform:translateX(40px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes fup{0%{opacity:0;transform:translate(-50%,20px) scale(.6)}20%{opacity:1;transform:translate(-50%,0) scale(1.15)}100%{opacity:0;transform:translate(-50%,-120px) scale(1)}}
+@keyframes cfall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.stage,.hero{animation:rise .5s ease-out}
+@media(max-width:620px){.slot{grid-template-columns:1fr}.rtile.hero2{grid-column:span 1}.tiles{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap"><div id="app"></div></div>
+<div id="toasts"></div>
+<script>
+(function(){
+"use strict";
+
+/* ---------- Config ---------- */
+var DOMAIN="Software Development & Coding", LEVEL="Intermediate";
+var COUNT=6, PAR=75, MAXHINTS=2, MAXSC=145;
+var LABELS={
+  Role:{icon:"🎭",tip:"Who the AI should be"},
+  Context:{icon:"🧭",tip:"The situation and inputs"},
+  Task:{icon:"🎯",tip:"The action to perform"},
+  Constraints:{icon:"📏",tip:"Limits and rules"},
+  Format:{icon:"🧱",tip:"Shape of the output"}
+};
+var COLORS={Role:"#a78bfa",Context:"#22d3ee",Task:"#34d399",Constraints:"#fbbf24",Format:"#fb7185",Concise:"#60a5fa"};
+var DIMS=["Role","Context","Task","Constraints","Format","Concise"];
+var TIPS={
+  Role:"Open with a role ('You are a...') so the model adopts the right expertise and tone.",
+  Context:"Add the situation, audience and inputs. The model cannot guess your background.",
+  Task:"State one clear action verb and the deliverable you expect.",
+  Constraints:"Add measurable limits: length, scope, and things to avoid.",
+  Format:"Specify the output structure: code block, table, numbered list or headings.",
+  Concise:"Trim filler. Every sentence should earn its place; vague hype and off-topic extras dilute results."
+};
+var TIERS=[
+  {min:900,name:"Prompt Architect",ic:"👑",rank:"S",rt:"Grandmaster"},
+  {min:780,name:"Prompt Engineer",ic:"🛠️",rank:"A",rt:"Expert"},
+  {min:620,name:"Prompt Crafter",ic:"✨",rank:"B",rt:"Skilled"},
+  {min:450,name:"Prompt Apprentice",ic:"🌱",rank:"C",rt:"Rising"},
+  {min:0,name:"Prompt Rookie",ic:"🥚",rank:"D",rt:"Newcomer"}
+];
+var TYPES={
+  build:{n:"Build the Prompt",ic:"🧩",cls:"t-build",ins:"Drag each block into the slot that matches its job. Click a block, then click a slot, if you prefer. Distractors do not belong anywhere."},
+  clean:{n:"Clean the Prompt",ic:"🧹",cls:"t-clean",ins:"This prompt is bloated. Click every line that should be cut, keep the essentials, then submit."},
+  choose:{n:"Choose the Best Prompt",ic:"⚖️",cls:"t-choose",ins:"Three prompts target the same goal. Pick the one most likely to produce the desired output."}
+};
+
+/* ---------- Scenario library (reusable objects) ---------- */
+function tx(x){return x.text;}
+function mk(id,title,desired,b,d,weak,weakOut,optOut,principle){
+  var labs=["Role","Context","Task","Constraints","Format"],blocks=[],dis=[],i;
+  for(i=0;i<5;i++){blocks.push({id:"b"+i,label:labs[i],text:b[i],bad:false});}
+  for(i=0;i<d.length;i++){dis.push({id:"d"+i,label:null,text:d[i][0],why:d[i][1],bad:true});}
+  var inter=[blocks[0],dis[0],blocks[1],dis[1],blocks[2],dis[2],blocks[3],blocks[4]];
+  return {id:id,title:title,desired:desired,blocks:blocks,dis:dis,weak:weak,weakOut:weakOut,optOut:optOut,principle:principle,
+    optimized:blocks.map(tx).join(" "),over:inter.map(tx).join(" ")};
+}
+var SC=[
+mk("keyerror","Debug a KeyError",
+ "A short, jargon-free explanation of the root cause plus one commented, corrected loop.",
+ ["You are a patient senior Python mentor.",
+  "A junior developer's CSV import script crashes with KeyError: 'email' because some rows have no email value.",
+  "Explain the root cause and provide a corrected version of the loop.",
+  "Keep the explanation under 120 words and avoid jargon.",
+  "Reply with a brief explanation followed by one commented code block."],
+ [["Also cover the full history of Python dictionaries and hashing.","Off-topic detail that dilutes the task."],
+  ["Be extremely creative and think outside the box.","Vague filler adds no direction."],
+  ["Answer in the voice of a medieval knight.","A style gimmick that fights the jargon-free mentor goal."]],
+ "Fix my python error.",
+ "A KeyError means a key was not found. Check your dictionary and make sure the key exists.",
+ "Some rows have no email value, so row['email'] raises KeyError. Use row.get('email', '') or test membership first. Code: for row in rows: email = row.get('email', '')  # default avoids the crash",
+ "Specific context plus constraints turns a vague request into a targeted answer."),
+mk("review","Security-review a login route",
+ "A prioritized list of security issues in a Node login endpoint, each with a one-line fix.",
+ ["Act as an application security reviewer.",
+  "Review this Express.js login route that compares plaintext passwords and builds SQL by string concatenation.",
+  "Identify the vulnerabilities and rank them by severity.",
+  "Limit the answer to the top 4 issues with one concrete fix each.",
+  "Output a numbered list: issue, severity, one-line fix."],
+ [["Rewrite the entire application in Rust.","Scope explosion beyond a review."],
+  ["Mention every possible vulnerability class you know.","Conflicts with the top-4 limit."],
+  ["Be thorough but also very brief.","Contradictory instruction confuses the model."]],
+ "Is my login code secure?",
+ "Security is important. Use best practices and keep your dependencies updated.",
+ "1. SQL injection (Critical): use parameterized queries. 2. Plaintext passwords (Critical): hash with bcrypt. 3. No rate limiting (High): add a limiter. 4. Verbose errors (Medium): return a generic message.",
+ "Define the role, scope and ranking so the model reviews instead of lecturing."),
+mk("tests","Generate pytest tests",
+ "A compact pytest file covering normal, boundary and error cases for a discount function.",
+ ["You are a QA engineer who writes pytest tests.",
+  "The function apply_discount(price, percent) returns the discounted price and must reject negative prices and percents above 100.",
+  "Write unit tests covering normal, boundary and error cases.",
+  "Use pytest.mark.parametrize and keep the file under 30 lines.",
+  "Return a single Python code block with no extra commentary."],
+ [["Also write tests for every function in the repository.","Scope creep."],
+  ["Use the most advanced testing techniques possible.","Vague and invites over-engineering."],
+  ["Explain what unit testing is before the code.","Contradicts the no-commentary format rule."]],
+ "Write tests.",
+ "def test_it(): assert True",
+ "A parametrized pytest block testing 0%, 50% and 100%, plus pytest.raises(ValueError) for a negative price and for 101 percent.",
+ "Constraints and an output format keep code answers directly usable."),
+mk("sql","Speed up a slow SQL query",
+ "An optimized SQL query with an index suggestion and a brief reason for each change.",
+ ["You are a PostgreSQL performance engineer.",
+  "A report query joins orders and customers and scans 5 million rows to filter on created_at and status.",
+  "Rewrite the query for speed and recommend any helpful index.",
+  "Keep the result set identical and justify each change in one sentence.",
+  "Provide the new SQL first, then a bulleted list of changes."],
+ [["Migrate the database to MongoDB.","Not what was asked."],
+  ["Make it blazing fast no matter what.","Unmeasurable and ignores the identical-results rule."],
+  ["Include a 500-word essay on relational theory.","Padding that buries the answer."]],
+ "Make my SQL faster.",
+ "Try adding indexes and avoid SELECT *. Also consider caching.",
+ "SQL filtering on status and a created_at range, joining on an indexed key, plus CREATE INDEX ON orders (status, created_at). Bullets: filter early, use a composite index, drop SELECT *.",
+ "Give the real situation, and require identical behavior to protect correctness."),
+mk("async","Refactor callbacks to async/await",
+ "A refactored async/await version of nested callback code with a short note on error handling.",
+ ["Act as a senior JavaScript engineer focused on readability.",
+  "A Node.js function reads a file, parses JSON, then saves to a database using three nested callbacks.",
+  "Refactor it to async/await with proper try/catch.",
+  "Preserve behavior and keep function names unchanged.",
+  "Show before and after code blocks, then two sentences on error handling."],
+ [["Convert the project to TypeScript while you are at it.","An unrequested change."],
+  ["Use whatever style you feel like.","Removes the readability target."],
+  ["Add ten new features to the function.","Breaks the preserve-behavior rule."]],
+ "Clean up this code.",
+ "Here is a cleaner version with comments added and a few variable names improved.",
+ "Before and after blocks; the after version uses await on readFile, JSON.parse and db.save inside try/catch. Errors are logged and rethrown so callers can react.",
+ "Name the transformation precisely; vague verbs like clean up get vague results."),
+mk("docs","Write endpoint documentation",
+ "A concise API reference for a POST /orders endpoint that a new teammate can use immediately.",
+ ["You are a technical writer for developer documentation.",
+  "The POST /orders endpoint takes customer_id and items, requires a bearer token and returns 201 with an order id.",
+  "Write the reference documentation for this endpoint.",
+  "Include one example request, one example response and the 401 and 422 errors.",
+  "Use Markdown with the headings Overview, Request, Response and Errors."],
+ [["Document every endpoint in the whole API.","Scope creep."],
+  ["Write it as a marketing brochure.","Wrong tone for reference docs."],
+  ["Make it sound impressive and professional.","Subjective filler with no testable outcome."]],
+ "Document my API.",
+ "This API lets you create orders. Send a request and you get a response.",
+ "Markdown with an Overview, a curl example using a bearer token, a 201 JSON response, and a table of 401 and 422 errors.",
+ "Specifying structure and required elements guarantees completeness."),
+mk("regex","Write a validation regex",
+ "A tested regex for Indian PIN codes with a plain-English breakdown.",
+ ["You are a regex specialist who explains patterns clearly.",
+  "A signup form must accept 6-digit Indian PIN codes that never start with 0.",
+  "Write a regular expression and explain each part.",
+  "Target JavaScript and include two valid and two invalid examples.",
+  "Return the regex in a code block, then a short table breaking down each token."],
+ [["Cover the postal codes of every country.","Over-broad scope."],
+  ["Use the most clever regex trick you know.","Cleverness hurts maintainability."],
+  ["Also build the whole signup form.","Unrequested work."]],
+ "Regex for pin code",
+ "Try /\\d+/ to match numbers.",
+ "/^[1-9][0-9]{5}$/ with a token table. Valid: 110001, 560034. Invalid: 011001, 12345.",
+ "Examples and a target environment make outputs verifiable."),
+mk("commit","Write a commit and PR message",
+ "A clear Conventional Commit message and PR description for a described change.",
+ ["Act as a meticulous open-source maintainer.",
+  "The change adds retry logic with exponential backoff to the payment webhook handler to fix intermittent failures.",
+  "Write a commit message and a pull request description.",
+  "Keep the subject line under 60 characters, in imperative mood, with no emojis.",
+  "Use Conventional Commits, then PR sections: Summary, Changes, Testing."],
+ [["Write a poem celebrating the change.","Off-brief."],
+  ["Include the author's life story.","Irrelevant."],
+  ["Make it as long and detailed as possible.","Clashes with the concise subject-line rule."]],
+ "Write a commit message.",
+ "Updated code and fixed stuff.",
+ "fix(webhook): add exponential backoff retries, followed by Summary, Changes and Testing sections.",
+ "Format conventions are cheap to state and expensive to guess.")
+];
+
+/* ---------- Helpers ---------- */
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function shuffle(a){var r=a.slice(),i,j,t;for(i=r.length-1;i>0;i--){j=Math.floor(Math.random()*(i+1));t=r[i];r[i]=r[j];r[j]=t;}return r;}
+function pad(n){return n<10?"0"+n:""+n;}
+function fmt(s){s=Math.max(0,Math.floor(s));return pad(Math.floor(s/60))+":"+pad(s%60);}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function byId(sc,id){var all=sc.blocks.concat(sc.dis),i;for(i=0;i<all.length;i++){if(all[i].id===id){return all[i];}}return null;}
+function newDna(){var o={},i;for(i=0;i<DIMS.length;i++){o[DIMS[i]]={ok:0,tot:0};}return o;}
+
+var S={screen:"intro"};
+var bestKey="pp_best_softdev_intermediate";
+function getBest(){try{var v=localStorage.getItem(bestKey);return v?parseInt(v,10):0;}catch(e){return 0;}}
+function setBest(v){try{localStorage.setItem(bestKey,String(v));}catch(e){}}
+
+/* ---------- Feedback / animation ---------- */
+function toast(msg,type){
+  var box=$("toasts"),d=document.createElement("div");
+  d.className="toast "+(type||"info");d.textContent=msg;box.appendChild(d);
+  while(box.children.length>4){box.removeChild(box.firstChild);}
+  setTimeout(function(){d.classList.add("out");},2200);
+  setTimeout(function(){if(d.parentNode){d.parentNode.removeChild(d);}},2750);
+}
+function floatPts(text,color){
+  var d=document.createElement("div");d.className="fpts";d.textContent=text;d.style.color=color||"#6ee7b7";
+  document.body.appendChild(d);setTimeout(function(){if(d.parentNode){d.parentNode.removeChild(d);}},1400);
+}
+function tween(el,from,to,dur){
+  if(!el){return;}
+  var st=performance.now(),tk=(el._tk=(el._tk||0)+1);
+  function f(now){
+    if(el._tk!==tk){return;}
+    var p=Math.min(1,(now-st)/dur),e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(from+(to-from)*e);
+    if(p<1){requestAnimationFrame(f);}
+  }
+  requestAnimationFrame(f);
+}
+function confetti(){
+  var cols=["#a78bfa","#22d3ee","#34d399","#fbbf24","#fb7185"],i;
+  for(i=0;i<60;i++){
+    (function(){
+      var d=document.createElement("div");d.className="cf";
+      d.style.left=Math.random()*100+"vw";d.style.background=cols[Math.floor(Math.random()*cols.length)];
+      d.style.animationDuration=(2+Math.random()*2.5)+"s";d.style.animationDelay=(Math.random()*0.8)+"s";
+      document.body.appendChild(d);setTimeout(function(){if(d.parentNode){d.parentNode.removeChild(d);}},5500);
+    })();
+  }
+}
+function copyText(t){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){toast("Copied to clipboard","ok");},function(){fallbackCopy(t);});
+  }else{fallbackCopy(t);}
+}
+function fallbackCopy(t){
+  var a=document.createElement("textarea"),ok=false;
+  a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();
+  try{ok=document.execCommand("copy");}catch(e){ok=false;}
+  document.body.removeChild(a);
+  toast(ok?"Copied to clipboard":"Select the text and press Ctrl+C",ok?"ok":"warn");
+}
+
+/* ---------- Game logic ---------- */
+function newGame(){
+  var pick=shuffle(SC).slice(0,COUNT);
+  var types=shuffle(["build","clean","choose","build","clean","choose"]);
+  S={screen:"play",sc:pick,types:types,idx:0,banked:0,bonus:0,ok:0,wrong:0,moves:0,hints:0,timeBanked:0,results:[],dna:newDna(),cur:null,shown:0,flash:null,drag:null,copy:""};
+  startScenario();
+  render();
+  window.scrollTo(0,0);
+}
+function startScenario(){
+  var sc=S.sc[S.idx],type=S.types[S.idx];
+  var c={type:type,ok:0,wrong:0,moves:0,hints:0,done:false,ts:Date.now(),res:null,hintId:null,hintSlot:null};
+  if(type==="build"){
+    c.slots=sc.blocks.map(function(){return null;});
+    c.pool=shuffle(sc.blocks.concat(sc.dis).map(function(x){return x.id;}));
+    c.sel=null;
+  }else if(type==="clean"){
+    var L=sc.blocks.slice();
+    sc.dis.forEach(function(d){L.splice(1+Math.floor(Math.random()*L.length),0,d);});
+    c.lines=L;c.removed={};c.seen={};
+  }else{
+    var o=shuffle([{k:"weak",text:sc.weak},{k:"opt",text:sc.optimized},{k:"over",text:sc.over}]),letters=["A","B","C"];
+    o.forEach(function(x,i){x.letter=letters[i];});
+    c.opts=o;c.elim={};c.picked=null;
+  }
+  S.cur=c;
+}
+function rec(label,ok){var d=S.dna[label];if(!d){return;}d.tot++;if(ok){d.ok++;}}
+function act(ok){var c=S.cur;c.moves++;S.moves++;if(ok){c.ok++;S.ok++;}else{c.wrong++;S.wrong++;}}
+function nmove(){S.cur.moves++;S.moves++;}
+
+function place(si,bid){
+  var c=S.cur,sc=S.sc[S.idx];
+  if(!c||c.done||c.type!=="build"){return;}
+  if(c.slots[si]!==null){toast("That slot is filled. Click its block to take it back.","warn");return;}
+  var bl=byId(sc,bid);
+  if(!bl||c.pool.indexOf(bid)<0){return;}
+  var sl=sc.blocks[si].label;
+  c.hintId=null;c.hintSlot=null;
+  if(bl.label===sl){
+    c.slots[si]=bid;c.pool.splice(c.pool.indexOf(bid),1);c.sel=null;
+    act(true);rec(sl,true);toast("✓ "+sl+" locked in","ok");
+  }else{
+    act(false);c.sel=null;
+    if(bl.bad){rec("Concise",false);toast("✗ Distractor! "+bl.why,"bad");}
+    else{rec(sl,false);toast("✗ That block is not the "+sl+" part","bad");}
+    S.flash={slot:si};
+  }
+  render();
+}
+function unplace(si){
+  var c=S.cur;
+  if(!c||c.done||c.type!=="build"||c.slots[si]===null){return;}
+  c.pool.push(c.slots[si]);c.slots[si]=null;nmove();render();
+}
+function toggleLine(id){
+  var c=S.cur;
+  if(!c||c.done||c.type!=="clean"){return;}
+  var ln=null,i;
+  for(i=0;i<c.lines.length;i++){if(c.lines[i].id===id){ln=c.lines[i];}}
+  if(!ln){return;}
+  c.hintId=null;
+  if(c.removed[id]){delete c.removed[id];nmove();toast("Line restored","warn");}
+  else{
+    c.removed[id]=true;
+    if(!c.seen[id]){
+      c.seen[id]=true;
+      if(ln.bad){act(true);rec("Concise",true);toast("✂ Nice cut: "+ln.why,"ok");}
+      else{act(false);rec(ln.label,false);toast("✗ That line was essential ("+ln.label+")","bad");}
+    }else{nmove();}
+  }
+  render();
+}
+function pick(k){
+  var c=S.cur;
+  if(!c||c.done||c.type!=="choose"||c.elim[k]){return;}
+  c.picked=k;
+  if(k==="opt"){act(true);rec("Concise",true);}
+  else{
+    act(false);
+    if(k==="weak"){rec("Context",false);rec("Constraints",false);}
+    else{rec("Concise",false);}
+  }
+  finalize();
+}
+function useHint(){
+  var c=S.cur,sc=S.sc[S.idx],i;
+  if(!c||c.done){return;}
+  if(c.hints>=MAXHINTS){toast("No hints left for this puzzle","warn");return;}
+  if(c.type==="build"){
+    var e=c.slots.indexOf(null);
+    if(e<0){toast("All slots are filled. Run the prompt!","warn");return;}
+    var lab=sc.blocks[e].label,id=null;
+    for(i=0;i<c.pool.length;i++){var b=byId(sc,c.pool[i]);if(b&&b.label===lab){id=b.id;}}
+    c.hintId=id;c.hintSlot=e;
+  }else if(c.type==="clean"){
+    var found=null;
+    for(i=0;i<c.lines.length;i++){if(c.lines[i].bad&&!c.removed[c.lines[i].id]){found=c.lines[i].id;break;}}
+    if(!found){toast("No bloat left. Submit your prompt!","warn");return;}
+    c.hintId=found;
+  }else{
+    var cand=["weak","over"].filter(function(k){return !c.elim[k];});
+    if(!cand.length){toast("Only one option left!","warn");return;}
+    c.elim[cand[Math.floor(Math.random()*cand.length)]]=true;
+  }
+  c.hints++;S.hints++;
+  toast("💡 Hint used (−10 points)","warn");
+  render();
+}
+function runBuild(){
+  var c=S.cur;
+  if(!c||c.done||c.type!=="build"||c.slots.indexOf(null)>=0){return;}
+  nmove();finalize();
+}
+function submitClean(){
+  var c=S.cur;
+  if(!c||c.done||c.type!=="clean"){return;}
+  nmove();
+  c.lines.forEach(function(l){
+    if(l.bad&&!c.removed[l.id]){c.wrong++;S.wrong++;rec("Concise",false);}
+  });
+  finalize();
+}
+function finalize(){
+  var c=S.cur,sc=S.sc[S.idx];
+  var el=(Date.now()-c.ts)/1000,tot=c.ok+c.wrong,acc=tot?c.ok/tot:0;
+  var base=Math.round(acc*100);
+  var tb=el<=PAR?20:(el<=PAR*1.5?10:0);
+  var ideal=c.type==="build"?sc.blocks.length+1:(c.type==="clean"?sc.dis.length+1:1);
+  var ob=(c.wrong===0&&c.hints===0&&c.moves<=ideal+1)?25:((c.wrong<=1&&c.moves<=ideal+3)?10:0);
+  var hp=c.hints*10;
+  var score=Math.max(0,base+tb+ob-hp);
+  c.done=true;
+  c.res={score:score,acc:Math.round(acc*100),base:base,tb:tb,ob:ob,hp:hp,el:el,wrong:c.wrong,moves:c.moves,hints:c.hints,title:sc.title,type:c.type,optimized:sc.optimized,sc:sc};
+  S.results.push(c.res);S.banked+=score;S.bonus+=ob;S.timeBanked+=el;
+  floatPts("+"+score,score>=100?"#6ee7b7":(score>=50?"#fde68a":"#fecdd3"));
+  render();
+}
+function nextScenario(){
+  if(!S.cur||!S.cur.done){return;}
+  if(S.idx<COUNT-1){S.idx++;startScenario();render();window.scrollTo(0,0);}
+  else{S.screen="report";render();window.scrollTo(0,0);}
+}
+function liveScore(){
+  var c=S.cur;
+  if(!c||c.done){return S.banked;}
+  var sc=S.sc[S.idx],part=0,i,n=0;
+  if(c.type==="build"){for(i=0;i<c.slots.length;i++){if(c.slots[i]!==null){n++;}}part=Math.round(100*n/c.slots.length);}
+  else if(c.type==="clean"){part=Math.round(100*c.ok/sc.dis.length);}
+  part=part-c.wrong*10-c.hints*10;
+  return S.banked+Math.max(0,part);
+}
+
+/* ---------- Views ---------- */
+function introHTML(){
+  var best=getBest();
+  return '<section class="card hero">'+
+    '<div style="font-size:64px">🧩</div>'+
+    '<h1><span class="grad">Prompt Puzzle</span></h1>'+
+    '<p class="lead">Master AI prompting through play. Assemble, trim and choose prompts across '+COUNT+' randomized scenarios, then get your Prompt Performance Report.</p>'+
+    '<div class="row" style="justify-content:center;margin-bottom:8px"><span class="chip">🌐 Domain: <b>'+esc(DOMAIN)+'</b></span><span class="chip">⚡ Difficulty: <b>'+LEVEL+'</b></span>'+(best?'<span class="chip">🏆 Best: <b>'+best+'</b></span>':'')+'</div>'+
+    '<div class="three">'+
+      '<div class="mini"><div class="ic">🧩</div><h2>Build the Prompt</h2><p class="ins">Drag blocks into Role, Context, Task, Constraints and Format slots. Dodge the distractors.</p></div>'+
+      '<div class="mini"><div class="ic">🧹</div><h2>Clean the Prompt</h2><p class="ins">Cut bloat and contradictions from an over-engineered prompt without losing what matters.</p></div>'+
+      '<div class="mini"><div class="ic">⚖️</div><h2>Choose the Best</h2><p class="ins">Compare a weak, an optimized and an over-engineered prompt. Spot the winner.</p></div>'+
+    '</div>'+
+    '<p class="ins">Score = Accuracy + Time bonus + Optimization bonus − Hint penalties. Par time per puzzle: '+fmt(PAR)+'.</p>'+
+    '<button class="btn go" data-act="start" style="font-size:18px;padding:14px 34px">▶ Start Playing</button>'+
+  '</section>';
+}
+function hudHTML(){
+  var tot=S.ok+S.wrong,acc=tot?Math.round(S.ok/tot*100):100;
+  return '<div class="hud"><div class="hudtop"><div class="brand">🧩 Prompt Puzzle</div><div class="row"><span class="chip">'+esc(DOMAIN)+'</span><span class="chip">⚡ '+LEVEL+'</span></div></div>'+
+   '<div class="tiles">'+
+   '<div class="tile big"><small>Score</small><b id="hScore">'+S.shown+'</b></div>'+
+   '<div class="tile"><small>Accuracy</small><b>'+acc+'%</b></div>'+
+   '<div class="tile"><small>Time</small><b id="hTime">'+fmt(S.timeBanked)+'</b></div>'+
+   '<div class="tile"><small>Moves</small><b>'+S.moves+'</b></div>'+
+   '<div class="tile"><small>Wrong</small><b style="color:'+(S.wrong?'var(--bad)':'inherit')+'">'+S.wrong+'</b></div>'+
+   '<div class="tile"><small>Hints</small><b>'+S.hints+'</b></div>'+
+   '<div class="tile"><small>Opt. Bonus</small><b style="color:var(--ok)">+'+S.bonus+'</b></div>'+
+   '</div></div>';
+}
+function progressHTML(){
+  var c=S.cur,i,dots="",doneCount=S.idx+(c&&c.done?1:0);
+  for(i=0;i<COUNT;i++){dots+='<span class="dot'+(i<doneCount?" done":(i===S.idx?" now":""))+'"></span>';}
+  return '<div class="progress"><span class="meta">Puzzle '+(S.idx+1)+'/'+COUNT+'</span><div class="bar"><i style="width:'+Math.round(doneCount/COUNT*100)+'%"></i></div><div class="dots">'+dots+'</div></div>';
+}
+function headHTML(sc,c){
+  var t=TYPES[c.type],el=c.done?c.res.el:(Date.now()-c.ts)/1000;
+  return '<div class="shead"><span class="badge '+t.cls+'">'+t.ic+' '+t.n+'</span><span class="meta">⏱ <b id="sTime">'+fmt(el)+'</b> <small>par '+fmt(PAR)+'</small></span></div>'+
+    '<h2>'+esc(sc.title)+'</h2>'+(c.done?'':'<p class="ins">'+t.ins+'</p>')+
+    '<div class="desired"><b>🎯 Desired Output</b><p>'+esc(sc.desired)+'</p></div>';
+}
+function hintBtn(c){
+  var left=MAXHINTS-c.hints;
+  return '<button class="btn ghost'+(left<=0?" dis":"")+'" data-act="hint">💡 Hint ('+left+' left · −10)</button>';
+}
+function buildHTML(sc,c){
+  var h='<h3>Prompt slots</h3><div class="slots">',i,allFilled=c.slots.indexOf(null)<0;
+  for(i=0;i<sc.blocks.length;i++){
+    var lab=sc.blocks[i].label,L=LABELS[lab],filled=c.slots[i]!==null;
+    var cls="slot"+(filled?" filled":"")+(c.hintSlot===i?" hint":"")+(S.flash&&S.flash.slot===i?" shake":"");
+    h+='<div class="'+cls+'" data-slot="'+i+'"><div class="slabel" style="--c:'+COLORS[lab]+'">'+L.icon+' '+lab+'<small>'+L.tip+'</small></div><div class="sbody">'+
+      (filled?'<div class="block placed" data-un="'+i+'" title="Click to remove">'+esc(byId(sc,c.slots[i]).text)+'</div>':'Drop a block here')+'</div></div>';
+  }
+  h+='</div><h3>Block tray</h3><div class="pool">';
+  if(!c.pool.length){h+='<span class="ins">Tray empty. All blocks placed!</span>';}
+  for(i=0;i<c.pool.length;i++){
+    var b=byId(sc,c.pool[i]);
+    h+='<div class="block'+(c.sel===b.id?" sel":"")+(c.hintId===b.id?" hint":"")+'" draggable="true" data-bid="'+b.id+'">'+esc(b.text)+'</div>';
+  }
+  h+='</div><div class="actions">'+hintBtn(c)+'<button class="btn go'+(allFilled?"":" dis")+'" data-act="run">▶ Run Prompt</button></div>';
+  return h;
+}
+function cleanHTML(sc,c){
+  var h='<h3>Bloated prompt (click lines to cut)</h3><div class="lines">',i,kept=[];
+  for(i=0;i<c.lines.length;i++){
+    var l=c.lines[i],rm=!!c.removed[l.id];
+    if(!rm){kept.push(l.text);}
+    h+='<div class="cline'+(rm?" removed":"")+(c.hintId===l.id?" hint":"")+'" data-line="'+l.id+'">'+(rm?"✂ ":"")+esc(l.text)+'</div>';
+  }
+  h+='</div><h3>Your cleaned prompt</h3><div class="preview">'+(kept.length?esc(kept.join(" ")):"(empty)")+'</div>';
+  h+='<div class="actions">'+hintBtn(c)+'<button class="btn go" data-act="submit">✅ Submit Cleaned Prompt</button></div>';
+  return h;
+}
+function chooseHTML(sc,c){
+  var h='<h3>Pick the best prompt</h3><div class="opts">',i;
+  for(i=0;i<c.opts.length;i++){
+    var o=c.opts[i];
+    h+='<div class="opt'+(c.elim[o.k]?" elim":"")+'" data-opt="'+o.k+'"><div class="oletter">'+o.letter+'</div>'+esc(o.text)+'</div>';
+  }
+  h+='</div><div class="actions">'+hintBtn(c)+'<span class="ins">Tip: the best prompt is rarely the shortest or the longest.</span></div>';
+  return h;
+}
+function revealHTML(sc,c){
+  var r=c.res,msg,good=r.wrong===0,i;
+  if(c.type==="choose"){
+    var pk=null,co=null;
+    for(i=0;i<c.opts.length;i++){if(c.opts[i].k===c.picked){pk=c.opts[i];}if(c.opts[i].k==="opt"){co=c.opts[i];}}
+    if(c.picked==="opt"){msg="✅ Correct! Prompt "+co.letter+" is the optimized prompt.";good=true;}
+    else if(c.picked==="weak"){msg="❌ You chose Prompt "+pk.letter+", which is too vague. The best was Prompt "+co.letter+".";good=false;}
+    else{msg="❌ You chose Prompt "+pk.letter+", which is over-engineered. The best was Prompt "+co.letter+".";good=false;}
+  }else if(c.type==="build"){
+    msg=good?"✅ Flawless assembly! Every block landed in the right slot first try.":"🧩 Prompt assembled with "+r.wrong+" wrong placement"+(r.wrong===1?"":"s")+".";
+  }else{
+    msg=good?"✅ Perfect clean! All bloat removed, every essential kept.":"🧹 Prompt cleaned with "+r.wrong+" mistake"+(r.wrong===1?"":"s")+".";
+  }
+  var why=sc.dis.map(function(d){return "• "+esc(d.text)+" → "+esc(d.why);}).join("<br>");
+  return '<div class="verdict '+(good?"good":"bad")+'">'+msg+
+    '<div class="chips"><span class="chip">Score <b>+'+r.score+'</b></span><span class="chip">Accuracy <b>'+r.acc+'%</b></span><span class="chip">⏱ <b>'+fmt(r.el)+'</b></span>'+
+    '<span class="chip">Time bonus <b>+'+r.tb+'</b></span><span class="chip">Optimization <b>+'+r.ob+'</b></span><span class="chip">Hints <b>−'+r.hp+'</b></span>'+
+    '<span class="chip">Moves <b>'+r.moves+'</b></span><span class="chip">Wrong <b>'+r.wrong+'</b></span></div></div>'+
+    '<div class="cmp">'+
+     '<div class="cbox weak"><div class="ctag">❌ Weak Prompt</div><p class="pr">'+esc(sc.weak)+'</p><div class="ctag sub">🤖 Weak AI Output</div><p class="ao">'+esc(sc.weakOut)+'</p></div>'+
+     '<div class="cbox good"><div class="ctag">✅ Optimized Prompt</div><p class="pr">'+esc(sc.optimized)+'</p><div class="ctag sub">🤖 Optimized AI Output</div><p class="ao">'+esc(sc.optOut)+'</p></div>'+
+     '<div class="cbox over"><div class="ctag">🌀 Over-Engineered Prompt</div><p class="pr">'+esc(sc.over)+'</p><div class="ctag sub">Why it fails</div><p class="ao">'+why+'</p></div>'+
+    '</div>'+
+    '<div class="principle"><b>💡 Prompt Principle:</b> '+esc(sc.principle)+'</div>'+
+    '<div class="actions"><span></span><button class="btn go" data-act="next">'+(S.idx<COUNT-1?"Next Puzzle →":"🏁 See My Report")+'</button></div>';
+}
+function playHTML(){
+  var sc=S.sc[S.idx],c=S.cur,body;
+  if(c.done){body=revealHTML(sc,c);}
+  else if(c.type==="build"){body=buildHTML(sc,c);}
+  else if(c.type==="clean"){body=cleanHTML(sc,c);}
+  else{body=chooseHTML(sc,c);}
+  return hudHTML()+progressHTML()+'<main class="card stage">'+headHTML(sc,c)+body+'</main>';
+}
+function strength(d){var x=S.dna[d];return x.tot?x.ok/x.tot:0.6;}
+function dnaSVG(){
+  var W=620,H=235,cy=116,i,x,pa=[],pb=[],s="";
+  for(x=20;x<=600;x+=6){
+    var t=(x-20)/46;
+    pa.push(x+","+(cy+58*Math.sin(t)).toFixed(1));
+    pb.push(x+","+(cy-58*Math.sin(t)).toFixed(1));
+  }
+  s+='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Prompt DNA visualization">';
+  s+='<polyline points="'+pa.join(" ")+'" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="3"/>';
+  s+='<polyline points="'+pb.join(" ")+'" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="3"/>';
+  for(i=0;i<DIMS.length;i++){
+    var d=DIMS[i],st=strength(d),px=60+i*100,half=14+72*st,col=COLORS[d];
+    s+='<line x1="'+px+'" y1="'+(cy-half)+'" x2="'+px+'" y2="'+(cy+half)+'" stroke="'+col+'" stroke-width="'+(4+6*st).toFixed(1)+'" stroke-linecap="round" opacity="'+(0.35+0.65*st).toFixed(2)+'"/>';
+    s+='<circle cx="'+px+'" cy="'+(cy-half)+'" r="7" fill="'+col+'"/><circle cx="'+px+'" cy="'+(cy+half)+'" r="7" fill="'+col+'"/>';
+    s+='<text x="'+px+'" y="16" text-anchor="middle" font-size="14" font-weight="700" fill="#eef1ff">'+Math.round(st*100)+'%</text>';
+    s+='<text x="'+px+'" y="'+(H-6)+'" text-anchor="middle" font-size="12" fill="#9aa4c7">'+d+'</text>';
+  }
+  s+='</svg>';
+  return s;
+}
+function tierFor(ps){var i;for(i=0;i<TIERS.length;i++){if(ps>=TIERS[i].min){return i;}}return TIERS.length-1;}
+function reportHTML(){
+  var n=S.results.length,pct=clamp(S.banked/(MAXSC*n),0,1),ps=Math.round(pct*1000);
+  var ti=tierFor(ps),tier=TIERS[ti],next=ti>0?TIERS[ti-1]:null;
+  var tot=S.ok+S.wrong,acc=tot?Math.round(S.ok/tot*100):0;
+  var best=getBest();if(ps>best){setBest(ps);}
+  S.finalPs=ps;S.isBest=ps>best;
+  var worst=S.results[0],i;
+  for(i=1;i<S.results.length;i++){if(S.results[i].score<worst.score){worst=S.results[i];}}
+  S.copy=worst.optimized;
+  /* strongest / weakest */
+  var wk=DIMS[0],sg=DIMS[0];
+  for(i=1;i<DIMS.length;i++){if(strength(DIMS[i])<strength(wk)){wk=DIMS[i];}if(strength(DIMS[i])>strength(sg)){sg=DIMS[i];}}
+  var avg=S.timeBanked/n,fb=[];
+  fb.push("You finished as a <b>"+tier.name+"</b> with "+acc+"% overall accuracy across "+n+" puzzles.");
+  if(strength(wk)<0.95){fb.push("Weakest strand: <b>"+wk+"</b> ("+Math.round(strength(wk)*100)+"%). "+TIPS[wk]);}
+  else{fb.push("No weak strands: your prompt DNA is well balanced across all six traits.");}
+  if(strength(sg)>=0.8){fb.push("Strongest strand: <b>"+sg+"</b> ("+Math.round(strength(sg)*100)+"%). Keep leaning on it.");}
+  fb.push(S.hints===0?"You solved everything without hints. That shows real prompting instinct.":"You used "+S.hints+" hint"+(S.hints===1?"":"s")+" (−"+S.hints*10+" points). Try the next run with none.");
+  fb.push(avg<=PAR?"Great pace: about "+fmt(avg)+" per puzzle, under the "+fmt(PAR)+" par.":"Your pace averaged "+fmt(avg)+" per puzzle. Aim for under "+fmt(PAR)+" to earn the full time bonus.");
+  if(S.wrong>0){fb.push("You made "+S.wrong+" wrong placement"+(S.wrong===1?"":"s")+". Read each block's job before dropping it: does it set a role, give context, name a task, limit it or shape the output?");}
+  var milestone=next?"Earn <b>"+(next.min-ps)+"</b> more points to reach "+next.ic+" <b>"+next.name+"</b> (score "+next.min+").":"You hold the top rating. Keep every run flawless and under par to stay there.";
+  var segs=worst.sc.blocks.map(function(b){return '<span class="seg" style="--c:'+COLORS[b.label]+'"><b>'+b.label+'</b>'+esc(b.text)+'</span>';}).join("");
+  var rows=S.results.map(function(r,k){
+    return '<tr><td>'+(k+1)+'</td><td>'+esc(r.title)+'</td><td>'+TYPES[r.type].ic+' '+TYPES[r.type].n+'</td><td>'+r.score+'/'+MAXSC+'</td><td>'+fmt(r.el)+'</td><td>'+r.wrong+'</td><td>'+r.hints+'</td></tr>';
+  }).join("");
+  var lib=S.results.map(function(r){return '<p><b>'+esc(r.title)+'</b><br><span class="ao">'+esc(r.optimized)+'</span></p>';}).join("");
+  var legend=DIMS.map(function(d){return '<span><i style="background:'+COLORS[d]+'"></i>'+d+'</span>';}).join("");
+  return '<section class="card stage">'+
+   '<div class="shead"><span class="badge t-choose">📊 Prompt Performance Report</span><span class="chip">'+esc(DOMAIN)+' · '+LEVEL+'</span>'+(S.isBest?'<span class="chip" style="color:#fde68a">🏆 New personal best!</span>':'')+'</div>'+
+   '<h1><span class="grad">'+tier.ic+' '+tier.name+'</span></h1>'+
+   '<div class="rgrid">'+
+    '<div class="rtile hero2"><small>Prompt Score</small><b id="rScore">0</b><small>out of 1000</small></div>'+
+    '<div class="rtile"><small>Rating</small><b style="font-size:20px">'+tier.name+'</b></div>'+
+    '<div class="rtile"><small>Rank</small><b>'+tier.rank+'</b><small>'+tier.rt+'</small></div>'+
+    '<div class="rtile"><small>Accuracy</small><b>'+acc+'%</b></div>'+
+    '<div class="rtile"><small>Total Time</small><b>'+fmt(S.timeBanked)+'</b></div>'+
+    '<div class="rtile"><small>Moves</small><b>'+S.moves+'</b></div>'+
+    '<div class="rtile"><small>Wrong</small><b>'+S.wrong+'</b></div>'+
+    '<div class="rtile"><small>Hints</small><b>'+S.hints+'</b></div>'+
+    '<div class="rtile"><small>Opt. Bonus</small><b style="color:var(--ok)">+'+S.bonus+'</b></div>'+
+   '</div>'+
+   '<div class="two">'+
+    '<div class="card"><h3 style="margin-top:0">🧬 Prompt DNA</h3>'+dnaSVG()+'<div class="legend">'+legend+'</div><p class="ins" style="margin-top:8px">Taller, brighter rungs mean stronger skills. Short, faint rungs are your growth areas.</p></div>'+
+    '<div class="card"><h3 style="margin-top:0">💬 Personalized Feedback</h3><ul class="fb">'+fb.map(function(f){return "<li>"+f+"</li>";}).join("")+'</ul>'+
+     '<div class="principle"><b>🚩 Next Milestone</b><br>'+milestone+'</div></div>'+
+   '</div>'+
+   '<div class="card" style="margin-top:16px"><h3 style="margin-top:0">✨ Final Optimized Prompt</h3>'+
+    '<p class="ins">From your toughest puzzle: <b>'+esc(worst.title)+'</b>. Study its anatomy, then reuse the pattern.</p>'+segs+
+    '<div class="actions"><button class="btn" data-act="copy">📋 Copy Prompt</button><span></span></div>'+
+    '<details><summary>View every optimized prompt from this run</summary>'+lib+'</details></div>'+
+   '<div class="card" style="margin-top:16px"><h3 style="margin-top:0">📋 Scenario Breakdown</h3><div style="overflow-x:auto"><table><tr><th>#</th><th>Scenario</th><th>Challenge</th><th>Score</th><th>Time</th><th>Wrong</th><th>Hints</th></tr>'+rows+'</table></div></div>'+
+   '<div class="actions" style="justify-content:center;margin-top:22px"><button class="btn go" data-act="replay" style="font-size:17px;padding:14px 30px">🔁 Replay with New Scenarios</button></div>'+
+  '</section>';
+}
+
+/* ---------- Render ---------- */
+function render(){
+  var app=$("app");
+  if(S.screen==="intro"){app.innerHTML=introHTML();}
+  else if(S.screen==="play"){app.innerHTML=playHTML();tween($("hScore"),S.shown,liveScore(),600);S.shown=liveScore();}
+  else{
+    app.innerHTML=reportHTML();
+    tween($("rScore"),0,S.finalPs,1400);
+    if(S.finalPs>=620&&!S.confettiDone){confetti();S.confettiDone=true;}
+  }
+  S.flash=null;
+}
+
+/* ---------- Events ---------- */
+var app=$("app");
+app.addEventListener("click",function(e){
+  var t=e.target.closest?e.target.closest("[data-act],[data-bid],[data-slot],[data-un],[data-line],[data-opt]"):null;
+  if(!t){return;}
+  var ds=t.dataset;
+  if(ds.act){
+    var a=ds.act;
+    if(a==="start"||a==="replay"){newGame();}
+    else if(a==="hint"){useHint();}
+    else if(a==="run"){runBuild();}
+    else if(a==="submit"){submitClean();}
+    else if(a==="next"){nextScenario();}
+    else if(a==="copy"){copyText(S.copy);}
+  }else if(ds.un!==undefined){unplace(parseInt(ds.un,10));}
+  else if(ds.bid){
+    if(S.cur&&!S.cur.done&&S.cur.type==="build"){S.cur.sel=(S.cur.sel===ds.bid?null:ds.bid);render();}
+  }else if(ds.slot!==undefined){
+    if(S.cur&&!S.cur.done&&S.cur.type==="build"){
+      if(S.cur.sel){place(parseInt(ds.slot,10),S.cur.sel);}
+      else{toast("Select or drag a block first","warn");}
+    }
+  }else if(ds.line){toggleLine(ds.line);}
+  else if(ds.opt){pick(ds.opt);}
+});
+app.addEventListener("dragstart",function(e){
+  var b=e.target.closest?e.target.closest("[data-bid]"):null;
+  if(!b){return;}
+  S.drag=b.dataset.bid;
+  try{e.dataTransfer.setData("text/plain",S.drag);e.dataTransfer.effectAllowed="move";}catch(x){}
+  b.classList.add("dragging");
+});
+app.addEventListener("dragend",function(e){
+  var b=e.target.closest?e.target.closest("[data-bid]"):null;
+  if(b){b.classList.remove("dragging");}
+});
+app.addEventListener("dragover",function(e){
+  var s=e.target.closest?e.target.closest("[data-slot]"):null;
+  if(s){e.preventDefault();s.classList.add("over");}
+});
+app.addEventListener("dragleave",function(e){
+  var s=e.target.closest?e.target.closest("[data-slot]"):null;
+  if(s){s.classList.remove("over");}
+});
+app.addEventListener("drop",function(e){
+  var s=e.target.closest?e.target.closest("[data-slot]"):null;
+  if(!s){return;}
+  e.preventDefault();s.classList.remove("over");
+  var id=S.drag;
+  if(!id){try{id=e.dataTransfer.getData("text/plain");}catch(x){id=null;}}
+  S.drag=null;
+  if(id){place(parseInt(s.dataset.slot,10),id);}
+});
+
+/* ---------- Timer tick ---------- */
+setInterval(function(){
+  if(!S||S.screen!=="play"||!S.cur){return;}
+  var c=S.cur,a=$("hTime"),b=$("sTime"),el;
+  if(c.done){return;}
+  el=(Date.now()-c.ts)/1000;
+  if(a){a.textContent=fmt(S.timeBanked+el);}
+  if(b){b.textContent=fmt(el);b.className=el>PAR?"late":"";}
+},250);
+
+render();
+})();
+</script>
+</body>
+</html>
