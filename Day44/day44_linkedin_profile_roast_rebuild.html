@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LinkedIn Profile Roast & Rebuild | Day 44</title>
+<style>
+:root{--bg:#f3f6fb;--panel:#fff;--ink:#172033;--muted:#68758b;--line:#e2e8f0;--blue:#2563eb;--soft:#eff6ff;--green:#16a34a}
+[data-theme=dark]{--bg:#0b1220;--panel:#111c2e;--ink:#e8eef9;--muted:#9aa9bf;--line:#26364d;--blue:#60a5fa;--soft:#152a48;--green:#4ade80}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,Segoe UI,sans-serif}header{background:linear-gradient(120deg,#0b1d3a,#153f83 60%,#2563eb);color:white;padding:28px 20px 32px}.wrap{max-width:1100px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center}.day,.pill{border:1px solid #ffffff55;background:#ffffff18;border-radius:99px;padding:7px 12px;font-size:12px}h1{font-size:clamp(28px,5vw,42px);line-height:1.12;margin:28px 0 10px}.sub{color:#dbeafe;max-width:760px}.hero-meta{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}main{max-width:1100px;margin:26px auto;padding:0 18px 45px;display:grid;grid-template-columns:260px 1fr;gap:20px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 35px #14285012}.sidebar{padding:20px;height:max-content;position:sticky;top:16px}.side-title{font-size:13px;font-weight:800}.track{height:8px;background:var(--line);border-radius:20px;overflow:hidden}.fill{height:100%;width:0;background:linear-gradient(90deg,#2563eb,#06b6d4)}.progress{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin:8px 0 18px}.steps{display:grid;gap:6px}.step{display:flex;align-items:center;gap:10px;text-align:left;width:100%;border:0;background:transparent;color:var(--muted);padding:10px;border-radius:10px;cursor:pointer;font:inherit}.step.active,.step:hover{background:var(--soft);color:var(--blue)}.num{width:25px;height:25px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;font-size:12px}.step.done .num{background:var(--green);color:white}.note{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin-top:18px}.content{padding:clamp(18px,3vw,30px)}.eyebrow{color:var(--blue);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:1px}h2{font-size:25px;margin:5px 0}.desc{color:var(--muted);margin:0 0 22px}.field{margin:18px 0}.field label{display:block;font-weight:700;margin-bottom:7px}input,textarea,select{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:12px;font:inherit}textarea{min-height:125px;resize:vertical}.hint{font-size:12px;color:var(--muted)}.actions{display:flex;justify-content:space-between;gap:10px;margin-top:24px;flex-wrap:wrap}.btn{border:0;border-radius:10px;padding:11px 17px;font:inherit;font-weight:750;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:var(--soft);color:var(--blue)}.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}.hidden{display:none!important}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.review{padding:13px;border:1px solid var(--line);border-radius:10px}.review b{display:block;margin-bottom:5px}.review span{white-space:pre-wrap;color:var(--muted);font-size:13px}.notice{background:var(--soft);border:1px solid var(--line);padding:12px;border-radius:10px;color:var(--muted);font-size:13px;margin:16px 0}.output{min-height:360px;font:13px/1.55 ui-monospace,Consolas,monospace}footer{text-align:center;color:var(--muted);font-size:12px;padding:0 15px 28px}@media(max-width:780px){main{grid-template-columns:1fr}.sidebar{position:static}.steps{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.grid{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header><div class="wrap"><div class="top"><b>ABTalks × Claude Challenge</b><span class="day">DAY 44 / 60</span></div><h1>LinkedIn Profile Roast<br>&amp; Rebuild Studio</h1><p class="sub">Turn your LinkedIn profile into a clear personal brand. Share honest inputs, generate a tailored Claude prompt, and leave with a practical 7-day activation plan.</p><div class="hero-meta"><span class="pill">⚡ Guided profile audit</span><span class="pill">🎯 Recruiter-focused positioning</span><span class="pill">🗓️ 7-day action plan</span></div></div></header>
+<main><aside class="card sidebar"><div class="side-title">YOUR PROGRESS</div><div class="track"><div class="fill" id="bar"></div></div><div class="progress"><span id="progressText">0 of 5 completed</span><span id="percent">0%</span></div><div class="steps" id="steps"><button class="step active" data-s="0"><i class="num">1</i> Headline</button><button class="step" data-s="1"><i class="num">2</i> About section</button><button class="step" data-s="2"><i class="num">3</i> Experience</button><button class="step" data-s="3"><i class="num">4</i> Top skills</button><button class="step" data-s="4"><i class="num">5</i> Target goal</button><button class="step" data-s="5"><i class="num">✓</i> Review &amp; generate</button></div><div class="note">Your answers stay in this browser session. This page does not upload profile data to a server.</div></aside>
+<section class="card content"><div id="formView"><div class="eyebrow" id="eyebrow">STEP 1 OF 5</div><h2 id="title">Current headline</h2><p class="desc" id="desc">Paste your current LinkedIn headline exactly as it appears.</p><div id="fields"></div><div class="actions"><button class="btn ghost" id="back">← Back</button><button class="btn primary" id="next">Continue →</button></div></div>
+<div id="reviewView" class="hidden"><div class="eyebrow">READY FOR THE NEXT STEP</div><h2>Review your inputs</h2><p class="desc">Check your details. Claude will use these facts and ask follow-up questions one at a time if important information is missing.</p><div class="grid" id="reviewGrid"></div><div class="notice"><b>How it works:</b> This page creates a detailed prompt. Paste it into Claude to receive the roast, rewrites, scorecards, 7-day plan, and shareable summary. It does not connect to LinkedIn or independently run an AI analysis.</div><div class="field"><label for="extra">Optional context (projects, metrics, target roles)</label><textarea id="extra" placeholder="Add only details you can verify..."></textarea></div><div class="actions"><button class="btn ghost" id="edit">← Edit answers</button><button class="btn primary" id="generate">Generate my Claude prompt ✨</button></div></div>
+<div id="outputView" class="hidden"><div class="eyebrow">YOUR PERSONALIZED PROMPT</div><h2>Ready to copy into Claude</h2><p class="desc">Start a new Claude conversation, paste the prompt, and answer any follow-up questions.</p><textarea class="output" id="output" readonly></textarea><div class="actions"><button class="btn ghost" id="review">← Review inputs</button><div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn secondary" id="download">Download .txt</button><button class="btn primary" id="copy">Copy prompt</button></div></div><div class="notice" id="message">Verify every generated claim and metric before publishing.</div></div></section></main><footer>Built for Day 44 • ABTalks × Claude 60 Days Challenge • Single-file HTML application</footer>
+<script>
+const fields=[
+{key:"headline",label:"Current LinkedIn headline",kind:"textarea",placeholder:"e.g. CSE Student | Aspiring AI/ML Engineer | Python | Machine Learning"},
+{key:"about",label:"Complete About section",kind:"textarea",placeholder:"Paste your full About section..."},
+{key:"expTitle",label:"Most recent experience — title",kind:"input",placeholder:"Role / internship / project title"},
+{key:"company",label:"Company / organization",kind:"input",placeholder:"Company, college, or project organization"},
+{key:"bullets",label:"Current experience bullets",kind:"textarea",placeholder:"Paste existing bullets or description..."},
+{key:"skills",label:"Top 5–10 skills (comma-separated)",kind:"textarea",placeholder:"Python, C++, Machine Learning, SQL..."},
+{key:"goal",label:"Primary target goal",kind:"select",options:["Job / internship opportunities","Attract clients","Thought leadership","Network growth","A combination of these"]},
+{key:"goalContext",label:"Target roles / audience / extra context",kind:"textarea",placeholder:"e.g. AI/ML internships, entry-level software roles..."}
+];
+const steps=[{name:"Current headline",desc:"Paste your LinkedIn headline exactly as it appears.",ids:[0]},{name:"About section",desc:"Paste the complete About section. The first two lines matter most.",ids:[1]},{name:"Most recent experience",desc:"Share your latest role, internship, or project entry.",ids:[2,3,4]},{name:"Top skills",desc:"List 5–10 skills currently visible on your profile.",ids:[5]},{name:"Target goal",desc:"Choose the main outcome you want LinkedIn to support.",ids:[6,7]}];
+const data={};let current=0,newProfile=false;
+const $=x=>document.getElementById(x);
+function render(){document.querySelectorAll(".step").forEach((b,i)=>{b.classList.toggle("active",i===current);b.classList.toggle("done",i<5&&done(i))});let n=[0,1,2,3,4].filter(done).length;$("bar").style.width=n*20+"%";$("progressText").textContent=n+" of 5 completed";$("percent").textContent=n*20+"%";
+$("formView").classList.toggle("hidden",current===5);$("reviewView").classList.add("hidden");$("outputView").classList.add("hidden");if(current===5){reviewPage();return}
+let s=steps[current];$("eyebrow").textContent="STEP "+(current+1)+" OF 5";$("title").textContent=s.name;$("desc").textContent=s.desc;$("fields").innerHTML="";
+s.ids.forEach(i=>{let f=fields[i],w=document.createElement("div");w.className="field";let l=document.createElement("label");l.textContent=f.label;w.append(l);let el=document.createElement(f.kind==="textarea"?"textarea":f.kind==="select"?"select":"input");if(f.kind==="input")el.type="text";if(f.placeholder)el.placeholder=f.placeholder;if(f.options)f.options.forEach(v=>{let o=document.createElement("option");o.textContent=v;o.value=v;el.append(o)});el.value=data[f.key]||"";el.oninput=()=>{data[f.key]=el.value;progress()};w.append(el);$("fields").append(w)});
+if(current===0){let w=document.createElement("div");w.className="field";w.innerHTML='<label><input id="newProfile" type="checkbox" style="width:auto"> I do not have a LinkedIn profile yet</label><p class="hint">Switches the questions to a new-profile setup.</p>';$("fields").append(w);w.querySelector("input").checked=newProfile;w.querySelector("input").onchange=e=>{newProfile=e.target.checked;render()}}
+$("back").disabled=current===0;progress();}
+function done(i){if(newProfile)return i===4?!!data.goal:true;if(i===0)return !!data.headline;if(i===1)return !!data.about;if(i===2)return !!(data.expTitle&&data.company&&data.bullets);if(i===3)return !!data.skills;return !!data.goal}
+function progress(){let n=[0,1,2,3,4].filter(done).length;$("bar").style.width=n*20+"%";$("progressText").textContent=n+" of 5 completed";$("percent").textContent=n*20+"%"}
+function reviewPage(){$("reviewView").classList.remove("hidden");let labels=[["Headline / identity",data.headline],["About / story",data.about],["Experience title",data.expTitle],["Company",data.company],["Experience bullets",data.bullets],["Top skills",data.skills],["Target goal",data.goal],["Goal context",data.goalContext]];$("reviewGrid").innerHTML=labels.map(([a,b])=>"<div class='review'><b>"+esc(a)+"</b><span>"+esc(b||"Not provided")+"</span></div>").join("");}
+function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+$("next").onclick=()=>{if(current<4){current++;render()}else{current=5;render()}};$("back").onclick=()=>{current=Math.max(0,current-1);render()};document.querySelectorAll(".step").forEach(b=>b.onclick=()=>{current=+b.dataset.s;render()});$("edit").onclick=()=>{current=0;render()};$("review").onclick=()=>{$("outputView").classList.add("hidden");reviewPage()};
+$("generate").onclick=()=>{data.extra=$("extra").value;let base=newProfile?`NEW PROFILE DETAILS\nName/status: ${data.headline||"Not provided"}\nBackground: ${data.about||"Not provided"}\nAchievements/projects: ${data.expTitle||"Not provided"} | ${data.company||"Not provided"} | ${data.bullets||"Not provided"}\nTop 3 skills: ${data.skills||"Not provided"}\nAudience: ${data.goal||"Not provided"}\nDifferentiator/context: ${data.goalContext||"Not provided"}`:`EXISTING PROFILE DETAILS\nHeadline: ${data.headline||"Not provided"}\nAbout: ${data.about||"Not provided"}\nExperience title: ${data.expTitle||"Not provided"}\nCompany: ${data.company||"Not provided"}\nExperience bullets: ${data.bullets||"Not provided"}\nTop skills: ${data.skills||"Not provided"}\nTarget goal: ${data.goal||"Not provided"}\nGoal context: ${data.goalContext||"Not provided"}`;
+$("output").value=`You are a LinkedIn Optimization Expert, Personal Branding Consultant, and experienced recruiter. Give me honest, specific, constructive feedback and a complete profile rebuild.
+
+NON-NEGOTIABLE RULES
+- Use ONLY my supplied information. Never invent roles, companies, achievements, credentials, metrics, or outcomes.
+- If essential information is missing, ask concise follow-up questions ONE AT A TIME before finalizing. Do not repeat questions already answered.
+- Clearly label assumptions, estimates, and placeholders. Never present estimates as verified results.
+- Explain WHY every recommendation matters. Use human language, not corporate filler.
+- Tailor everything to my stated goal. Do not promise recruiter visibility or job outcomes.
+- If I have no LinkedIn profile, create a new-profile strategy; do not score nonexistent sections.
+
+${base}
+
+Additional context: ${data.extra||"None supplied."}
+
+PART 1 — THE ROAST
+For an existing profile, score /10: Headline; About first two lines; About full section; Experience; Skills/keywords. Give the realistic 3-second recruiter reaction for each. Calculate overall /100 and explain the scoring rubric. For each section explain: (1) specific issue, quoting my words, (2) why it hurts, (3) invisible opportunity cost. Mark missing sections as missing, not reviewed. For a new profile, give a readiness assessment and missing foundations.
+
+PART 2 — THE REBUILD
+A. Headline: 3 options using [Role/Identity] | [What I do/value] | [Proof/differentiator]: keyword-optimized, value proposition, authority/thought-leadership. Explain when to use each; do not imply unsupported authority.
+B. About: complete copy-ready rewrite with two-line hook, human story, factual proof, clear CTA. Add natural LinkedIn SEO keywords and list them.
+C. Experience: Before → After for each bullet. Lead with action and outcomes. Use only supplied metrics; otherwise insert [ADD VERIFIED METRIC].
+D. Skills: top 10 in priority order for my goal, skills to remove only if clearly irrelevant, and 3 to pin. Separate current skills from suggested skills.
+
+PART 3 — BEFORE vs AFTER SCORECARD
+Compare headline, About hook, About full, experience, skills/keywords. Show before /10 → projected after /10 and change. Overall /100 before → projected after. Explain projected scores are estimates contingent on implementation, not measured results.
+
+PART 4 — 7-DAY ACTIVATION PLAN
+Day 1: profile-change checklist.
+Day 2: full "I rebuilt my LinkedIn" post under 1,300 characters with a comment-driving question.
+Day 3: exactly who to target for 10 strategic connections and a note under 300 characters.
+Day 4: explain Agree + Add Insight + Ask a Question; give 5 relevant post themes to comment on.
+Day 5: draft a niche lessons-learned / thoughtful-opinion post grounded in my real experience.
+Day 6: reply routine for every comment and 5 more targeted connections.
+Day 7: explain profile views, search appearances (if available), and acceptance rate; interpret cautiously and suggest adjustments.
+
+PART 5 — SHAREABLE SUMMARY CARD
+Fill: "I let AI roast my LinkedIn profile today. Before: __/100. After: __/100. Top 3 mistakes: 1... 2... 3... Biggest change: ..." Use real scores only when defensible; otherwise say "Not scored yet". Make it screenshot-friendly.
+
+FINAL CHECK
+Provide ready-to-paste copy; separate facts from suggestions/placeholders; be candid but respectful; end with the single highest-impact next action.`;$("reviewView").classList.add("hidden");$("outputView").classList.remove("hidden")};
+$("copy").onclick=async()=>{try{await navigator.clipboard.writeText($("output").value);$("message").textContent="✓ Prompt copied. Paste it into a new Claude conversation."}catch(e){$("output").select();document.execCommand("copy");$("message").textContent="Prompt selected. Copy and paste it into Claude."}};
+$("download").onclick=()=>{let a=document.createElement("a"),u=URL.createObjectURL(new Blob([$("output").value],{type:"text/plain"}));a.href=u;a.download="day44_linkedin_optimization_prompt.txt";a.click();URL.revokeObjectURL(u)};
+render();
+</script></body></html>
