@@ -1,0 +1,426 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Day 45 Decision Strategist</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: single centered column (720px), dark dashboard, one colored left border per report section. */
+:root {
+  --bg: #0f0f14;
+  --card: #1a1a24;
+  --card-2: #1e1e2e;
+  --text: #f0f0f5;
+  --muted: #8888a0;
+  --green: #34d399;
+  --red: #f87171;
+  --blue: #60a5fa;
+  --gold: #fbbf24;
+  --purple: #a78bfa;
+  --line: rgba(255,255,255,.07);
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 64px;
+}
+.wrap { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+h1, h2, h3, p, ul, ol { margin: 0; }
+h1, h2, h3 { text-wrap: balance; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--purple); }
+
+/* Header */
+header { display: flex; flex-direction: column; gap: 14px; }
+h1 { font-size: clamp(30px, 7vw, 44px); line-height: 1.05; font-weight: 800; letter-spacing: -.02em; }
+h1 span { background: linear-gradient(90deg, var(--blue), var(--purple)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ctx { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; display: grid; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+.ctx .q { font-size: 17px; font-weight: 600; }
+.ctx dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 6px 14px; font-size: 13.5px; }
+.ctx dt { color: var(--muted); }
+.ctx dd { margin: 0; }
+.note { font-size: 13px; color: var(--gold); background: rgba(251,191,36,.08); border: 1px solid rgba(251,191,36,.25); border-radius: 12px; padding: 10px 14px; }
+nav.jump { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+nav.jump a { flex: none; font-size: 12.5px; font-weight: 600; color: var(--muted); text-decoration: none; border: 1px solid var(--line); background: var(--card); padding: 6px 12px; border-radius: 999px; transition: color .2s, border-color .2s, transform .2s; }
+nav.jump a:hover, nav.jump a:focus-visible { color: var(--text); border-color: var(--purple); transform: translateY(-1px); outline: none; }
+
+/* Sections */
+section { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--c, var(--purple)); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 10px 28px rgba(0,0,0,.3); scroll-margin-top: 20px; transition: transform .25s, box-shadow .25s; }
+section:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(0,0,0,.38); }
+.sec-head { display: flex; flex-direction: column; gap: 4px; }
+.sec-head .num { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--c, var(--purple)); }
+h2 { font-size: 21px; font-weight: 700; letter-spacing: -.01em; }
+.sub { color: var(--muted); font-size: 13.5px; }
+.sub-card { background: var(--card-2); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; transition: transform .2s, border-color .2s; }
+.sub-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.16); }
+.tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; margin-bottom: 6px; }
+.tag.prov { color: var(--gold); background: rgba(251,191,36,.12); }
+.tag.assume { color: var(--gold); background: rgba(251,191,36,.12); }
+
+/* 1 real decision */
+.real p { font-size: 16.5px; line-height: 1.65; }
+.real p + p { margin-top: 2px; }
+.real b { color: var(--purple); }
+
+/* 2 cases */
+.cases { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.case { background: var(--card-2); border: 1px solid var(--line); border-top: 3px solid var(--k); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; transition: transform .2s, box-shadow .2s; }
+.case:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,.4); }
+.case h3 { font-size: 16px; font-weight: 700; color: var(--k); }
+.case h4 { margin: 0 0 2px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.case p { font-size: 14px; }
+.case .for { color: var(--green); }
+.case .weak { color: var(--red); }
+.case .up { color: var(--gold); }
+.case .best { color: var(--k); }
+.case h4.for, .case h4.weak, .case h4.up, .case h4.best { color: inherit; }
+.case h4.for { color: var(--green); } .case h4.weak { color: var(--red); } .case h4.up { color: var(--gold); } .case h4.best { color: var(--purple); }
+.case p.for, .case p.weak, .case p.up, .case p.best { color: var(--text); }
+
+/* 3 buster */
+.list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.list li { background: var(--card-2); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 14.5px; }
+.list li b { display: block; margin-bottom: 2px; }
+.list li small { color: var(--muted); font-size: 13px; display: block; }
+.bias { color: var(--gold); }
+.sub-title { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.overlook { border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.07); }
+.overlook b { color: var(--purple); }
+
+/* 4 matrix */
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.dot.a { background: linear-gradient(90deg, #3b82f6, var(--blue)); }
+.dot.b { background: linear-gradient(90deg, #10b981, var(--green)); }
+.crit { display: flex; flex-direction: column; gap: 10px; padding-bottom: 16px; border-bottom: 1px dashed var(--line); }
+.crit:last-of-type { border-bottom: 0; padding-bottom: 0; }
+.crit-name { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.crit-name b { font-size: 15px; }
+.crit-name span { font-size: 12px; color: var(--muted); }
+.row { display: grid; grid-template-columns: 150px 1fr 36px; gap: 12px; align-items: center; }
+.row .lbl { font-size: 13px; color: var(--muted); font-weight: 500; }
+.track { height: 12px; background: rgba(255,255,255,.06); border-radius: 999px; overflow: hidden; }
+.fill { height: 100%; width: var(--w); border-radius: 999px; animation: grow 1.2s cubic-bezier(.22,.8,.25,1) backwards; animation-delay: var(--d, 0ms); }
+.fill.a { background: linear-gradient(90deg, #2563eb, var(--blue)); box-shadow: 0 0 14px rgba(96,165,250,.35); }
+.fill.b { background: linear-gradient(90deg, #059669, var(--green)); box-shadow: 0 0 14px rgba(52,211,153,.3); }
+@keyframes grow { from { width: 0; } to { width: var(--w); } }
+.row .val { font-weight: 700; font-size: 14px; text-align: right; font-variant-numeric: tabular-nums; }
+.why { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+.why p b { color: var(--text); font-weight: 600; }
+.why .wa b { color: var(--blue); } .why .wb b { color: var(--green); }
+.totals { display: flex; flex-direction: column; gap: 12px; padding-top: 6px; }
+.tot { background: var(--card-2); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.tot.win { border-color: var(--gold); background: linear-gradient(180deg, rgba(251,191,36,.10), var(--card-2)); box-shadow: 0 0 0 1px rgba(251,191,36,.25), 0 0 32px rgba(251,191,36,.12); }
+.tot-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.tot-top b { font-size: 15px; }
+.tot-top .score { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.tot-top .score small { font-size: 14px; color: var(--muted); font-weight: 500; }
+.badge { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #1a1300; background: var(--gold); padding: 3px 9px; border-radius: 999px; margin-left: 8px; }
+.tot .track { height: 16px; }
+
+/* 5 premortem */
+.pm { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.pm-card { background: var(--card-2); border: 1px solid var(--line); border-top: 3px solid var(--k); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; transition: transform .2s; }
+.pm-card:hover { transform: translateY(-3px); }
+.pm-card h3 { font-size: 15px; color: var(--k); }
+.pm-card ol { padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.pm-card .lab { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.pm-card .warn .lab { color: var(--red); } .pm-card .prev .lab { color: var(--green); } .pm-card .why-lab { color: var(--muted); }
+.pm-card p { font-size: 14px; }
+
+/* 6 plan */
+.days { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.days li { display: grid; grid-template-columns: 74px 1fr; gap: 14px; align-items: start; background: var(--card-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; transition: transform .2s, border-color .2s; }
+.days li:hover { transform: translateX(3px); border-color: rgba(255,255,255,.16); }
+.days .d { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--k); padding-top: 2px; }
+.days .d small { display: block; color: var(--muted); font-weight: 600; letter-spacing: .06em; font-size: 10.5px; }
+.days p { font-size: 14px; }
+
+/* 7 verdict */
+section.verdict { --c: var(--gold); border-color: rgba(251,191,36,.45); background: linear-gradient(180deg, rgba(251,191,36,.08), var(--card) 55%); box-shadow: 0 0 0 1px rgba(251,191,36,.18), 0 0 48px rgba(251,191,36,.14), 0 10px 28px rgba(0,0,0,.35); }
+.v-pick { font-size: clamp(22px, 5vw, 28px); font-weight: 800; letter-spacing: -.01em; color: var(--gold); line-height: 1.2; }
+.verdict .block { display: flex; flex-direction: column; gap: 6px; }
+.verdict .block p, .verdict .block li { font-size: 14.5px; }
+.verdict ul { padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.hard { border-left: 3px solid var(--red); background: rgba(248,113,113,.08); padding: 14px 16px; border-radius: 0 12px 12px 0; font-weight: 600; font-size: 15px; }
+.hard small { display: block; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 4px; font-weight: 800; }
+
+/* 8 share cards */
+.share { display: flex; flex-direction: column; gap: 18px; }
+.sc { position: relative; background: linear-gradient(160deg, var(--card-2), #14141d); border: 1px solid rgba(255,255,255,.1); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.4); transition: transform .25s; }
+.sc:hover { transform: translateY(-3px); }
+.sc.gold { border-color: rgba(251,191,36,.5); box-shadow: 0 0 36px rgba(251,191,36,.14), 0 12px 32px rgba(0,0,0,.4); }
+.sc .kicker { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.sc .kicker b { color: var(--purple); }
+.sc h3 { font-size: 20px; line-height: 1.25; font-weight: 800; }
+.sc .mini { display: grid; gap: 8px; }
+.sc .mini .row { grid-template-columns: 96px 1fr 62px; }
+.sc .mini .val { font-size: 13px; }
+.sc .foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
+.sc .foot b { color: var(--text); font-weight: 600; }
+.hook { font-size: 18px; font-weight: 700; line-height: 1.35; }
+.cap { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.cta { color: var(--blue); font-weight: 600; font-size: 14px; }
+button.copy { font: inherit; font-size: 12.5px; font-weight: 600; color: var(--text); background: var(--card); border: 1px solid rgba(255,255,255,.16); border-radius: 10px; padding: 7px 14px; cursor: pointer; transition: border-color .2s, transform .2s; }
+button.copy:hover, button.copy:focus-visible { border-color: var(--purple); transform: translateY(-1px); outline: none; }
+footer { text-align: center; color: var(--muted); font-size: 12.5px; }
+
+@media (max-width: 600px) {
+  body { padding-block: 28px 48px; }
+  section { padding: 20px 18px; }
+  .cases, .pm { grid-template-columns: 1fr; }
+  .ctx dl { grid-template-columns: 1fr; gap: 0 0; }
+  .ctx dt { margin-top: 8px; }
+  .row { grid-template-columns: 1fr 36px; row-gap: 6px; }
+  .row .lbl { grid-column: 1 / -1; }
+  .sc .mini .row { grid-template-columns: 1fr 62px; }
+  .days li { grid-template-columns: 1fr; gap: 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .fill { animation: none; }
+  section, .sub-card, .case, .pm-card, .days li, .sc, nav.jump a, button.copy { transition: none; }
+  section:hover, .case:hover, .pm-card:hover, .sc:hover, .days li:hover { transform: none; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Day 45 &middot; Decision Strategist</div>
+    <h1><span>DECISION</span> STRATEGIST</h1>
+    <div class="ctx">
+      <div class="q">What should be my primary career focus for the next 6 months?</div>
+      <dl>
+        <dt>Option A</dt><dd>AI/ML + Cloud Computing</dd>
+        <dt>Option B</dt><dd>Full-Stack Development + DSA</dd>
+        <dt>Goal</dt><dd>Industry-ready AI/ML engineer: 2&ndash;3 quality projects and an internship within 6 months</dd>
+        <dt>Gut says</dt><dd>A, aligned with the long-term goal</dd>
+        <dt>Main fear</dt><dd>Falling behind in DSA and missing placement opportunities</dd>
+        <dt>Reversible?</dt><dd>Yes, through a 6-month review</dd>
+      </dl>
+    </div>
+    <p class="note"><b>Provisional.</b> I only know what is listed above. Scores and claims about the job market are assumptions to test in the 7-day plan, not facts about you.</p>
+    <nav class="jump" aria-label="Report sections">
+      <a href="#s1">1 Real decision</a><a href="#s2">2 Cases</a><a href="#s3">3 Assumptions</a><a href="#s4">4 Matrix</a><a href="#s5">5 Premortem</a><a href="#s6">6 Test plan</a><a href="#s7">7 Verdict</a><a href="#s8">8 Share</a>
+    </nav>
+  </header>
+
+  <section id="s1" style="--c: var(--purple)">
+    <div class="sec-head"><span class="num">Section 1</span><h2>The real decision</h2></div>
+    <div class="real">
+      <p>You are choosing between the shortest path to the engineer you want to become (<b>A</b>) and the widest door to a first offer (<b>B</b>).</p>
+      <p>The trade-off is long-term fit against near-term placement security.</p>
+      <p>It feels hard because your gut already points to A, and your fear of missing placements is louder than your evidence.</p>
+    </div>
+  </section>
+
+  <section id="s2" style="--c: var(--blue)">
+    <div class="sec-head"><span class="num">Section 2</span><h2>Case for each option</h2></div>
+    <div class="cases">
+      <article class="case" style="--k: var(--blue)">
+        <h3>Option A &middot; AI/ML + Cloud</h3>
+        <div><h4 class="for">Strongest case for</h4><p>It is the goal you named. Two or three deployed ML projects give an internship reviewer something specific to judge.</p></div>
+        <div><h4 class="up">Hidden upside</h4><p>Cloud skills turn notebooks into running services. A live demo separates you from tutorial-only portfolios.</p></div>
+        <div><h4 class="weak">Biggest weakness</h4><p>DSA and placement prep get no built-in schedule, so they are the first thing to slip.</p></div>
+        <div><h4 class="best">Best if you value</h4><p>Depth in the field you want over the number of open doors.</p></div>
+      </article>
+      <article class="case" style="--k: var(--green)">
+        <h3>Option B &middot; Full-Stack + DSA</h3>
+        <div><h4 class="for">Strongest case for</h4><p>DSA and web skills are screened in the widest range of internship and placement processes. It is the lowest-risk route to interviews.</p></div>
+        <div><h4 class="up">Hidden upside</h4><p>A shipped full-stack app is a ready-made home for AI features later. Fundamentals transfer.</p></div>
+        <div><h4 class="weak">Biggest weakness</h4><p>It can quietly postpone the AI/ML goal until "later" never comes.</p></div>
+        <div><h4 class="best">Best if you value</h4><p>Security and a clear checklist over specialization.</p></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="s3" style="--c: var(--gold)">
+    <div class="sec-head"><span class="num">Section 3</span><h2>Assumption buster</h2></div>
+    <div class="sub-title">3 assumptions to test</div>
+    <ul class="list">
+      <li><span class="tag assume">Assumption</span><b>"AI/ML internships don't test DSA."</b><small>Many companies run coding rounds for every engineering role. Check 10 real AI/ML postings before believing either way.</small></li>
+      <li><span class="tag assume">Assumption</span><b>"Choosing B means giving up AI/ML."</b><small>It delays AI/ML. A full-stack project with an ML feature keeps the goal alive inside B.</small></li>
+      <li><span class="tag assume">Assumption</span><b>"The next 6 months is one all-or-nothing bet."</b><small>You said the decision is reversible. A check-in at month 2 and month 4 lowers the stakes further.</small></li>
+    </ul>
+    <div class="sub-title">2 cognitive biases at work</div>
+    <ul class="list">
+      <li><b class="bias">Loss aversion</b><small>Missing a placement feels larger than the equal gain of building the exact skills you want, so fear is outvoting the goal.</small></li>
+      <li><b class="bias">Confirmation bias</b><small>With a gut preference for A, you may collect only evidence that supports A. Include the strongest evidence for B in the 7-day test.</small></li>
+    </ul>
+    <div class="sub-title">1 overlooked factor</div>
+    <ul class="list">
+      <li class="overlook"><b>Your placement calendar.</b><small>The real deadline is the date of the first coding screening you want to clear, not "6 months". I don't know that date. Finding it on Day 2 is the single most useful fact you can add.</small></li>
+    </ul>
+  </section>
+
+  <section id="s4" style="--c: var(--blue)">
+    <div class="sec-head"><span class="num">Section 4</span><h2>Decision matrix</h2><p class="sub"><span class="tag prov">Provisional scores</span> out of 10 per factor, 70 in total. Stress and Regret Risk: 10 = low.</p></div>
+    <div class="legend"><span><i class="dot a"></i>Option A &middot; AI/ML + Cloud</span><span><i class="dot b"></i>Option B &middot; Full-Stack + DSA</span></div>
+    <div id="matrix"></div>
+    <div class="totals" id="totals"></div>
+  </section>
+
+  <section id="s5" style="--c: var(--red)">
+    <div class="sec-head"><span class="num">Section 5</span><h2>Premortem</h2><p class="sub">Imagine it is 12 months from now and this choice failed.</p></div>
+    <div class="pm">
+      <article class="pm-card" style="--k: var(--blue)">
+        <h3>If A failed</h3>
+        <div><div class="lab why-lab">3 reasons</div>
+          <ol><li>Tutorial hopping across too many tools, with no finished project.</li><li>DSA faded, and coding rounds filtered you out.</li><li>Projects looked like copies of common tutorials and had no live demo.</li></ol></div>
+        <div class="warn"><div class="lab">Warning sign</div><p>Month 2 arrives with zero deployed projects, or three straight weeks with no DSA practice.</p></div>
+        <div class="prev"><div class="lab">Prevention</div><p>Set a weekly DSA floor in your calendar and ship one live demo by week 8.</p></div>
+      </article>
+      <article class="pm-card" style="--k: var(--green)">
+        <h3>If B failed</h3>
+        <div><div class="lab why-lab">3 reasons</div>
+          <ol><li>You ended up with a generic CRUD portfolio nobody remembers.</li><li>DSA grinding crowded out ML, and motivation dropped.</li><li>You had no AI/ML signal when AI/ML internships opened.</li></ol></div>
+        <div class="warn"><div class="lab">Warning sign</div><p>You dread sessions and keep opening ML content on the side for several weeks.</p></div>
+        <div class="prev"><div class="lab">Prevention</div><p>Block 3 hours a week for an ML build, or add an AI feature to your full-stack project.</p></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="s6" style="--c: var(--green)">
+    <div class="sec-head"><span class="num">Section 6</span><h2>7-day test plan</h2><p class="sub">One action a day. Thresholds are proposals you can change.</p></div>
+    <ol class="days">
+      <li style="--k: var(--blue)"><div class="d">Day 1<small>Research</small></div><p>Collect 10 AI/ML and 10 SDE internship postings and tally how often DSA, cloud and ML projects are required.</p></li>
+      <li style="--k: var(--blue)"><div class="d">Day 2<small>Research</small></div><p>Find your placement calendar and eligibility rules, and note the date of the earliest coding screening.</p></li>
+      <li style="--k: var(--gold)"><div class="d">Day 3<small>Experiment</small></div><p>Build a tiny end-to-end ML demo (train, wrap in an API, deploy on a free cloud tier) and note what energized or frustrated you.</p></li>
+      <li style="--k: var(--gold)"><div class="d">Day 4<small>Experiment</small></div><p>Solve 4 easy-to-medium DSA problems against a timer and record the time and where you got stuck.</p></li>
+      <li style="--k: var(--purple)"><div class="d">Day 5<small>Talk</small></div><p>Message 2 seniors or alumni who landed AI/ML internships and ask how they balanced DSA with projects.</p></li>
+      <li style="--k: var(--purple)"><div class="d">Day 6<small>Talk</small></div><p>Ask a placement coordinator or recruiter what their coding rounds screen for, and how much a project portfolio counts.</p></li>
+      <li style="--k: var(--green)"><div class="d">Day 7<small>Decide</small></div><p>Confirm A if the demo excited you, postings reward projects, and about 5 DSA hours a week fits. Switch to B if the first screening is under 12 weeks away and your timed solving is weak.</p></li>
+    </ol>
+  </section>
+
+  <section id="s7" class="verdict">
+    <div class="sec-head"><span class="num">Section 7</span><h2>The verdict</h2></div>
+    <div class="v-pick" id="vpick">Choose Option A: AI/ML + Cloud, with a fixed DSA floor.</div>
+    <div class="block"><div class="sub-title">Why</div>
+      <p>It leads the matrix, it matches your stated goal, and your biggest fear has a direct fix. Your fear is about placements, and that is a scheduling problem you can solve inside A with a weekly DSA block, without switching paths.</p></div>
+    <div class="block"><div class="sub-title">What could change this verdict</div>
+      <ul>
+        <li>Your first coding screening is within roughly 12 weeks and your timed DSA results are weak.</li>
+        <li>The Day 1 postings show AI/ML roles mostly ask for DSA and little project work.</li>
+        <li>You cannot hold the weekly DSA floor for two weeks in a row.</li>
+      </ul></div>
+    <div class="hard"><small>Hard truth</small>A strong AI/ML portfolio will not save you from a coding round you didn't practice for.</div>
+  </section>
+
+  <section id="s8" style="--c: var(--purple)">
+    <div class="sec-head"><span class="num">Section 8</span><h2>Shareable cards</h2><p class="sub">Compact and screenshot-ready.</p></div>
+    <div class="share">
+      <article class="sc" id="card1">
+        <div class="kicker"><b>Day 45 &middot; Decision Matrix</b><span>Provisional</span></div>
+        <h3>AI/ML + Cloud vs Full-Stack + DSA</h3>
+        <div class="mini" id="miniBars"></div>
+        <div class="foot"><span id="miniNote"></span><b>Built with Claude AI</b></div>
+      </article>
+      <article class="sc gold" id="card2">
+        <div class="kicker"><b>Day 45 &middot; Verdict</b><span>6-month review</span></div>
+        <h3 style="color: var(--gold)">AI/ML + Cloud, with a fixed DSA floor.</h3>
+        <p>The fear of missing placements is real. It gets solved by a weekly schedule, not by dropping the goal.</p>
+        <div class="foot"><span>Hard truth: portfolio doesn't replace practice.</span><b>Built with Claude AI</b></div>
+      </article>
+      <article class="sc" id="card3">
+        <div class="kicker"><b>Day 45 &middot; LinkedIn</b><span>Hook + caption</span></div>
+        <p class="hook">I had two paths and six months. I let a scoring matrix argue with my gut.</p>
+        <div class="cap" id="cap">
+          <span>Option A: AI/ML + Cloud. Option B: Full-Stack + DSA.</span>
+          <span>The matrix gave a close result, and my real fear was placements, so I added a DSA floor.</span>
+          <span>Now I test it for 7 days, then review at 6 months.</span>
+        </div>
+        <p class="cta" id="cta">What would you choose? Comment A or B.</p>
+        <div class="foot"><button class="copy" id="copyBtn" type="button">Copy post text</button><b>Built with Claude AI</b></div>
+      </article>
+    </div>
+  </section>
+
+  <footer>Built with Claude AI &middot; Scores are provisional and based on stated assumptions.</footer>
+</div>
+
+<script>
+(function () {
+  var C = [
+    { n: 'Life / Career Upside', h: '', a: 9, b: 7,
+      ta: 'Matches the AI/ML engineer goal directly, and deployed ML projects are a strong signal.',
+      tb: 'Strong, broad employability, but it points to a general SDE path.' },
+    { n: 'Financial Safety', h: '', a: 5, b: 8,
+      ta: 'Fewer entry-level AI/ML openings, and a weak DSA base can block interviews.',
+      tb: 'Widest pool of internships and placements, since DSA and web skills are screened almost everywhere.' },
+    { n: 'Growth & Learning', h: '', a: 9, b: 7,
+      ta: 'Steep, compounding learning across ML, deployment and cloud.',
+      tb: 'Solid growth, though returns flatten sooner than in ML plus cloud.' },
+    { n: 'Stress', h: '10 = low stress', a: 5, b: 6,
+      ta: 'Wider surface area plus the placement fear keeps pressure high.',
+      tb: 'A clearer checklist, though placement season pressure remains.' },
+    { n: 'Reversibility', h: '', a: 7, b: 8,
+      ta: 'Reviewable at month 6, but catching up on DSA later takes real time.',
+      tb: 'Easy to add AI/ML afterward, and the fundamentals transfer.' },
+    { n: 'Long-term Alignment', h: '', a: 10, b: 6,
+      ta: 'Exactly your stated long-term direction.',
+      tb: 'A useful foundation, but not the shortest path to your goal.' },
+    { n: 'Regret Risk', h: '10 = low regret', a: 6, b: 5,
+      ta: 'Regret centers on one scenario, missed placements, which a DSA floor reduces.',
+      tb: 'Likely to feel like postponing the goal you named if your gut preference persists.' }
+  ];
+  var sum = function (k) { return C.reduce(function (s, c) { return s + c[k]; }, 0); };
+  var A = sum('a'), B = sum('b');
+  var winA = A >= B;
+  var el = function (id) { return document.getElementById(id); };
+
+  var html = '';
+  C.forEach(function (c, i) {
+    html += '<div class="crit">' +
+      '<div class="crit-name"><b>' + c.n + '</b>' + (c.h ? '<span>' + c.h + '</span>' : '') + '</div>' +
+      '<div class="row"><span class="lbl">A &middot; AI/ML + Cloud</span><div class="track"><div class="fill a" style="--w:' + c.a * 10 + '%;--d:' + (i * 2) * 110 + 'ms"></div></div><span class="val">' + c.a + '</span></div>' +
+      '<div class="row"><span class="lbl">B &middot; Full-Stack + DSA</span><div class="track"><div class="fill b" style="--w:' + c.b * 10 + '%;--d:' + (i * 2 + 1) * 110 + 'ms"></div></div><span class="val">' + c.b + '</span></div>' +
+      '<div class="why"><p class="wa"><b>A:</b> ' + c.ta + '</p><p class="wb"><b>B:</b> ' + c.tb + '</p></div>' +
+    '</div>';
+  });
+  el('matrix').innerHTML = html;
+
+  var d0 = C.length * 2 * 110 + 150;
+  function tot(label, v, cls, win, d) {
+    return '<div class="tot' + (win ? ' win' : '') + '">' +
+      '<div class="tot-top"><b>' + label + (win ? '<span class="badge">Higher score</span>' : '') + '</b><span class="score">' + v + '<small> / 70</small></span></div>' +
+      '<div class="track"><div class="fill ' + cls + '" style="--w:' + (v / 70 * 100) + '%;--d:' + d + 'ms"></div></div></div>';
+  }
+  el('totals').innerHTML =
+    tot('Option A &middot; AI/ML + Cloud', A, 'a', winA, d0) +
+    tot('Option B &middot; Full-Stack + DSA', B, 'b', !winA, d0 + 160);
+
+  el('miniBars').innerHTML =
+    '<div class="row"><span class="lbl">A &middot; AI/ML</span><div class="track"><div class="fill a" style="--w:' + (A / 70 * 100) + '%"></div></div><span class="val">' + A + ' / 70</span></div>' +
+    '<div class="row"><span class="lbl">B &middot; Full-Stack</span><div class="track"><div class="fill b" style="--w:' + (B / 70 * 100) + '%"></div></div><span class="val">' + B + ' / 70</span></div>';
+  el('miniNote').textContent = 'Gap of ' + Math.abs(A - B) + ' points: close, so test before committing.';
+
+  el('copyBtn').addEventListener('click', function () {
+    var btn = this;
+    var text = el('card3').querySelector('.hook').textContent + '\n\n' +
+      Array.prototype.map.call(el('cap').children, function (s) { return s.textContent; }).join('\n') + '\n\n' +
+      el('cta').textContent;
+    function done(msg) { btn.textContent = msg; setTimeout(function () { btn.textContent = 'Copy post text'; }, 1800); }
+    function fallback() {
+      var r = document.createRange();
+      r.selectNodeContents(el('card3'));
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      done('Selected: press copy');
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () { done('Copied'); }, fallback);
+    } catch (e) { fallback(); }
+  });
+})();
+</script>
+
+</body></html>
