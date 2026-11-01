@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autonomous Agent Studio</title>
+<style>
+:root{--bg:#090d18;--panel:#111a2b;--panel2:#172238;--line:#263651;--text:#edf3ff;--muted:#91a2bd;--blue:#60a5fa;--cyan:#22d3ee;--violet:#a78bfa;--green:#34d399;--amber:#fbbf24;--red:#fb7185}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#182a4b 0,transparent 38%),radial-gradient(ellipse at 90% 10%,#291b48 0,transparent 30%),var(--bg);color:var(--text);font:14px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{max-width:1440px;margin:auto;padding:28px}.top{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}.brand{display:flex;gap:13px;align-items:center}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--cyan),var(--violet));display:grid;place-items:center;color:#07111f;font-size:22px;font-weight:900;box-shadow:0 8px 30px #22d3ee33}.eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.title{font-size:clamp(25px,4vw,38px);font-weight:850;letter-spacing:-1.3px;margin:2px 0}.sub{color:var(--muted)}.pill{border:1px solid var(--line);background:#101a2b;padding:8px 12px;border-radius:999px;color:var(--muted);font-size:12px}
+.layout{display:grid;grid-template-columns:360px minmax(0,1fr);gap:18px}.panel{background:linear-gradient(145deg,#121d30ee,#0f1727ee);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 14px 40px #0003;min-width:0}.panel h2{font-size:15px;margin:0 0 14px}.panel h3{font-size:13px;margin:0 0 8px}.muted{color:var(--muted)}label{display:block;color:#bdcbe0;font-size:12px;margin:12px 0 6px}input,textarea,select{width:100%;background:#091323;color:var(--text);border:1px solid #2a3c59;border-radius:10px;padding:11px 12px;font:inherit;outline:none}textarea{min-height:95px;resize:vertical}input:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #22d3ee18}.btn{border:0;border-radius:11px;padding:11px 15px;font-weight:800;cursor:pointer;color:#07111e;background:linear-gradient(100deg,var(--cyan),#8b9cff);transition:.2s}.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}.btn.secondary{background:#1c2a41;color:var(--text);border:1px solid #334968}.btn.danger{background:#3b1c2b;color:#fecdd3;border:1px solid #74364b}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.notice{padding:11px 12px;border-radius:10px;background:#332713;border:1px solid #735321;color:#fcd98b;font-size:12px;margin-top:12px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}.stat{padding:13px;background:#0c1627;border:1px solid var(--line);border-radius:13px}.stat b{display:block;font-size:23px;letter-spacing:-.5px}.stat span{font-size:11px;color:var(--muted)}.maincol{display:grid;gap:18px}.viz{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;align-items:center}.node{background:#0c1729;border:1px solid #2b3c57;border-radius:12px;padding:12px 8px;text-align:center;position:relative;min-height:78px}.node b{display:block;font-size:12px}.node small{color:var(--muted);font-size:10px}.node.active{border-color:var(--cyan);box-shadow:0 0 0 2px #22d3ee20,0 0 22px #22d3ee22}.node.done{border-color:#247b62}.cycle{grid-column:1/-1;text-align:center;color:var(--violet);font-size:12px;padding:8px;border:1px dashed #6552a2;border-radius:10px}.log{max-height:230px;overflow:auto;display:flex;flex-direction:column;gap:7px}.logitem{padding:8px 10px;border-radius:9px;background:#0a1424;border-left:3px solid var(--blue);font-size:12px}.logitem small{display:block;color:var(--muted)}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}.tab{padding:7px 10px;border-radius:8px;background:#0b1526;border:1px solid var(--line);color:var(--muted);cursor:pointer;font-size:12px}.tab.active{color:var(--cyan);border-color:#26778a}.output{white-space:pre-wrap;overflow-wrap:anywhere;background:#091323;border:1px solid #233650;border-radius:11px;padding:13px;min-height:90px;max-height:360px;overflow:auto;color:#dce8fb;font-size:12px}.history{width:100%;border-collapse:collapse;font-size:12px}.history th,.history td{text-align:left;padding:9px;border-bottom:1px solid var(--line)}.history th{color:var(--muted);font-weight:600}.bar{height:7px;background:#24334b;border-radius:10px;overflow:hidden;margin-top:7px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));width:0;transition:width .5s}.agentgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.agent{background:#0b1526;border:1px solid var(--line);border-radius:10px;padding:10px}.agent b{font-size:11px}.agent p{font-size:10px;color:var(--muted);margin:5px 0 0}.footer{color:var(--muted);font-size:11px;text-align:center;padding:18px}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.wrap{padding:14px}.top{align-items:flex-start;flex-direction:column}.viz{grid-template-columns:repeat(2,1fr)}.agentgrid{grid-template-columns:repeat(2,1fr)}}
+</style></head>
+<body><div class="wrap">
+<header class="top"><div class="brand"><div class="logo">✳</div><div><div class="eyebrow">Multi-agent orchestration lab</div><div class="title">Autonomous Agent Studio</div><div class="sub">Plan · Build · Evaluate · Improve · Repeat</div></div></div><div class="pill" id="status">● Ready to configure</div></header>
+<div class="layout">
+<aside class="panel">
+<h2>01 / Workflow configuration</h2>
+<label>Project objective</label><textarea id="objective">Build an end-to-end machine learning project. Analyze the dataset, prepare features, train and compare suitable models, evaluate performance, improve the solution, and produce clear documentation.</textarea>
+<label>Dataset / project context</label><textarea id="context" placeholder="Describe dataset columns, target variable, constraints, or paste a data dictionary.">Create a reproducible ML project. Do not invent dataset statistics or claim code was executed. If data is unavailable, produce a clearly labelled implementation plan and request the required files.</textarea>
+<label>Success rubric</label><textarea id="rubric">Balanced project quality: problem understanding, data preparation, model choice, evaluation methodology, code structure, reproducibility, tests, documentation, and deployment readiness. Score overall quality from 0 to 100 and justify it.</textarea>
+<label>Target quality score</label><input id="target" type="number" min="1" max="100" value="85">
+<label>Anthropic API key</label><input id="key" type="password" placeholder="sk-ant-… (kept in this browser tab only)">
+<label>Model</label><select id="model"><option value="claude-sonnet-4-20250514">Claude Sonnet 4</option><option value="claude-3-7-sonnet-20250219">Claude 3.7 Sonnet</option><option value="claude-3-5-haiku-20241022">Claude 3.5 Haiku</option></select>
+<div class="notice"><b>API requirement:</b> Anthropic API calls require your own API key and may require billing. This standalone browser app sends requests directly to Anthropic. For production, route calls through a secure backend; never expose a long-lived key in a public deployment.</div>
+<div class="actions"><button class="btn" id="start">▶ Start autonomous run</button><button class="btn secondary" id="stop" disabled>Stop run</button><button class="btn danger" id="reset">Reset</button></div>
+<p class="muted" style="font-size:11px">The runtime safety cap is 12 rounds. It is a fallback only; threshold or plateau should normally end the run first.</p>
+</aside>
+<main class="maincol">
+<div class="stats"><div class="stat"><b id="roundStat">0</b><span>Rounds completed</span></div><div class="stat"><b id="scoreStat">—</b><span>Latest quality score</span></div><div class="stat"><b id="retryStat">0</b><span>API retries</span></div><div class="stat"><b id="timeStat">0s</b><span>Elapsed time</span></div></div>
+<section class="panel"><h2>02 / Live orchestration cycle</h2><div class="viz" id="viz">
+<div class="node" data-agent="Planner"><b>◈ Planner</b><small>Plan the work</small></div><div class="node" data-agent="Executor"><b>⚙ Executor</b><small>Create the draft</small></div><div class="node" data-agent="Evaluator"><b>◎ Evaluator</b><small>Score against rubric</small></div><div class="node" data-agent="Critic"><b>⌁ Critic</b><small>Find weaknesses</small></div>
+<div class="node" data-agent="Improver"><b>✧ Improver</b><small>Revise the draft</small></div><div class="node" data-agent="Memory Manager"><b>▤ Memory</b><small>Carry context forward</small></div><div class="node" data-agent="Safety Monitor"><b>⬡ Safety</b><small>Check safe claims</small></div><div class="node" data-agent="Final Reviewer"><b>✓ Final Reviewer</b><small>Approve final result</small></div>
+<div class="cycle">↶ IMPROVER → EVALUATOR · Re-evaluate every pass · Stop branch → FINAL REVIEWER</div></div><p class="muted" id="roundLabel">Waiting for workflow input.</p></section>
+<section class="panel"><h2>03 / Agent responsibilities</h2><div class="agentgrid">
+<div class="agent"><b>Planner</b><p>Breaks the objective into milestones, dependencies, and acceptance checks.</p></div><div class="agent"><b>Executor</b><p>Produces the first substantive project draft and implementation plan.</p></div><div class="agent"><b>Evaluator</b><p>Scores the current draft against the supplied rubric with evidence.</p></div><div class="agent"><b>Critic</b><p>Finds gaps, risks, unsupported claims, and high-impact weaknesses.</p></div><div class="agent"><b>Improver</b><p>Uses the previous evaluation and critique to revise the draft.</p></div><div class="agent"><b>Memory Manager</b><p>Compresses durable decisions and unresolved items between rounds.</p></div><div class="agent"><b>Safety Monitor</b><p>Flags unsafe instructions, secrets, fabricated execution, and data risks.</p></div><div class="agent"><b>Final Reviewer</b><p>Checks the final deliverable after the stop condition fires.</p></div></div></section>
+<section class="panel"><h2>04 / Activity log</h2><div class="log" id="log"><div class="logitem">Studio initialized.<small>Configure objective and API key to begin.</small></div></div></section>
+<section class="panel"><h2>05 / Intermediate agent outputs</h2><div class="tabs" id="tabs"><button class="tab active" data-tab="Planner">Planner</button><button class="tab" data-tab="Executor">Executor</button><button class="tab" data-tab="Evaluator">Evaluator</button><button class="tab" data-tab="Critic">Critic</button><button class="tab" data-tab="Improver">Improver</button><button class="tab" data-tab="Memory Manager">Memory</button><button class="tab" data-tab="Safety Monitor">Safety</button><button class="tab" data-tab="Final Reviewer">Final</button></div><div class="output" id="output">Agent responses will appear here verbatim.</div></section>
+<section class="panel"><h2>06 / Iteration history</h2><div style="overflow:auto"><table class="history"><thead><tr><th>Round</th><th>Score</th><th>Δ</th><th>Critique</th><th>Stop check</th></tr></thead><tbody id="history"><tr><td colspan="5" class="muted">No rounds yet.</td></tr></tbody></table></div></section>
+<section class="panel"><h2>07 / Memory updates & final summary</h2><div class="output" id="memory">Memory updates will appear here.</div><h3 style="margin-top:14px">Final output</h3><div class="output" id="final">The final reviewed deliverable will appear here.</div><h3 style="margin-top:14px">Execution report</h3><div class="output" id="report">Execution statistics will appear here.</div><div class="actions"><button class="btn secondary" id="download" disabled>↓ Download execution log (.json)</button></div></section>
+</main></div><div class="footer">AUTONOMOUS AGENT STUDIO · Single-file agentic workflow demonstrator · Keep API credentials private</div></div>
+<script>
+const $=id=>document.getElementById(id);
+const agents={
+Planner:"You are a senior ML systems planner. Decompose the objective into a practical end-to-end workflow with milestones, dependencies, acceptance criteria, and explicit missing inputs. Never claim work has been executed.",
+Executor:"You are a senior ML engineer. Create a technically sound first draft of the requested ML project: architecture, data pipeline, candidate models, evaluation plan, code/file structure, tests, documentation, and deployment approach. Clearly label assumptions and do not fabricate dataset results.",
+Evaluator:"You are a rigorous independent evaluator. Assess the CURRENT DRAFT against the provided rubric. Return a numeric overall quality score from 0 to 100, evidence-based dimension scores, strengths, and gaps. The first line MUST be exactly 'QUALITY_SCORE: <integer>'. Do not reward unsupported claims or pretend code was run.",
+Critic:"You are a demanding but constructive technical critic. Identify concrete defects, missing requirements, methodological risks, leakage risks, reproducibility problems, and the three highest-impact improvements. Be specific and evidence-based.",
+Improver:"You are a senior ML project improver. Revise the complete draft using the latest evaluation AND critique. Preserve sound work, resolve the most important gaps, and output the full improved draft, not merely a list of edits. Never invent test results.",
+"Memory Manager":"You are the workflow memory manager. Summarize durable decisions, constraints, assumptions, completed work, unresolved questions, and next-round priorities. Keep memory concise and useful. Do not add facts not in the conversation.",
+"Safety Monitor":"You are a safety and integrity monitor. Inspect the current project draft for secrets, privacy issues, unsafe actions, fabricated execution/results, data leakage, and misleading claims. State blockers and safe mitigations. Do not silently rewrite the draft.",
+"Final Reviewer":"You are the final quality gate. Review the final draft, stop reason, evaluation history, safety report, and objective. State whether it is ready, what is delivered, what remains unverified, and the exact stop reason. Never claim external execution occurred."
+};
+let running=false,stopRequested=false,retries=0,history=[],outputs={},memoryText="",started=0,activeTab="Planner",timer=null,finalReason="";
+function log(msg){const d=document.createElement("div");d.className="logitem";d.textContent=msg;const s=document.createElement("small");s.textContent=new Date().toLocaleTimeString();d.appendChild(s);$("log").prepend(d)}
+function show(agent,text){outputs[agent]=text;if(activeTab===agent)$("output").textContent=text}
+function setActive(agent){document.querySelectorAll(".node").forEach(n=>{n.classList.toggle("active",n.dataset.agent===agent);if(n.dataset.agent===agent)n.classList.remove("done")});$("roundLabel").textContent=agent+" is working…"}
+function done(agent){const n=document.querySelector('.node[data-agent="'+agent+'"]');if(n){n.classList.remove("active");n.classList.add("done")}}
+function extractScore(text){const m=text.match(/QUALITY_SCORE\s*:\s*(100|[1-9]?\d)\b/i);return m?Number(m[1]):null}
+async function callAgent(agent,prompt){
+ setActive(agent);log("Calling "+agent+"…");
+ const key=$("key").value.trim();const model=$("model").value;
+ for(let attempt=0;attempt<3;attempt++){
+  try{
+   const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model,max_tokens:5000,system:agents[agent],messages:[{role:"user",content:prompt}]})});
+   const data=await res.json();if(!res.ok)throw new Error(data.error?.message||("HTTP "+res.status));
+   const text=(data.content||[]).filter(x=>x.type==="text").map(x=>x.text).join("\n");if(!text)throw new Error("Empty response from API");
+   show(agent,text);done(agent);log(agent+" response received.");return text;
+  }catch(e){if(attempt===2)throw e;retries++;$("retryStat").textContent=retries;log(agent+" failed; retry "+(attempt+1)+": "+e.message);await new Promise(r=>setTimeout(r,900*(attempt+1)));}
+ }
+}
+function updateStats(){ $("roundStat").textContent=history.length;$("retryStat").textContent=retries;$("timeStat").textContent=Math.round((Date.now()-started)/1000)+"s"; }
+function renderHistory(){const body=$("history");body.innerHTML="";history.forEach(h=>{const tr=document.createElement("tr");[h.round,h.score??"Unparsed",h.delta===null?"—":(h.delta>=0?"+":"")+h.delta,h.critique.slice(0,180),h.stop||"Continue"].forEach(v=>{const td=document.createElement("td");td.textContent=v;tr.appendChild(td)});body.appendChild(tr)});$("scoreStat").textContent=history.length?(history.at(-1).score??"—"):"—"}
+function stopCheck(score,prevScore,plateauCount,round){
+ const delta=prevScore===null?null:score-prevScore;
+ const plateau=delta!==null&&delta<1?plateauCount+1:0;
+ if(plateau>=2)return {stop:true,reason:"Plateau: score improved by less than 1 point for 2 consecutive rounds.",delta,plateau};
+ if(score>=Number($("target").value))return {stop:true,reason:"Threshold reached: quality score "+score+"/100 met the target of "+$("target").value+"/100.",delta,plateau};
+ if(round>=12)return {stop:true,reason:"Safety fallback: hard cap of 12 rounds reached.",delta,plateau};
+ return {stop:false,reason:"Continue: neither plateau nor threshold fired.",delta,plateau};
+}
+async function run(){
+ if(running)return;const key=$("key").value.trim();if(!key){alert("Enter your Anthropic API key. The API requires authentication.");return}
+ if(!$("objective").value.trim()){alert("Enter a project objective.");return}
+ running=true;stopRequested=false;retries=0;history=[];outputs={};memoryText="";started=Date.now();$("start").disabled=true;$("stop").disabled=false;$("download").disabled=true;$("status").textContent="● Running";$("log").innerHTML="";$("history").innerHTML="";log("Autonomous workflow started.");
+ const objective=$("objective").value,context=$("context").value,rubric=$("rubric").value;
+ try{
+  const base="OBJECTIVE:\n"+objective+"\n\nCONTEXT:\n"+context+"\n\nRUBRIC:\n"+rubric;
+  const plan=await callAgent("Planner",base+"\n\nCreate a staged plan with acceptance criteria and identify missing inputs.");
+  if(stopRequested)throw new Error("Stopped by user.");
+  let draft=await callAgent("Executor",base+"\n\nPLANNER OUTPUT:\n"+plan+"\n\nCreate the initial full project draft.");
+  let prevScore=null,plateauCount=0,round=0,stopInfo={stop:false};
+  while(!stopRequested){
+   round++;$("roundLabel").textContent="Round "+round+" — checking stop condition…";
+   const evalText=await callAgent("Evaluator",base+"\n\nCURRENT DRAFT:\n"+draft+"\n\nEvaluate this version. Begin with QUALITY_SCORE: integer.");
+   const score=extractScore(evalText);
+   const critic=await callAgent("Critic",base+"\n\nCURRENT DRAFT:\n"+draft+"\n\nLATEST EVALUATION:\n"+evalText+"\n\nCritique this version.");
+   const safety=await callAgent("Safety Monitor",base+"\n\nCURRENT DRAFT:\n"+draft+"\n\nLATEST CRITIQUE:\n"+critic+"\n\nInspect for blockers and integrity risks.");
+   const memory=await callAgent("Memory Manager","Prior memory:\n"+memoryText+"\n\nObjective and context:\n"+base+"\n\nCurrent draft:\n"+draft+"\n\nEvaluation:\n"+evalText+"\n\nCritique:\n"+critic+"\n\nSafety:\n"+safety+"\n\nUpdate durable workflow memory.");
+   memoryText=memory;$("memory").textContent=memory;
+   if(score===null)throw new Error("Evaluator response did not contain the required QUALITY_SCORE: integer. Review the raw Evaluator output and retry with a clearer rubric.");
+   stopInfo=stopCheck(score,prevScore,plateauCount,round);
+   const entry={round,score,delta:stopInfo.delta,critique:critic, draft,stop:stopInfo.stop?stopInfo.reason:"Continue"};
+   history.push(entry);renderHistory();updateStats();log("Round "+round+": score "+score+"/100; "+stopInfo.reason);
+   if(stopInfo.stop){finalReason=stopInfo.reason;break}
+   if(stopRequested)break;
+   const improved=await callAgent("Improver",base+"\n\nCURRENT DRAFT:\n"+draft+"\n\nPRIOR ROUND EVALUATION:\n"+evalText+"\n\nPRIOR ROUND CRITIQUE:\n"+critic+"\n\nSAFETY REPORT:\n"+safety+"\n\nMEMORY:\n"+memoryText+"\n\nImprove the complete draft for the next evaluation pass.");
+   draft=improved;plateauCount=stopInfo.plateau;prevScore=score;
+  }
+  if(stopRequested){finalReason="User manually stopped the run."}
+  const final=await callAgent("Final Reviewer",base+"\n\nFINAL DRAFT:\n"+draft+"\n\nSTOP REASON:\n"+finalReason+"\n\nHISTORY:\n"+JSON.stringify(history.map(h=>({round:h.round,score:h.score,delta:h.delta,stop:h.stop})))+"\n\nMEMORY:\n"+memoryText+"\n\nProvide the final review and clearly identify unverified work.");
+  $("final").textContent="STOP REASON: "+finalReason+"\n\n"+final+"\n\nFINAL DRAFT:\n"+draft;
+  $("report").textContent="Rounds: "+history.length+"\nRetries: "+retries+"\nElapsed: "+Math.round((Date.now()-started)/1000)+" seconds\nFinal score: "+(history.at(-1)?.score??"Unparsed")+"\nStop reason: "+finalReason+"\n\nAgent calls are live API responses; code execution and dataset operations are not performed by this browser-only orchestrator.";
+  log("Run completed. "+finalReason);$("status").textContent="● Completed";$("download").disabled=false;
+ }catch(e){log("Run halted: "+e.message);$("status").textContent="● Halted";$("final").textContent="RUN HALTED\n"+e.message+"\n\nInspect the activity log and agent outputs. You may correct the input and start a new run."}
+ finally{running=false;$("start").disabled=false;$("stop").disabled=true;updateStats()}
+}
+$("start").onclick=run;$("stop").onclick=()=>{stopRequested=true;log("Stop requested; current API call will finish before the loop exits.")};
+$("reset").onclick=()=>{if(running)return;history=[];outputs={};memoryText="";retries=0;finalReason="";$("roundStat").textContent="0";$("scoreStat").textContent="—";$("retryStat").textContent="0";$("timeStat").textContent="0s";$("history").innerHTML='<tr><td colspan="5" class="muted">No rounds yet.</td></tr>';$("output").textContent="Agent responses will appear here verbatim.";$("memory").textContent="Memory updates will appear here.";$("final").textContent="The final reviewed deliverable will appear here.";$("report").textContent="Execution statistics will appear here.";$("log").innerHTML="";document.querySelectorAll(".node").forEach(n=>n.classList.remove("active","done"));$("status").textContent="● Ready to configure";$("roundLabel").textContent="Waiting for workflow input.";};
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");activeTab=b.dataset.tab;$("output").textContent=outputs[activeTab]||"No output yet for "+activeTab+"."});
+$("download").onclick=()=>{const payload={objective:$("objective").value,history,outputs,memory:memoryText,finalReason,report:$("report").textContent};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="autonomous-agent-studio-log.json";a.click();URL.revokeObjectURL(a.href)};
+setInterval(()=>{if(running)updateStats()},1000);
+</script></body></html>
