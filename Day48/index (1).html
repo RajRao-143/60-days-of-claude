@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080d1b">
+<title>Verdict Engine | Day 48 — ABTalks</title>
+<style>
+:root{--bg:#080d1b;--surface:#101a2e;--surface2:#142139;--line:rgba(160,184,225,.14);--text:#edf2ff;--muted:#94a4c0;--blue:#65a5ff;--violet:#a78bfa;--cyan:#57d8e8;--green:#56d6a0;--amber:#ffc477;--radius:18px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:radial-gradient(ellipse at 12% 0%,rgba(64,105,201,.16),transparent 35%),radial-gradient(ellipse at 92% 12%,rgba(133,85,220,.12),transparent 34%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}button,input{font:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
+.container{width:min(1200px,calc(100% - 40px));margin:auto}
+header{position:sticky;top:0;z-index:10;background:rgba(8,13,27,.9);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.nav{height:68px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:1.5px;font-size:14px}
+.brand-mark{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#4b91ff,#9d72ed)}
+nav{display:flex;gap:22px}nav a{font-size:12px;color:var(--muted);font-weight:650}
+.nav-tag{font-size:11px;border:1px solid var(--line);border-radius:30px;padding:6px 11px;color:var(--cyan)}
+.hero{padding:78px 0 48px}.eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:2px}
+.pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:8px}
+h1{font-size:clamp(42px,8vw,82px);line-height:.98;letter-spacing:-4px;margin:22px 0 17px}
+.gradient{background:linear-gradient(100deg,#fff,#83baff,#b79aff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-sub{font-size:clamp(17px,2.2vw,23px);color:#c4d0e7;max-width:700px}
+.hero-desc{color:var(--muted);max-width:650px;font-size:14px}
+.hero-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:27px}
+.pill{border:1px solid var(--line);background:rgba(255,255,255,.035);border-radius:30px;padding:8px 13px;font-size:11px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:25px 0 40px}
+.stat,.card,.panel{background:linear-gradient(145deg,rgba(20,33,57,.92),rgba(12,22,40,.94));border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 18px 50px rgba(0,0,0,.2)}
+.stat{padding:17px 19px}.stat b{display:block;font-size:25px}.stat span{font-size:11px;color:var(--muted)}
+.section{padding:42px 0}.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:22px}
+.kicker{font-size:10px;letter-spacing:2px;color:var(--cyan);font-weight:850}
+h2{font-size:clamp(24px,4vw,34px);margin:5px 0}.section-desc{color:var(--muted);font-size:13px;max-width:700px}
+.platform-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.platform{padding:20px;min-height:194px;position:relative;overflow:hidden}
+.platform-top{display:flex;align-items:center;gap:12px}
+.logo{width:43px;height:43px;display:grid;place-items:center;border-radius:13px;font-size:20px;font-weight:900}
+.platform h3{font-size:17px;margin:0}.platform small{font-size:10px;color:var(--muted)}
+.platform p{font-size:12px;color:#b1bfd6;margin:17px 0}.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:9px;padding:4px 8px;border-radius:30px;background:rgba(255,255,255,.055);color:#b7c7e3}
+.claude .logo{background:#36271e;color:#ffc68d}.chatgpt .logo{background:#15382f;color:#71e2bd}
+.gemini .logo{background:#202d51;color:#a6b8ff}.perplexity .logo{background:#15383c;color:#78e4e7}
+.panel{padding:23px}.weight-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+.weight-row{padding:15px 0;border-bottom:1px solid var(--line)}.weight-row:last-child{border:0}
+.weight-head{display:flex;justify-content:space-between;margin-bottom:9px}
+.weight-head label{font-size:12px;font-weight:700}.weight-value{font-size:13px;color:var(--cyan);font-weight:850}
+input[type=range]{width:100%;accent-color:#7e9dff;cursor:pointer}
+.range-foot{display:flex;justify-content:space-between;color:#7285a4;font-size:9px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.btn{border:1px solid var(--line);background:#1a2944;color:#dce7fa;padding:9px 13px;border-radius:10px;font-size:11px;font-weight:750;cursor:pointer}
+.btn:hover{border-color:var(--blue)}.btn.primary{background:linear-gradient(100deg,#3b75d5,#765bc7);color:white}
+.weight-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:17px}
+.mini-stat{background:rgba(255,255,255,.035);padding:12px;border-radius:12px}
+.mini-stat span{display:block;font-size:10px;color:var(--muted)}.mini-stat b{font-size:19px}
+.preset-note{font-size:11px;color:var(--muted)}
+.rank-list{display:flex;flex-direction:column;gap:12px;margin-top:17px}
+.rank-item{padding:13px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.025)}
+.rank-top{display:flex;justify-content:space-between;align-items:center}
+.rank-name{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:800}
+.rank-num{font-size:10px;color:var(--muted);padding:4px 7px;border-radius:7px;background:rgba(255,255,255,.07)}
+.rank-score{font-size:19px;font-weight:900}.bar{height:7px;border-radius:10px;background:#263650;margin:10px 0;overflow:hidden}
+.bar>span{display:block;height:100%;border-radius:10px;background:linear-gradient(90deg,#559bff,#9b83ff);transition:width .3s}
+.rank-bottom{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;gap:8px}
+.verdict-text{font-size:12px;color:#b7c6df;line-height:1.7;margin-top:17px;padding:14px;background:rgba(103,151,255,.07);border-radius:12px}
+.badge{font-size:9px;font-weight:800;border-radius:5px;padding:4px 6px}
+.analyst{background:rgba(101,165,255,.13);color:#9bc5ff}.verified{background:rgba(86,214,160,.13);color:#7ce7b6}
+.estimate{background:rgba(255,196,119,.13);color:#ffd08f}.na{background:rgba(255,255,255,.07);color:#a4b2c9}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:15px}
+table{width:100%;border-collapse:collapse;min-width:760px;font-size:11px}
+th,td{padding:14px 13px;text-align:center;border-bottom:1px solid var(--line)}
+th{background:#15233b;color:#c5d3e9;font-size:10px}th:first-child,td:first-child{text-align:left;min-width:210px}
+td:first-child{color:#d7e2f4;font-weight:750}tr:last-child td{border:0}
+.score-cell{font-size:16px;font-weight:900}.cell-note{display:block;font-size:9px;color:var(--muted)}
+.table-note{color:var(--muted);font-size:10px;margin-top:11px}
+.facts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.fact-card{padding:19px}
+.fact-title{display:flex;justify-content:space-between;gap:12px}.fact-title h3{font-size:15px;margin:0}
+.fact-card ul{padding-left:17px}.fact-card li{font-size:11px;color:#b8c7dd;margin:9px 0}
+.fact-meta{font-size:9px;color:var(--muted)}
+.sources-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.source{padding:15px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025)}
+.source-top{display:flex;justify-content:space-between;gap:10px}.source b{font-size:11px}
+.source p{font-size:10px;color:var(--muted)}.source a{font-size:10px;overflow-wrap:anywhere}
+.notice{padding:14px 16px;border:1px solid rgba(255,196,119,.2);background:rgba(255,196,119,.06);border-radius:12px;color:#e6c99f;font-size:10px;margin:15px 0}
+details{border:1px solid var(--line);border-radius:14px;background:rgba(16,26,46,.85);margin:10px 0}
+summary{padding:17px 19px;cursor:pointer;font-size:12px;font-weight:800;list-style:none;display:flex;justify-content:space-between}
+summary::-webkit-details-marker{display:none}summary:after{content:"＋";color:var(--cyan)}details[open] summary:after{content:"−"}
+.details-content{padding:0 19px 18px;color:#b5c4dc;font-size:11px}
+.details-content h4{color:white;font-size:12px;margin:16px 0 5px}
+footer{padding:30px 0 45px;border-top:1px solid var(--line);color:var(--muted);font-size:10px}
+footer .container{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+@media(max-width:900px){nav{gap:12px}.platform-grid{grid-template-columns:repeat(2,1fr)}.weight-layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.container{width:calc(100% - 28px)}.nav{height:58px}nav{display:none}.hero{padding:55px 0 25px}h1{letter-spacing:-2.5px}.stats{gap:8px}.stat{padding:13px}.stat b{font-size:21px}.section{padding:30px 0}.platform-grid{gap:9px}.platform{padding:14px;min-height:205px}.platform h3{font-size:14px}.logo{width:36px;height:36px}.panel{padding:16px}.facts-grid,.sources-grid{grid-template-columns:1fr}.section-head{align-items:start;flex-direction:column}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="container nav">
+<div class="brand"><span class="brand-mark">V</span> VERDICT ENGINE</div>
+<nav aria-label="Main navigation"><a href="#platforms">Platforms</a><a href="#weights">Priorities</a><a href="#verdict">Verdict</a><a href="#evidence">Evidence</a><a href="#sources">Sources</a></nav>
+<span class="nav-tag">DAY 48 / 60</span>
+</div></header>
+<main class="container">
+<section class="hero">
+<div class="eyebrow"><span class="pulse"></span> AI RESEARCH &amp; DECISION INTELLIGENCE</div>
+<h1><span class="gradient">VERDICT</span><br>ENGINE.</h1>
+<p class="hero-sub">The AI That Renders a Verdict on Your Toughest Decisions.</p>
+<p class="hero-desc">Compare AI assistants using documented capabilities, adjustable priorities, and transparent evidence. Your priorities determine the verdict — not a predetermined winner.</p>
+<div class="hero-meta"><span class="pill">ABTalks × Claude Challenge</span><span class="pill">Day 48 / 60</span><span class="pill">Research snapshot: 03 Nov 2026</span></div>
+<div class="stats">
+<div class="stat"><b>04</b><span>AI platforms compared</span></div><div class="stat"><b>06</b><span>Decision criteria</span></div><div class="stat"><b>0–10</b><span>Analyst scoring scale</span></div><div class="stat"><b>100%</b><span>Adjustable priorities</span></div>
+</div></section>
+<section class="section" id="platforms"><div class="section-head"><div><div class="kicker">01 / THE CONTENDERS</div><h2>Meet the platforms.</h2><p class="section-desc">Four distinct AI assistants, each with a different product philosophy and workflow.</p></div></div>
+<div class="platform-grid">
+<article class="card platform claude"><div class="platform-top"><div class="logo">✳</div><div><h3>Claude</h3><small>Anthropic</small></div></div><p>An AI assistant focused on thoughtful conversations, coding workflows, long-form analysis, and document work.</p><div class="tags"><span class="tag">Claude Code</span><span class="tag">Artifacts</span><span class="tag">Projects</span></div></article>
+<article class="card platform chatgpt"><div class="platform-top"><div class="logo">◎</div><div><h3>ChatGPT</h3><small>OpenAI</small></div></div><p>A general-purpose assistant combining reasoning, coding, research, data analysis, and a broad tool ecosystem.</p><div class="tags"><span class="tag">Codex</span><span class="tag">Deep Research</span><span class="tag">Data Analysis</span></div></article>
+<article class="card platform gemini"><div class="platform-top"><div class="logo">✦</div><div><h3>Gemini</h3><small>Google</small></div></div><p>Google's multimodal AI assistant, with access to Google services and model capabilities across text, images, and more.</p><div class="tags"><span class="tag">Google Integration</span><span class="tag">Deep Research</span><span class="tag">Multimodal</span></div></article>
+<article class="card platform perplexity"><div class="platform-top"><div class="logo">⌕</div><div><h3>Perplexity</h3><small>Perplexity AI</small></div></div><p>An answer-oriented search assistant built around web discovery, cited responses, and research workflows.</p><div class="tags"><span class="tag">Web Search</span><span class="tag">Citations</span><span class="tag">Deep Research</span></div></article>
+</div></section>
+<section class="section" id="weights"><div class="section-head"><div><div class="kicker">02 / YOUR DECISION MODEL</div><h2>Set your priorities.</h2><p class="section-desc">Move the sliders to reflect what matters most. The live ranking recalculates immediately.</p></div></div>
+<div class="weight-layout"><div class="panel">
+<div class="controls"><button class="btn" id="balanced">Balanced Weights</button><button class="btn primary" id="student">Student / Developer</button><button class="btn" id="reset">Reset Weights</button></div>
+<div id="sliders"></div><div class="weight-summary"><div class="mini-stat"><span>Total weight points</span><b id="totalWeight">44</b></div><div class="mini-stat"><span>Weighting method</span><b id="weightMode">Default</b></div></div>
+<p class="preset-note">Scale: 0 = not important · 10 = essential. If all weights are zero, equal weighting is automatically applied.</p>
+</div><div class="panel" id="verdict"><div class="kicker">03 / LIVE VERDICT</div><h2 style="font-size:23px">Your AI leaderboard.</h2><p class="section-desc">Rankings use the scores and priorities shown here. No platform is hardcoded as the winner.</p><div class="rank-list" id="rankList" aria-live="polite"></div><div class="verdict-text" id="verdictExplanation" aria-live="polite"></div></div></div></section>
+<section class="section" id="evidence"><div class="section-head"><div><div class="kicker">04 / TRANSPARENT SCORING</div><h2>Evidence comparison matrix.</h2><p class="section-desc">Scores are analyst assessments, not benchmark percentages.</p></div></div>
+<div class="table-wrap"><table><thead><tr><th>Decision criterion</th><th>Claude</th><th>ChatGPT</th><th>Gemini</th><th>Perplexity</th></tr></thead><tbody id="matrixBody"></tbody></table></div>
+<p class="table-note">All matrix scores are evidence-based analyst assessments on a 0–10 scale. They are not official provider ratings or standardized benchmark results.</p></section>
+<section class="section" id="facts"><div class="section-head"><div><div class="kicker">05 / PRODUCT FACTS</div><h2>What is documented?</h2><p class="section-desc">Factual product information is separated from analyst scores.</p></div></div>
+<div class="notice"><strong>Research snapshot:</strong> Product plans, model names, context limits, and availability change. Where a current official page does not establish a comparable value, this dashboard states the limitation instead of inventing a figure. Prices are USD list prices and may vary by region, taxes and billing cycle.</div><div class="facts-grid" id="factsGrid"></div></section>
+<section class="section" id="sources"><div class="section-head"><div><div class="kicker">06 / AUDIT TRAIL</div><h2>Research sources.</h2><p class="section-desc">Primary product documentation and independent benchmark references used to inform the comparison.</p></div></div><div class="sources-grid" id="sourcesGrid"></div></section>
+<section class="section" id="method"><div class="section-head"><div><div class="kicker">07 / TRANSPARENCY FIRST</div><h2>How this was researched.</h2><p class="section-desc">Understand what the verdict means — and what it does not mean.</p></div></div>
+<details><summary>Research methodology and data collection</summary><div class="details-content">
+<h4>Research snapshot and scope</h4><p>Snapshot date: 03 November 2026. The comparison covers the consumer-facing products Claude, ChatGPT, Gemini, and Perplexity for student and developer workflows. It is not a comparison of every underlying model, API, enterprise contract, or third-party integration.</p>
+<h4>Source hierarchy</h4><p>Official provider documentation is the primary authority for plan descriptions, feature availability, subscription pricing, and model context specifications. Independent benchmark sources are used only to illustrate specific measured tasks under stated configurations.</p>
+<h4>Scoring methodology</h4><p>Each criterion receives a 0–10 evidence-based analyst assessment. Scores summarize product capability and suitability for the stated audience, considering documented features, workflow coverage, accessibility, and known limitations. They are not standardized benchmark results or user satisfaction statistics.</p>
+<p><strong>Evidence labels:</strong></p><ul><li>Verified benchmark result: A named, reproducible benchmark result with an identified model and evaluation setup.</li><li>Evidence-based analyst assessment: A reasoned comparative judgment based on documented product capabilities.</li><li>Estimate: An explicitly approximate figure.</li><li>Data unavailable: Insufficient comparable evidence to assign a defensible score.</li></ul>
+<h4>Weighted score formula</h4><p>Weighted Score = Σ(score × selected weight) / Σ(selected weights).</p><p>Scores with unavailable data are omitted from both numerator and denominator for that platform. If all weights are zero, the system uses equal weights of one for all criteria.</p>
+<h4>How to interpret rankings</h4><p>A difference of a few tenths is not proof of a meaningful real-world performance advantage. Scores are analyst judgments represented numerically to support transparent prioritization. Change the weights, inspect the evidence, and test the products on your own tasks before choosing.</p>
+<h4>Limitations and missing information</h4><ul><li>There is no single controlled benchmark evaluating all four complete consumer assistants across all six criteria.</li><li>Model quality can change independently of the app, plan, routing policy, or available tools.</li><li>Free-tier quotas and message limits are dynamic and are not directly comparable across providers.</li><li>Context-window specifications differ by model, plan, interface, and task. An API model limit does not automatically equal the consumer application's usable context.</li><li>Speed depends on model selection, server load, task complexity, region, and network conditions. No comparable speed score is asserted.</li><li>Citation presence does not guarantee source correctness, completeness, or faithful interpretation.</li><li>Prices are not Indian checkout quotes. Local taxes, exchange rates, and regional plan variations may apply.</li></ul>
+<h4>Conflicts and resolution</h4><p>When official pages and third-party summaries disagree, the official provider page takes precedence for its own plan and feature facts. Benchmark results are retained only with their exact benchmark identity and evaluation configuration. Results from different harnesses, models, or dates are not averaged.</p>
+<h4>Important uncertainty</h4><p>This is a static research dataset embedded in the HTML. The application does not fetch live data, claim live verification, or require an API key. Source links lead to external pages that may change after this snapshot.</p>
+</div></details>
+<details><summary>Scoring definitions and evidence labels</summary><div class="details-content"><p><span class="badge analyst">ANALYST</span> A comparative judgment grounded in documented features and workflow suitability.</p><p><span class="badge verified">VERIFIED BENCHMARK</span> A score reported by a named benchmark under a documented evaluation setup.</p><p><span class="badge estimate">ESTIMATE</span> A clearly identified approximation.</p><p><span class="badge na">DATA UNAVAILABLE</span> There is not enough comparable evidence to assign a defensible score.</p></div></details>
+<details><summary>Practical recommendation for students and developers</summary><div class="details-content"><p>Do not subscribe based on one aggregate number alone. Give each assistant the same representative tasks: explain a difficult concept, debug a real code issue, research a topic using primary sources, and produce a structured deliverable.</p><p>For coding, test the same repository issue and inspect whether the suggested fix passes tests. For research, open citations and verify the supporting passage. For learning, check whether explanations adapt to your level and help you solve a problem independently.</p></div></details>
+</section>
+</main>
+<footer><div class="container"><span>ABTalks × Claude — 60 Days Challenge · Day 48</span><span>VERDICT ENGINE · Evidence before opinion.</span></div></footer>
+<script>
+"use strict";
+const criteria=[
+{id:"coding",name:"Coding Performance & Debugging",short:"Coding & debugging",weight:9},
+{id:"research",name:"Research Quality & Source Accuracy",short:"Research quality",weight:8},
+{id:"learning",name:"Learning Support & Explanation Quality",short:"Learning support",weight:8},
+{id:"writing",name:"Writing & Productivity Capabilities",short:"Writing & productivity",weight:6},
+{id:"pricing",name:"Pricing & Free-Tier Limitations",short:"Pricing & free tier",weight:7},
+{id:"context",name:"Context Window, Speed & Availability",short:"Context & availability",weight:6}
+];
+const platforms=[
+{id:"claude",name:"Claude",company:"Anthropic",symbol:"✳",scores:{coding:9,research:8,learning:9,writing:9,pricing:6.5,context:9},evidence:{coding:"Claude Code provides terminal-based agentic coding and repository workflows.",research:"Web search and Research provide source links and citations. Citation correctness still requires independent checking.",learning:"Conversational explanations, extended thinking and document workflows. No standardized cross-assistant teaching test.",writing:"Document creation, editing, Projects and Artifacts support iterative long-form work.",pricing:"Free tier exists; Pro is $20 monthly or $200 annually on the referenced US pricing page.",context:"Model-specific. Anthropic documents up to 1M tokens for selected models; consumer access varies."},facts:[["Free plan","$0; limited usage. Features include web search, content creation and code generation, subject to limits."],["Pro plan","$20/month or $200/year when billed annually (US list pricing)."],["Usage limits","Depend on message length, conversation length, model, attachments and tool usage."],["Context","Model-specific. Up to 1M tokens is documented for selected models; not a universal consumer guarantee."],["Developer tools","Claude Code and Artifacts support coding and document workflows, with plan-dependent availability."]],refs:[0,1,2,3,4]},
+{id:"chatgpt",name:"ChatGPT",company:"OpenAI",symbol:"◎",scores:{coding:9,research:9,learning:9.5,writing:9.5,pricing:7.5,context:8.5},evidence:{coding:"Codex supports coding tasks, repository workflows, code review, debugging and tests.",research:"Deep Research creates structured reports with citations and source links.",learning:"Study Mode supports guided, step-by-step learning, questioning, practice and feedback.",writing:"Broad writing, file analysis, image generation, data analysis and productivity workflows.",pricing:"Free access exists; Plus is $20/month. Free tool and model limits apply.",context:"Limits depend on plan and selected model. There is no single universal product context figure."},facts:[["Free plan","$0; web search, file and image uploads and data analysis, subject to usage limits."],["Plus plan","$20/month (US list price)."],["Usage limits","Model and tool-specific limits can change with demand and rollout."],["Context","Depends on selected model and subscription. Input and reasoning limits are not interchangeable."],["Learning and coding","Study Mode and Codex offer learning and coding workflows with plan-dependent usage."]],refs:[5,6,7,8,9,10]},
+{id:"gemini",name:"Gemini",company:"Google",symbol:"✦",scores:{coding:8.5,research:8.5,learning:9,writing:8.5,pricing:8.5,context:9},evidence:{coding:"Gemini models and developer tools support coding and multimodal inputs.",research:"Deep Research and web-connected features support information gathering and synthesis.",learning:"Multimodal explanations and document understanding support learning workflows.",writing:"Writing assistance and supported Google service integrations improve productivity.",pricing:"Free access is available. Paid AI subscription prices and availability vary by country.",context:"Google publishes plan-dependent context and usage information. A 1M-token figure is not a universal guarantee."},facts:[["Free access","Gemini is available without a paid AI plan, with standard usage limits."],["Google AI Plus","Official Google One listing shows $9.99/month on the referenced US pricing page."],["Google AI Pro","Official Google One listing shows $19.99/month on the referenced US pricing page."],["Usage limits","Google documents plan-dependent usage limits that can change with capacity."],["Context","Google's Gemini Apps documentation describes plan-dependent context windows."],["Productivity","Google AI subscriptions provide access to Gemini features and supported services."]],refs:[11,12,13,14]},
+{id:"perplexity",name:"Perplexity",company:"Perplexity AI",symbol:"⌕",scores:{coding:7,research:9.5,learning:7.5,writing:8,pricing:8.5,context:7},evidence:{coding:"Useful for coding questions and research, but its core positioning is answer-oriented web research rather than a dedicated repository coding agent.",research:"Cited web answers, discovery and research modes are core product strengths.",learning:"Useful for source-backed explanations and follow-up exploration.",writing:"Can generate documents and polished outputs; source discovery and synthesis are more central to its product positioning.",pricing:"Free Standard plan exists. Pro is listed at $20/month on the referenced pricing source.",context:"A directly comparable universal consumer context-window figure is not established here."},facts:[["Free Standard","$0; basic searches, limited Pro Searches and basic file uploads."],["Pro plan","$20/month on the referenced official pricing page; confirm billing details at checkout."],["Usage limits","Free advanced searches and file uploads are limited. Pro expands usage and model access."],["Research","Cited web answers and Deep Research are documented product features."],["Context","No directly comparable universal consumer context-window specification established in this dataset."]],refs:[15,16,17]}
+];
+const sources=[
+{publisher:"Anthropic",title:"Pricing — Claude plans",url:"https://www.anthropic.com/pricing",date:"Current pricing page; accessed 03 Nov 2026",supports:"Claude Free and Pro capabilities, subscription pricing, Claude Code and Research."},
+{publisher:"Anthropic Help Center",title:"Choose a Claude plan",url:"https://support.claude.com/en/articles/11049762-choose-a-claude-plan",date:"Live documentation",supports:"Free, Pro and Max plan pricing and usage descriptions."},
+{publisher:"Anthropic Help Center",title:"Context window on paid Claude plans",url:"https://support.claude.com/en/articles/8606394-how-large-is-the-context-window-on-paid-claude-plans",date:"Live documentation",supports:"Model-specific paid-plan context windows."},
+{publisher:"Anthropic Help Center",title:"Usage Limit Best Practices",url:"https://support.anthropic.com/en/articles/9797557-usage-limit-best-practices",date:"Live documentation",supports:"Usage variation by message length, conversation length, models and tools."},
+{publisher:"Anthropic Help Center",title:"Artifacts: what they are and how to use them",url:"https://support.anthropic.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them",date:"Live documentation",supports:"Artifact capabilities and workflows."},
+{publisher:"OpenAI Help Center",title:"What is ChatGPT Plus?",url:"https://help.openai.com/en/articles/6950777-what-is-chatgpt-plus",date:"Live documentation",supports:"Plus pricing, features and usage limits."},
+{publisher:"OpenAI Help Center",title:"ChatGPT Free Tier FAQ",url:"https://help.openai.com/en/articles/9275245-chatgpt-free-tier-faq",date:"Live documentation",supports:"Free access, tools and rate limits."},
+{publisher:"OpenAI Help Center",title:"Using study mode in ChatGPT",url:"https://help.openai.com/en/articles/11780217-using-study-mode-in-chatgpt",date:"Live documentation",supports:"Guided learning, practice and step-by-step explanations."},
+{publisher:"OpenAI Help Center",title:"Deep research in ChatGPT",url:"https://help.openai.com/en/articles/10500283-research-faq",date:"Live documentation",supports:"Research planning, source controls, citations and reports."},
+{publisher:"OpenAI Help Center",title:"Using Codex with your ChatGPT plan",url:"https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan",date:"Live documentation",supports:"Codex coding features, plan access and usage."},
+{publisher:"OpenAI Help Center",title:"Searching the web with ChatGPT",url:"https://help.openai.com/en/articles/9237897-searching-the-web-with-chatgpt",date:"Live documentation",supports:"Web search citations and source verification."},
+{publisher:"Google One",title:"Plans and pricing",url:"https://one.google.com/about/plans?hl=en_IN",date:"Current pricing page",supports:"Google AI subscription pricing and included benefits."},
+{publisher:"Google Gemini Apps Help",title:"Gemini Apps limits and feature availability",url:"https://support.google.com/gemini/answer/16275805?hl=en",date:"Live documentation",supports:"Plan-based usage limits and context-window descriptions."},
+{publisher:"Google",title:"Google AI subscriptions",url:"https://one.google.com/about/google-ai-plans/",date:"Current pricing page",supports:"Google AI subscription tiers and Gemini features."},
+{publisher:"Google Gemini",title:"Gemini",url:"https://gemini.google.com/",date:"Current product page",supports:"Product identity and Gemini assistant experience."},
+{publisher:"Perplexity Help Center",title:"Which Perplexity Subscription Plan is right for you?",url:"https://www.perplexity.ai/help-center/en/articles/11187416-which-perplexity-subscription-plan-is-right-for-you",date:"Live documentation",supports:"Standard, Pro and other plan features and usage limits."},
+{publisher:"Perplexity",title:"Perplexity pricing",url:"https://www.perplexity.ai/enterprise/pricing",date:"Current pricing page",supports:"Free and Pro pricing, Deep Research and usage features."},
+{publisher:"Perplexity",title:"Perplexity — AI for the Curious",url:"https://www.perplexity.ai/hub",date:"Current product information",supports:"Product positioning, citations and web-grounded responses."},
+{publisher:"SWE-bench",title:"Official SWE-bench Leaderboards",url:"https://www.swebench.com/",date:"Continuously updated",supports:"Independent coding-agent benchmark and evaluation configurations."},
+{publisher:"CCBench",title:"CCBench — Coding benchmark",url:"https://cc-bench.org/",date:"Benchmark documentation",supports:"Independent coding-agent benchmark."},
+{publisher:"BenchLM",title:"Coding model leaderboard",url:"https://benchlm.ai/coding",date:"Leaderboard",supports:"Independent multi-benchmark model comparison."}
+];
+function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n}
+function link(url,label){const a=el("a","",label);a.href=url;a.target="_blank";a.rel="noopener noreferrer";return a}
+function buildSliders(){const root=document.getElementById("sliders");criteria.forEach(c=>{const row=el("div","weight-row"),head=el("div","weight-head"),label=el("label","",c.name),value=el("output","weight-value",String(c.weight)),input=document.createElement("input"),foot=el("div","range-foot");label.htmlFor="weight-"+c.id;value.id="value-"+c.id;input.type="range";input.min="0";input.max="10";input.step="1";input.value=String(c.weight);input.id="weight-"+c.id;input.setAttribute("aria-label",c.name+" importance");input.addEventListener("input",()=>{c.weight=Number(input.value);value.textContent=input.value;updateMode("Custom");calculate()});foot.append(el("span","","0 · Ignore"),el("span","","10 · Essential"));head.append(label,value);row.append(head,input,foot);root.append(row)})}
+function updateSliders(){criteria.forEach(c=>{document.getElementById("weight-"+c.id).value=c.weight;document.getElementById("value-"+c.id).textContent=c.weight})}
+function updateMode(mode){document.getElementById("weightMode").textContent=mode}
+function setWeights(values,mode){criteria.forEach((c,i)=>c.weight=values[i]);updateSliders();updateMode(mode);calculate()}
+function getTotalWeight(){return criteria.reduce((sum,c)=>sum+c.weight,0)}
+function scoreFor(p){let numerator=0,denominator=0;criteria.forEach(c=>{const s=p.scores[c.id],w=c.weight;if(w>0&&Number.isFinite(s)){numerator+=s*w;denominator+=w}});return denominator===0?null:numerator/denominator}
+function calculate(){const total=getTotalWeight();document.getElementById("totalWeight").textContent=total;if(total===0)updateMode("Equal fallback");const ranked=platforms.map(platform=>({platform,score:scoreFor(platform)}));ranked.sort((a,b)=>a.score===null?1:b.score===null?-1:b.score-a.score);renderRanking(ranked);renderMatrix()}
+function renderRanking(ranked){const root=document.getElementById("rankList");root.replaceChildren();const top=ranked.find(x=>x.score!==null);ranked.forEach((item,index)=>{const p=item.platform,card=el("div","rank-item"),topRow=el("div","rank-top"),name=el("div","rank-name"),score=el("span","rank-score",item.score===null?"N/A":item.score.toFixed(2)+"/10");name.append(el("span","rank-num","#"+(index+1)),el("span","",p.symbol),el("span","",p.name));topRow.append(name,score);const bar=el("div","bar"),fill=document.createElement("span");fill.style.width=item.score===null?"0%":(item.score*10)+"%";if(index===0)fill.style.background="linear-gradient(90deg,#58d6a1,#7cbaff)";bar.append(fill);const bottom=el("div","rank-bottom");let diff="Not scored";if(item.score!==null&&top)diff=index===0?"Highest weighted score":(item.score-top.score).toFixed(2)+" pts vs leader";bottom.append(el("span","",diff),el("span","",getTotalWeight()===0?"Equal weighting":"Weighted score"));card.append(topRow,bar,bottom);root.append(card)});const explanation=document.getElementById("verdictExplanation");if(!top){explanation.textContent="No platform can be ranked because all criteria lack usable data.";return}const runner=ranked.find(x=>x.score!==null&&x.platform.id!==top.platform.id),active=criteria.filter(c=>c.weight>0).map(c=>c.short);let msg="Current leader: "+top.platform.name+" with a weighted score of "+top.score.toFixed(2)+"/10. ";if(runner)msg+="It leads "+runner.platform.name+" by "+(top.score-runner.score).toFixed(2)+" points. ";msg+="The ranking reflects "+(active.length?active.join(", "):"equal weighting across all six criteria")+". ";if(getTotalWeight()===0)msg+="All sliders are zero, so equal weighting has been automatically applied. ";msg+="This is a prioritization aid based on analyst assessments, not proof of universal superiority.";explanation.textContent=msg}
+function renderMatrix(){const tbody=document.getElementById("matrixBody");tbody.replaceChildren();criteria.forEach(c=>{const tr=document.createElement("tr"),first=el("td","",c.name+" · "+c.weight+"/10");tr.append(first);platforms.forEach(p=>{const td=document.createElement("td"),score=p.scores[c.id];td.append(el("div","score-cell",Number.isFinite(score)?score.toFixed(1):"N/A"),el("span","badge analyst","ANALYST"),el("span","cell-note","Assessment"));td.title=p.evidence[c.id];td.setAttribute("aria-label",p.name+": "+score.toFixed(1)+" out of 10. "+p.evidence[c.id]);tr.append(td)});tbody.append(tr)})}
+function renderFacts(){const root=document.getElementById("factsGrid");platforms.forEach(p=>{const card=el("article","card fact-card"),head=el("div","fact-title"),ul=document.createElement("ul");head.append(el("h3","",p.name),el("span","fact-meta",p.company));p.facts.forEach(f=>{const li=document.createElement("li"),strong=el("strong","",f[0]+": ");li.append(strong,document.createTextNode(f[1]));ul.append(li)});const label=el("p","fact-meta","Official documentation:"),links=el("div","tags");p.refs.forEach(i=>{const s=sources[i];if(s){const a=link(s.url,s.publisher);a.className="tag";links.append(a)}});card.append(head,ul,label,links);root.append(card)})}
+function renderSources(){const root=document.getElementById("sourcesGrid");sources.forEach((s,i)=>{const card=el("article","source"),top=el("div","source-top");top.append(el("b","",s.publisher),el("span","fact-meta","SOURCE "+(i+1)));card.append(top,el("p","",s.title),el("div","fact-meta",s.date),el("p","",s.supports),link(s.url,"Open original source ↗"));root.append(card)})}
+document.getElementById("balanced").addEventListener("click",()=>setWeights([5,5,5,5,5,5],"Balanced"));
+document.getElementById("student").addEventListener("click",()=>setWeights([9,8,8,6,7,6],"Student / Developer"));
+document.getElementById("reset").addEventListener("click",()=>setWeights([9,8,8,6,7,6],"Default"));
+buildSliders();renderFacts();renderSources();calculate();
+</script>
+</body>
+</html>
