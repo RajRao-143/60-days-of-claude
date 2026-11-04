@@ -8,33 +8,33 @@ A personalized AI productivity workspace designed to make everyday AI usage more
 
 🚀 Overview
 
-Personal AI Playbook is a single-file interactive HTML application that helps organize AI workflows, build better prompts, and create repeatable AI-assisted processes.
+Personal AI Playbook is an interactive, single-file HTML application that helps organize AI workflows, build better prompts, and create repeatable AI-assisted processes.
 
 It follows a simple workflow:
 
 Plan → Build → Review → Improve
 
-✨ Features
+✨ Key Features
 
 - Dashboard: Central workspace for accessing AI tools and workflows.
 - AI Workflows: Ready-to-use workflows for coding, DSA, projects, academics, research, and career development.
-- Prompt Builder: Create structured prompts using modular components.
-- Loop Builder: Design iterative workflows with evaluation criteria and improvement steps.
+- Prompt Builder: Build structured prompts using modular components.
+- Loop Builder: Create iterative workflows with evaluation criteria and improvement strategies.
 - Saved Workflows: Save, edit, duplicate, favorite, and search workflows.
 - Import & Export: Manage saved workflows using JSON files.
-- Responsive Design: Works across different screen sizes.
 - Dark Mode: Switch between light and dark themes.
+- Responsive UI: Designed for different screen sizes.
 
 🛠️ Tech Stack
 
-- HTML
-- CSS
+- HTML5
+- CSS3
 - JavaScript
 - LocalStorage
 
 📂 Project Structure
 
-Personal-AI-Playbook/
+Day49/
 │
 ├── personal_ai_playbook.html
 ├── personal_ai_playbook_dashboard.png
@@ -43,16 +43,16 @@ Personal-AI-Playbook/
 ▶️ How to Run
 
 1. Clone or download this repository.
-2. Open "personal_ai_playbook.html" in any modern web browser.
-3. Start exploring the workflows and prompt-building tools.
+2. Open "personal_ai_playbook.html" in your browser.
+3. Explore the dashboard and start using the available workflows.
 
 No installation or backend setup is required.
 
-🎯 Purpose
+🎯 Objective
 
-The goal is to move beyond random AI prompting and build a structured system for using AI in:
+The objective is to move beyond random AI prompting and develop a structured approach to using AI for:
 
-- Problem solving and debugging
+- Coding and debugging
 - DSA practice
 - AI/ML project development
 - Academic preparation
@@ -63,11 +63,11 @@ The goal is to move beyond random AI prompting and build a structured system for
 
 - More customizable AI workflows
 - Additional prompt templates
-- Integration with AI APIs
+- AI API integrations
 - Advanced workflow management
 
 ---
 
-Built as part of my journey toward becoming a more productive AI-assisted developer.
+Built as part of my AI learning and productivity journey.
 
-⭐ If you find this project useful, consider starring the repository!
+⭐ If you find this project useful, consider giving it a star!
