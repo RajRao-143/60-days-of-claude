@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LaunchPath AI — Day 55</title>
+<style>
+:root{--ink:#14243a;--muted:#66758a;--line:#e5ebf2;--bg:#f4f7fb;--teal:#0e9f9a;--blue:#315cbd;--amber:#f3b64b;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:#12243b;color:white;padding:22px max(20px,calc((100% - 1120px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-size:20px;font-weight:800;letter-spacing:.2px}.brand span{color:#63d4cc}.sub{color:#c4d1df;font-size:12px}
+main{max-width:1120px;margin:26px auto;padding:0 18px}.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+h1{font-size:28px;margin:0 0 4px}.muted{color:var(--muted)}.pill{background:#e1f5f3;color:#087e79;border-radius:99px;padding:5px 10px;font-size:12px;font-weight:700}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tab{border:1px solid var(--line);background:white;padding:10px 15px;border-radius:10px;cursor:pointer;font-weight:700;color:var(--muted)}.tab.active{background:var(--ink);color:white;border-color:var(--ink)}
+.panel{display:none}.panel.active{display:block}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.card{background:white;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 5px 18px #1b35500a;margin-bottom:16px}
+h2{font-size:18px;margin:0 0 14px}h3{font-size:15px;margin:0 0 6px}
+label{display:block;font-weight:700;font-size:13px;margin:10px 0 5px}select,input,textarea{width:100%;border:1px solid #d9e1eb;border-radius:9px;padding:10px;background:white;color:var(--ink);font:inherit}
+button{border:0;border-radius:9px;padding:10px 14px;background:var(--teal);color:white;font-weight:750;cursor:pointer}button.secondary{background:#edf2f7;color:var(--ink)}button.danger{background:#fff0ef;color:#b33b35}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.stat{font-size:26px;font-weight:800}.bar{height:9px;background:#edf1f6;border-radius:99px;overflow:hidden;margin:9px 0}.bar span{display:block;height:100%;background:var(--teal);width:0}
+.task{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}.task:last-child{border:0}.task input{width:auto;margin-top:4px}.task small,.resource small{display:block;color:var(--muted)}
+.tag{font-size:11px;background:#eef3fa;color:#53657b;padding:3px 7px;border-radius:99px;display:inline-block;margin:3px 4px 0 0}
+.resource{padding:13px 0;border-bottom:1px solid var(--line)}.resource:last-child{border:0}.resource a{color:var(--blue);font-weight:700;text-decoration:none}.resource a:hover{text-decoration:underline}
+.answer{background:#f3f8fb;border-left:4px solid var(--teal);padding:14px;border-radius:8px;margin-top:14px;white-space:pre-wrap}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}h1{font-size:23px}}
+</style></head>
+<body>
+<header><div><div class="brand">LaunchPath <span>AI</span></div><div class="sub">Your Intelligent Placement Readiness Companion</div></div><div class="sub">DAY 55 · ROADMAP & LEARNING</div></header>
+<main>
+<div class="hero"><div><h1>Your learning path, made actionable.</h1><div class="muted">Stable weekly milestones. Adaptive tasks. Learning that works even without AI.</div></div><span class="pill">No paid API required</span></div>
+<div class="tabs">
+<button class="tab active" data-tab="roadmap">Weekly roadmap</button><button class="tab" data-tab="resources">Learning library</button><button class="tab" data-tab="tutor">AI tutor</button>
+</div>
+<section id="roadmap" class="panel active">
+<div class="grid">
+<div class="card"><h2>Week 1 · Build your foundation</h2><p class="muted">Your milestone stays stable; tasks adapt to your role, level and available time.</p>
+<div class="row"><div><label for="role">Primary role</label><select id="role"><option>AI / ML Engineer</option><option>Software Engineer</option><option>Cloud Engineer</option><option>Data Analyst</option></select></div><div><label for="level">Current level</label><select id="level"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div><div><label for="hours">Hours per week</label><select id="hours"><option>3</option><option selected>6</option><option>8</option><option>10</option><option>12</option><option>15</option></select></div></div>
+<label>Priority skill gaps</label><div class="row" style="justify-content:flex-start"><label><input type="checkbox" class="gap" value="Python fundamentals" checked style="width:auto"> Python</label><label><input type="checkbox" class="gap" value="SQL and databases" style="width:auto"> SQL</label><label><input type="checkbox" class="gap" value="Machine learning basics" checked style="width:auto"> ML basics</label><label><input type="checkbox" class="gap" value="Projects and GitHub" style="width:auto"> Projects</label></div>
+<div class="row" style="margin:12px 0"><button id="adapt">Adapt my tasks</button><button class="secondary" id="reset">Reset progress</button></div>
+<div id="tasks"></div>
+</div>
+<div>
+<div class="card"><h2>Weekly progress</h2><div class="stat" id="percent">0%</div><div class="bar"><span id="progress"></span></div><div class="muted" id="count">0 of 0 tasks completed</div></div>
+<div class="card"><h2>Milestone</h2><h3 id="milestone">Build role-ready foundations</h3><p class="muted">By the end of this week, complete the core learning tasks and produce one small proof of practice.</p><span class="tag" id="roleTag">AI / ML Engineer</span><span class="tag" id="levelTag">Beginner</span></div>
+<div class="card"><h2>Learning notes</h2><textarea id="notes" rows="5" placeholder="Record key concepts, questions or mistakes..."></textarea><button id="saveNotes" style="margin-top:8px">Save notes</button><span class="muted" id="noteStatus" style="margin-left:8px"></span></div>
+</div></div>
+</section>
+<section id="resources" class="panel">
+<div class="card"><h2>Curated learning library</h2><div class="row"><div><label for="topicFilter">Topic</label><select id="topicFilter"><option value="All">All topics</option><option>Python</option><option>Machine Learning</option><option>SQL</option><option>Git & Projects</option><option>Cloud</option></select></div><div><label for="levelFilter">Level</label><select id="levelFilter"><option value="All">All levels</option><option>Beginner</option><option>Intermediate</option></select></div></div><div id="resourceList"></div></div>
+</section>
+<section id="tutor" class="panel">
+<div class="grid"><div class="card"><h2>Beginner-first tutor</h2><p class="muted">Choose a topic. This local tutor uses curated explanations and templates; no external AI call is made.</p>
+<label for="tutorTopic">What do you want to learn?</label><select id="tutorTopic"><option>Python variables</option><option>Python functions</option><option>Train-test split</option><option>Overfitting</option><option>SQL joins</option><option>Git commits</option></select>
+<button id="teach" style="margin-top:12px">Explain this topic</button><div id="tutorAnswer" class="answer">Your lesson will appear here.</div></div>
+<div class="card"><h2>Practice check</h2><p id="question" class="muted">A short question will appear after you generate a lesson.</p><div id="choices"></div><div id="feedback" class="muted" style="margin-top:10px"></div></div></div>
+<div class="card"><h2>Privacy & controls</h2><p class="muted">This prototype stores task completion and notes in this browser only. It does not send data to an external AI service.</p><button class="danger" id="deleteData">Delete saved learning data</button></div>
+</section>
+</main><footer>LaunchPath AI · Day 55 prototype · Deterministic fallback mode</footer>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const templates={
+"AI / ML Engineer":["Review Python data types and control flow","Practice functions, lists and dictionaries","Learn the ML workflow: features, labels and evaluation","Run a small train-test split experiment","Write a short project README and next steps"],
+"Software Engineer":["Revise programming fundamentals and complexity","Solve two beginner problem-solving exercises","Learn Git branching and clean commits","Review REST API request/response basics","Build or improve one small feature"],
+"Cloud Engineer":["Understand cloud service models (IaaS, PaaS, SaaS)","Learn compute, storage and networking basics","Explore IAM and least-privilege access","Deploy a simple static project","Document architecture and deployment steps"],
+"Data Analyst":["Practice spreadsheet/data cleaning concepts","Write basic SQL SELECT and WHERE queries","Learn grouping and aggregate functions","Create a small chart from sample data","Summarize three insights in a short report"]
+};
+const resources=[
+["Python","Beginner","Interactive course","2–4 hours","Python official tutorial","https://docs.python.org/3/tutorial/"],
+["Python","Beginner","Practice","1 hour","Python exercises — W3Schools","https://www.w3schools.com/python/python_exercises.asp"],
+["Machine Learning","Beginner","Course","3 hours","Google Machine Learning Crash Course","https://developers.google.com/machine-learning/crash-course"],
+["Machine Learning","Intermediate","Guide","1 hour","Scikit-learn: getting started","https://scikit-learn.org/stable/getting_started.html"],
+["SQL","Beginner","Interactive tutorial","2 hours","SQLBolt lessons","https://sqlbolt.com/"],
+["Git & Projects","Beginner","Reference","1 hour","GitHub: getting started with Git","https://docs.github.com/en/get-started/using-git/about-git"],
+["Cloud","Beginner","Learning path","2 hours","AWS Skill Builder — Cloud Essentials","https://skillbuilder.aws/"]
+];
+const lessons={
+"Python variables":{concept:"A variable is a named reference used to store a value so your program can use it later.",example:"name = 'Raj'\\nage = 22\\nprint(name, age)",impl:"Choose meaningful names. Python assigns the type at runtime; you do not write int or String before a variable.",q:"Which line assigns the value 10 to x?",opts:["x == 10","x = 10","10 = x"],a:1,why:"The single equals sign (=) assigns a value. Double equals (==) compares values."},
+"Python functions":{concept:"A function is a reusable block of code that performs a focused task. It can accept inputs and return a result.",example:"def add(a, b):\\n    return a + b\\n\\nprint(add(2, 3))",impl:"Define with def, use parameters for inputs, and return the result when the caller needs it.",q:"Which keyword defines a function in Python?",opts:["func","function","def"],a:2,why:"Python uses the def keyword to define a function."},
+"Train-test split":{concept:"A train-test split keeps some data for learning and separate unseen data for evaluation.",example:"from sklearn.model_selection import train_test_split\\nX_train, X_test, y_train, y_test = train_test_split(\\n    X, y, test_size=0.2, random_state=42\\n)",impl:"Fit preprocessing and the model using training data only. Evaluate once on the held-out test data.",q:"Why keep a test set?",opts:["To evaluate on unseen data","To make the dataset larger","To remove all errors"],a:0,why:"The test set estimates how well the model generalizes to unseen examples."},
+"Overfitting":{concept:"Overfitting happens when a model learns training details or noise too closely and performs poorly on new data.",example:"Training accuracy = 99%\\nTest accuracy = 72%\\nLarge gap → investigate overfitting.",impl:"Try simpler models, regularization, more representative data, or cross-validation.",q:"A common sign of overfitting is:",opts:["Low train and high test score","Very high train score but much lower test score","Same score on every dataset"],a:1,why:"A large train-test performance gap can indicate overfitting."},
+"SQL joins":{concept:"A JOIN combines rows from tables using a related column, such as a customer_id.",example:"SELECT c.name, o.order_id\\nFROM customers c\\nINNER JOIN orders o\\nON c.customer_id = o.customer_id;",impl:"INNER JOIN returns matching rows. LEFT JOIN keeps every row from the left table and adds matches when available.",q:"Which join keeps every row from the left table?",opts:["INNER JOIN","LEFT JOIN","CROSS JOIN"],a:1,why:"LEFT JOIN preserves all left-table rows, even when there is no right-table match."},
+"Git commits":{concept:"A Git commit records a snapshot of staged changes with a message describing the change.",example:"git add .\\ngit commit -m \"Add learning roadmap\"",impl:"Make small, meaningful commits. Avoid committing secrets, API keys or generated files unnecessarily.",q:"Which command creates a commit?",opts:["git push","git commit","git status"],a:1,why:"git commit records the staged snapshot in the repository history."}
+};
+let currentLesson=null;
+function state(){return JSON.parse(localStorage.getItem("lp55")||'{"done":[],"notes":""}')}
+function save(s){localStorage.setItem("lp55",JSON.stringify(s))}
+function makeTasks(){let role=$("#role").value, level=$("#level").value, hours=+$("#hours").value, gaps=$$(".gap:checked").map(x=>x.value);let arr=templates[role].slice();if(gaps.length){arr=arr.map((t,i)=>gaps.some(g=>t.toLowerCase().includes(g.split(" ")[0].toLowerCase()))?t+" — focused practice":t)}
+let count=Math.max(2,Math.min(arr.length,Math.round(hours/2)));arr=arr.slice(0,count);if(level==="Intermediate")arr=arr.map(t=>t.replace("Review","Apply").replace("Learn","Implement"));if(level==="Advanced")arr=arr.map(t=>"Extend: "+t.toLowerCase());return arr}
+function renderTasks(){let tasks=makeTasks(),s=state();$("#tasks").innerHTML=tasks.map((t,i)=>`<div class="task"><input type="checkbox" data-task="${i}" ${s.done.includes(t)?"checked":""}><div><strong>${t}</strong><small>Suggested effort: ${Math.max(30,Math.round(+$("#hours").value*60/tasks.length/5/10)*10)}–60 min · ${$("#level").value}</small></div></div>`).join("");$$("[data-task]").forEach(c=>c.onchange=()=>{let st=state(),name=tasks[+c.dataset.task];st.done=c.checked?[...new Set([...st.done,name])]:st.done.filter(x=>x!==name);save(st);renderProgress(tasks) });renderProgress(tasks);$("#roleTag").textContent=$("#role").value;$("#levelTag").textContent=$("#level").value}
+function renderProgress(tasks){let s=state(),n=tasks.filter(t=>s.done.includes(t)).length,p=Math.round(n/tasks.length*100);$("#percent").textContent=p+"%";$("#progress").style.width=p+"%";$("#count").textContent=n+" of "+tasks.length+" tasks completed"}
+function renderResources(){let topic=$("#topicFilter").value,level=$("#levelFilter").value;$("#resourceList").innerHTML=resources.filter(r=>(topic==="All"||r[0]===topic)&&(level==="All"||r[1]===level)).map(r=>`<div class="resource"><a href="${r[5]}" target="_blank" rel="noopener">${r[4]}</a><small>${r[0]} · ${r[1]} · ${r[2]} · ${r[3]} · Source: ${new URL(r[5]).hostname}</small></div>`).join("")}
+function teach(){let name=$("#tutorTopic").value,l=lessons[name];currentLesson=l;$("#tutorAnswer").textContent="CONCEPT\\n"+l.concept+"\\n\\nWORKED EXAMPLE\\n"+l.example.replaceAll("\\n","\n")+"\\n\\nIMPLEMENTATION TIP\\n"+l.impl;$("#question").textContent=l.q;$("#choices").innerHTML=l.opts.map((o,i)=>`<label style="font-weight:500"><input type="radio" name="answer" value="${i}" style="width:auto;margin-right:8px">${o}</label>`).join("")+'<button id="checkAnswer" style="margin-top:10px">Check answer</button>';$("#checkAnswer").onclick=()=>{let v=$('input[name="answer"]:checked');$("#feedback").textContent=!v?"Select an answer first.":(+v.value===l.a?"Correct! ":"Not quite. ")+l.why}}
+$$(".tab").forEach(b=>b.onclick=()=>{$$(".tab").forEach(x=>x.classList.toggle("active",x===b));$$(".panel").forEach(p=>p.classList.toggle("active",p.id===b.dataset.tab))});
+$("#adapt").onclick=()=>renderTasks();["role","level","hours"].forEach(id=>$("#"+id).onchange=renderTasks);$$(".gap").forEach(x=>x.onchange=renderTasks);
+$("#reset").onclick=()=>{if(confirm("Reset completed tasks and notes?")){save({done:[],notes:""});$("#notes").value="";renderTasks()}};
+$("#notes").value=state().notes;$("#saveNotes").onclick=()=>{let s=state();s.notes=$("#notes").value;save(s);$("#noteStatus").textContent="Saved on this device."};
+$("#topicFilter").onchange=renderResources;$("#levelFilter").onchange=renderResources;$("#teach").onclick=teach;
+$("#deleteData").onclick=()=>{if(confirm("Delete all saved Day 55 learning data from this browser?")){localStorage.removeItem("lp55");$("#notes").value="";renderTasks();$("#noteStatus").textContent="Saved data deleted."}};
+renderTasks();renderResources();
+</script></body></html>
