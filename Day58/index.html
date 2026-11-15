@@ -6,6 +6,17 @@
 <title>LaunchPath AI — Day 58 Job Tracker</title>
 <style>
 :root{--ink:#14243a;--muted:#66758a;--line:#e5ebf2;--bg:#f4f7fb;--teal:#0e9f9a;--blue:#315cbd;--amber:#f3b64b;--white:#fff;--red:#b33b35;--green:#147d52}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,system-ui,-apple-system,Segoe UI,sans-serif}header{background:#12243b;color:#fff;padding:20px max(18px,calc((100% - 1160px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.brand{font-size:21px;font-weight:850}.brand span{color:#63d4cc}.sub{color:#c4d1df;font-size:12px}main{max-width:1160px;margin:25px auto;padding:0 18px}.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}h1{font-size:27px;margin:0 0 4px}h2{font-size:18px;margin:0 0 13px}h3{font-size:15px;margin:0 0 7px}.muted{color:var(--muted)}.pill{background:#e1f5f3;color:#087e79;border-radius:99px;padding:5px 10px;font-size:12px;font-weight:750}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tab{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:750;color:var(--muted)}.tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}.panel{display:none}.panel.active{display:block}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:19px;box-shadow:0 5px 18px #1b35500a;margin-bottom:16px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1;min-width:0}label{display:block;font-weight:700;font-size:13px;margin:10px 0 5px}select,input,textarea{width:100%;border:1px solid #d9e1eb;border-radius:9px;padding:10px;background:#fff;color:var(--ink);font:inherit}input[type=checkbox],input[type=radio]{width:auto;margin-right:7px}button{border:0;border-radius:9px;padding:10px 14px;background:var(--teal);color:#fff;font-weight:750;cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}button.secondary{background:#edf2f7;color:var(--ink)}button.danger{background:#fff0ef;color:var(--red)}.stat{font-size:26px;font-weight:850}.bar{height:9px;background:#edf1f6;border-radius:99px;overflow:hidden;margin:9px 0}.bar span{display:block;height:100%;background:var(--teal);width:0}.task{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}.task:last-child{border:0}.task small,.resource small{display:block;color:var(--muted)}.tag{font-size:11px;background:#eef3fa;color:#53657b;padding:3px 7px;border-radius:99px;display:inline-block;margin:3px 4px 0 0}.resource{padding:13px 0;border-bottom:1px solid var(--line)}.resource:last-child{border:0}.resource a{color:var(--blue);font-weight:700;text-decoration:none}.resource a:hover{text-decoration:underline}.answer{background:#f3f8fb;border-left:4px solid var(--teal);padding:14px;border-radius:8px;margin-top:14px;white-space:pre-wrap}.question-option{display:flex;gap:8px;align-items:flex-start;padding:9px;border:1px solid var(--line);border-radius:9px;margin:7px 0;font-weight:500;cursor:pointer}.question-option:has(input:checked){border-color:var(--teal);background:#effaf9}.feedback{padding:12px;border-radius:9px;margin-top:12px;background:#f3f8fb}.feedback.correct{border-left:4px solid var(--green)}.feedback.wrong{border-left:4px solid var(--red)}.meta{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}.hint{border:1px solid var(--line);border-radius:9px;padding:10px;margin:8px 0;background:#fbfcfe}.code{white-space:pre-wrap;background:#14243a;color:#eaf2ff;padding:14px;border-radius:10px;overflow:auto;font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}.history{padding:10px 0;border-bottom:1px solid var(--line)}.small{font-size:12px}.empty{padding:16px;text-align:center;color:var(--muted);background:#f8fafc;border-radius:10px}footer{text-align:center;color:var(--muted);font-size:12px;padding:25px 18px 30px}footer strong{color:var(--ink)}.notice{font-size:13px;background:#fff8e8;border:1px solid #f2dfb4;color:#73541b;border-radius:10px;padding:12px;margin:12px 0}.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}.hidden{display:none!important}@media(max-width:760px){.grid,.split{grid-template-columns:1fr}h1{font-size:23px}.row>*{flex-basis:100%}.tabs{gap:6px}.tab{flex:1 1 auto}}
+
+@media print{
+ body{background:#fff;color:#111;font-size:11pt}
+ header,.tabs,footer,.no-print,button{display:none!important}
+ main{max-width:none;margin:0;padding:0}
+ .panel{display:none!important}
+ #analytics{display:block!important}
+ #analytics .card{box-shadow:none;border:1px solid #bbb;break-inside:avoid}
+ #analytics .grid{grid-template-columns:1fr 1fr}
+ #analytics .stat{font-size:20pt}
+}
 </style>
 </head>
 <body>
@@ -13,7 +24,7 @@
 <main>
 <div class="hero"><div><h1>Practice with purpose. Improve with every attempt.</h1><div class="muted">Build aptitude confidence and strengthen programming fundamentals with clear explanations.</div></div><span class="pill">Free · Local-first · No paid API</span></div>
 <div class="tabs" role="tablist" aria-label="LaunchPath sections">
-<button class="tab active" data-tab="roadmap">Weekly roadmap</button><button class="tab" data-tab="resources">Learning library</button><button class="tab" data-tab="tutor">AI tutor</button><button class="tab" data-tab="practice">Aptitude practice</button><button class="tab" data-tab="coding">Coding & DSA</button><button class="tab" data-tab="interviews">Interview simulator</button><button class="tab" data-tab="jobs">Jobs & calendar</button>
+<button class="tab active" data-tab="roadmap">Weekly roadmap</button><button class="tab" data-tab="resources">Learning library</button><button class="tab" data-tab="tutor">AI tutor</button><button class="tab" data-tab="practice">Aptitude practice</button><button class="tab" data-tab="coding">Coding & DSA</button><button class="tab" data-tab="interviews">Interview simulator</button><button class="tab" data-tab="jobs">Jobs & calendar</button><button class="tab" data-tab="analytics">Analytics</button>
 </div>
 <section id="roadmap" class="panel active"><div class="grid"><div class="card"><h2>Week 1 · Build your foundation</h2><p class="muted">Your milestone stays stable; tasks adapt to your role, level and available time.</p><div class="row"><div><label for="role">Primary role</label><select id="role"><option>AI / ML Engineer</option><option>Software Engineer</option><option>Cloud Engineer</option><option>Data Analyst</option></select></div><div><label for="level">Current level</label><select id="level"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div><div><label for="hours">Hours per week</label><select id="hours"><option>3</option><option selected>6</option><option>8</option><option>10</option><option>12</option><option>15</option></select></div></div><label>Priority skill gaps</label><div class="row" style="justify-content:flex-start"><label><input type="checkbox" class="gap" value="Python fundamentals" checked>Python</label><label><input type="checkbox" class="gap" value="SQL and databases">SQL</label><label><input type="checkbox" class="gap" value="Machine learning basics" checked>ML basics</label><label><input type="checkbox" class="gap" value="Projects and GitHub">Projects</label></div><div class="row" style="margin:12px 0"><button id="adapt">Adapt my tasks</button><button class="secondary" id="reset">Reset progress</button></div><div id="tasks"></div></div><div><div class="card"><h2>Weekly progress</h2><div class="stat" id="percent">0%</div><div class="bar"><span id="progress"></span></div><div class="muted" id="count">0 of 0 tasks completed</div></div><div class="card"><h2>Milestone</h2><h3 id="milestone">Build role-ready foundations</h3><p class="muted">Complete the core learning tasks and produce one small proof of practice.</p><span class="tag" id="roleTag">AI / ML Engineer</span><span class="tag" id="levelTag">Beginner</span></div><div class="card"><h2>Learning notes</h2><textarea id="notes" rows="5" placeholder="Record key concepts, questions or mistakes..."></textarea><button id="saveNotes" style="margin-top:8px">Save notes</button><span class="muted" id="noteStatus" style="margin-left:8px"></span></div></div></div></section>
 <section id="resources" class="panel"><div class="card"><h2>Curated learning library</h2><div class="row"><div><label for="topicFilter">Topic</label><select id="topicFilter"><option value="All">All topics</option><option>Python</option><option>Machine Learning</option><option>SQL</option><option>Git & Projects</option><option>Cloud</option></select></div><div><label for="levelFilter">Level</label><select id="levelFilter"><option value="All">All levels</option><option>Beginner</option><option>Intermediate</option></select></div></div><div id="resourceList"></div></div></section>
@@ -65,7 +76,64 @@
  <div class="card"><div class="row"><div><h2>Calendar & upcoming actions</h2><p class="muted small">A date-ordered agenda for application dates and deadlines.</p></div><div><label for="calendarMonth">Month</label><input id="calendarMonth" type="month"></div><button class="secondary" id="clearCalendarFilter" type="button">Show all dates</button></div><div id="jobCalendar"></div></div>
 </section>
 
-</main>
+
+<section id="analytics" class="panel">
+ <div class="hero">
+  <div><h2>Learning & placement preparation analytics</h2>
+   <p class="muted">A local summary of activity recorded in this browser. These indicators measure practice activity, not placement probability or hiring readiness.</p>
+  </div>
+  <button type="button" id="printAnalytics" class="no-print">Print / Save as PDF</button>
+ </div>
+ <div class="grid">
+  <div class="card">
+   <h2>Learning progress</h2>
+   <div class="stat" id="analyticsRoadmap">0%</div>
+   <div class="bar"><span id="analyticsRoadmapBar"></span></div>
+   <div class="muted small" id="analyticsRoadmapText">Roadmap tasks completed</div>
+  </div>
+  <div class="card">
+   <h2>Aptitude practice</h2>
+   <div class="split">
+    <div><div class="stat" id="analyticsAptAttempts">0</div><div class="muted small">Submitted attempts</div></div>
+    <div><div class="stat" id="analyticsAptAccuracy">—</div><div class="muted small">Accuracy</div></div>
+   </div>
+   <div class="bar"><span id="analyticsAptBar"></span></div>
+  </div>
+  <div class="card">
+   <h2>Coding & DSA</h2>
+   <div class="stat" id="analyticsCoding">0 / 0</div>
+   <div class="bar"><span id="analyticsCodingBar"></span></div>
+   <div class="muted small">Problems marked as self-practiced</div>
+  </div>
+  <div class="card">
+   <h2>Mock interview practice</h2>
+   <div class="stat" id="analyticsInterview">—</div>
+   <div class="muted small" id="analyticsInterviewText">Average completed-session rubric score</div>
+  </div>
+  <div class="card">
+   <h2>Job application activity</h2>
+   <div class="split">
+    <div><div class="stat" id="analyticsJobs">0</div><div class="muted small">Real records tracked</div></div>
+    <div><div class="stat" id="analyticsApplied">0</div><div class="muted small">Applied or later stage</div></div>
+   </div>
+   <div id="analyticsJobStages" class="small" style="margin-top:12px"></div>
+  </div>
+  <div class="card">
+   <h2>Upcoming actions</h2>
+   <div class="split">
+    <div><div class="stat" id="analyticsUpcoming">0</div><div class="muted small">Due in next 7 days</div></div>
+    <div><div class="stat" id="analyticsOverdue">0</div><div class="muted small">Overdue</div></div>
+   </div>
+   <div id="analyticsDeadlines" class="small" style="margin-top:12px"></div>
+  </div>
+ </div>
+ <div class="card">
+  <h2>Report notes</h2>
+  <p class="muted small">The report uses saved browser data from the Weekly roadmap, Aptitude practice, Coding & DSA, Interview simulator and Jobs & calendar sections. Demo job examples are excluded from job totals. If browser data is cleared or you use another device/browser, these figures may differ.</p>
+  <p class="muted small" id="analyticsGenerated"></p>
+ </div>
+</section>
+\n</main>
 <footer><strong>Built with Claude as part of the AB Talks 60-Day Claude AI Challenge.</strong><br>Day 58 · Job discovery, application tracking & calendar · Local browser storage</footer>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -188,6 +256,60 @@ function renderReminders(list){const rows=list.filter(j=>j.deadline&&!['Rejected
 function renderCalendar(list){const month=$('#calendarMonth').value;let events=[];list.forEach(j=>{if(j.applied)events.push({date:j.applied,label:'Applied',job:j});if(j.deadline)events.push({date:j.deadline,label:'Deadline / next action',job:j})});events=events.filter(e=>!month||e.date.startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date));$('#jobCalendar').innerHTML=events.length?events.map(e=>`<div class="history"><div class="row"><strong>${dateLabel(e.date)}</strong><span class="tag">${e.label}</span></div><div>${escapeJob(e.job.title)} · ${escapeJob(e.job.company)}</div><div class="small muted">${escapeJob(e.job.status)}${e.job.demo?' · DEMO':''} · ${escapeJob(e.job.nextAction||'No next action specified')}</div></div>`).join(''):'<div class="empty">No application dates or deadlines for this period.</div>'}
 $('#jobForm').addEventListener('submit',saveJobForm);$('#cancelJobEdit').addEventListener('click',()=>{resetJobForm();$('#jobFormMessage').textContent='Edit cancelled.'});$('#jobFilter').addEventListener('change',renderJobs);$('#jobSearch').addEventListener('input',renderJobs);$('#calendarMonth').addEventListener('change',()=>renderCalendar(getJobData()));$('#clearCalendarFilter').addEventListener('click',()=>{$('#calendarMonth').value='';renderCalendar(getJobData())});$('#jobList').addEventListener('click',e=>{const edit=e.target.closest('[data-edit-job]'),del=e.target.closest('[data-delete-job]');if(edit)editJob(edit.dataset.editJob);if(del)deleteJob(del.dataset.deleteJob)});
 $('#jobChecked').value=localDate();renderJobs();
+
+// Day 58 Analytics — derived only from locally stored user activity.
+function renderAnalytics(){
+ const state=readState();
+ const tasks=makeTasks();
+ const completed=tasks.filter(t=>state.done.includes(t)).length;
+ const roadmapPct=tasks.length?Math.round(completed/tasks.length*100):0;
+ $('#analyticsRoadmap').textContent=roadmapPct+'%';
+ $('#analyticsRoadmapBar').style.width=roadmapPct+'%';
+ $('#analyticsRoadmapText').textContent=`${completed} of ${tasks.length} current roadmap tasks completed`;
+
+ const attempts=state.aptAttempts||[];
+ const correct=attempts.filter(x=>x.correct).length;
+ const accuracy=attempts.length?Math.round(correct/attempts.length*100):null;
+ $('#analyticsAptAttempts').textContent=attempts.length;
+ $('#analyticsAptAccuracy').textContent=accuracy===null?'—':accuracy+'%';
+ $('#analyticsAptBar').style.width=(accuracy||0)+'%';
+
+ const coding=(state.codingDone||[]).filter(id=>problems.some(p=>p.id===id)).length;
+ const codingPct=problems.length?Math.round(coding/problems.length*100):0;
+ $('#analyticsCoding').textContent=`${coding} / ${problems.length}`;
+ $('#analyticsCodingBar').style.width=codingPct+'%';
+
+ const sessions=state.interviewSessions||[];
+ const avg=sessions.length?Math.round(sessions.reduce((sum,x)=>sum+(Number(x.score)||0),0)/sessions.length):null;
+ $('#analyticsInterview').textContent=avg===null?'—':avg+'/100';
+ $('#analyticsInterviewText').textContent=sessions.length
+  ? `${sessions.length} completed session(s) · average practice rubric score`
+  : 'No completed interview sessions recorded';
+
+ const jobs=getJobData().filter(j=>!j.demo);
+ const applied=jobs.filter(j=>['Applied','Assessment','Interview','Offer'].includes(j.status)).length;
+ $('#analyticsJobs').textContent=jobs.length;
+ $('#analyticsApplied').textContent=applied;
+ $('#analyticsJobStages').innerHTML=JOB_STATUSES.map(st=>
+  `<div class="row"><span>${escapeJob(st)}</span><strong>${jobs.filter(j=>j.status===st).length}</strong></div>`
+ ).join('');
+
+ const dated=jobs.filter(j=>j.deadline&&!['Rejected','Withdrawn','Offer'].includes(j.status))
+  .map(j=>({...j,delta:daysUntil(j.deadline)}));
+ const upcoming=dated.filter(j=>j.delta>=0&&j.delta<=7);
+ const overdue=dated.filter(j=>j.delta<0);
+ $('#analyticsUpcoming').textContent=upcoming.length;
+ $('#analyticsOverdue').textContent=overdue.length;
+ const deadlineRows=[...overdue.map(j=>({...j,kind:'Overdue'})),...upcoming.map(j=>({...j,kind:'Upcoming'}))]
+  .sort((a,b)=>a.delta-b.delta).slice(0,8);
+ $('#analyticsDeadlines').innerHTML=deadlineRows.length?deadlineRows.map(j=>
+  `<div class="history"><strong>${escapeJob(j.title)}</strong><div class="muted small">${escapeJob(j.company)} · ${j.kind} · ${dateLabel(j.deadline)}</div></div>`
+ ).join(''):'<div class="empty">No upcoming or overdue actions recorded.</div>';
+ $('#analyticsGenerated').textContent='Report generated: '+new Date().toLocaleString();
+}
+$('#printAnalytics').addEventListener('click',()=>{renderAnalytics();window.print()});
+
+renderAnalytics();
 
 </script>
 </body></html>
